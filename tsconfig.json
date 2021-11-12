@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "lib": ["ESNext"],
+        "target": "ES2020",
+        "module": "esnext",
+        "composite": true,
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+        "strict": false,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "isolatedModules": true,
+        "outDir": "build/esm",
+        "rootDir": "src"
+    },
+    "include": ["src"]
+}
