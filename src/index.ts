@@ -149,6 +149,62 @@ class MulNode extends INode {
     }
 }
 
+abstract class MathNode extends INode {
+    protected constructor(data: unknown | unknown[], globalsHash: string) {
+        super(data, globalsHash)
+    }
+
+    protected get items() {
+        let item1 = this.data[0]
+        let item2 = this.data[1]
+
+        if (item1.isNode) {
+            item1 = item1.solve()
+        }
+
+        if (item2.isNode) {
+            item2 = item2.solve()
+        }
+
+        return [item1, item2]
+    }
+}
+
+class LeNode extends MathNode {
+    public constructor(data: unknown | unknown[], globalsHash: string) {
+        super(data, globalsHash)
+    }
+
+    override solve(): boolean {
+        const [item1, item2] = this.items
+
+        return item1 <= item2
+    }
+}
+
+class GeNode extends MathNode {
+    public constructor(data: unknown | unknown[], globalsHash: string) {
+        super(data, globalsHash)
+    }
+
+    override solve(): boolean {
+        const [item1, item2] = this.items
+
+        return item1 >= item2
+    }
+}
+
+class TimerAfterNode extends INode {
+    public constructor(data: unknown | unknown[], globalsHash: string) {
+        super(data, globalsHash)
+    }
+
+    solve(): boolean {
+        // timers will run out eventually
+        return true
+    }
+}
+
 function hasOwn(target: unknown, value: string): boolean {
     return Object.prototype.hasOwnProperty.call(target, value)
 }
@@ -172,6 +228,18 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
 
     if (hasOwn(parent, "$mul")) {
         return new MulNode(parent["$mul"], globalsHash)
+    }
+
+    if (hasOwn(parent, "$ge")) {
+        return new GeNode(parent["$ge"], globalsHash)
+    }
+
+    if (hasOwn(parent, "$le")) {
+        return new LeNode(parent["$le"], globalsHash)
+    }
+
+    if (hasOwn(parent, "$after")) {
+        return new TimerAfterNode(parent["$after"], globalsHash)
     }
 }
 
