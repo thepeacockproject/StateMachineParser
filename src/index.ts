@@ -1,15 +1,34 @@
 export type Globals = Record<string, string | boolean | number>
 
 abstract class INode {
-    protected constructor(data: unknown, globals: Globals) {
+    protected constructor(data: unknown[], globals: Globals) {
         this.data = data
-        this.isSolved = false
         this.globals = globals
     }
 
-    data
+    isNode = true
+
+    data: unknown[]
     globals: Globals
-    isSolved: boolean
+
+    serialize() {
+        let i = 0
+
+        while (this.data && this.data[i]) {
+            let item = this.data[i]
+
+            if (typeof item === "string" && item.includes(".")) {
+                item = $referenceToData(item, this.globals)
+            }
+
+            if (typeof item === "object") {
+                item = getNewNodes(item, this.globals)
+            }
+
+            this.data[i] = item
+            i++
+        }
+    }
 
     abstract solve(): boolean
 }
@@ -33,21 +52,67 @@ class EqNode extends INode {
 
     public constructor(data: unknown[], globals: Globals) {
         super(data, globals)
+        this.serialize()
     }
 
     solve(): boolean {
         let item1 = this.data[0]
         let item2 = this.data[1]
 
-        if (typeof item1 === "string" && item1.includes(".")) {
-            item1 = $referenceToData(item1, this.globals)
+        if (item1.isNode) {
+            item1 = item1.solve()
         }
 
-        if (typeof item2 === "string" && item2.includes(".")) {
-            item2 = $referenceToData(item2, this.globals)
+        if (item2.isNode) {
+            item2 = item2.solve()
         }
 
         return item1 === item2
+    }
+}
+
+class AndNode extends INode {
+    public constructor(data: unknown[], globals: Globals) {
+        super(data, globals)
+        this.serialize()
+    }
+
+    solve(): boolean {
+        let i = 0
+
+        while (this.data && this.data[i]) {
+            let item = this.data[i]
+
+            if (item.isNode) {
+                item = item.solve()
+            }
+
+            if (!item) {
+                return false
+            }
+
+            i++
+        }
+
+        return true
+    }
+}
+
+class NotNode extends INode {
+    public constructor(data: unknown[], globals: Globals) {
+        super(data, globals)
+        this.serialize()
+    }
+
+    solve(): boolean {
+        let item = this.data as INode
+        let bool = false
+
+        if ((item as INode).isNode) {
+            bool = item.solve()
+        }
+
+        return !bool
     }
 }
 
@@ -55,9 +120,17 @@ function hasOwn(target: unknown, value: string): boolean {
     return Object.prototype.hasOwnProperty.call(target, value)
 }
 
-function getNewNodes(parent: unknown, globals: Globals, callback): undefined | INode {
+function getNewNodes(parent: unknown, globals: Globals): undefined | INode {
     if (hasOwn(parent, "$eq")) {
         return new EqNode(parent.$eq, globals)
+    }
+
+    if (hasOwn(parent, "$and")) {
+        return new AndNode(parent.$and, globals)
+    }
+
+    if (hasOwn(parent, "$not")) {
+        return new NotNode(parent.$not, globals)
     }
 }
 
@@ -68,17 +141,8 @@ export class StateMachine {
         this.globals = globals
     }
 
-    check<T = unknown>(params: T): boolean {
-        const pendingNodes = []
-
-        const n = getNewNodes(params, this.globals, (o) => pendingNodes.push(o))
-
-        if (n) {
-            pendingNodes.push(n)
-        }
-
-        let allAreEq = true
-
-        return allAreEq
+    check(params: unknown): boolean {
+        const n = getNewNodes(params, this.globals)
+        return n.solve() // should be a boolean
     }
 }
