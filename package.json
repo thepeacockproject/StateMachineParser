@@ -1,8 +1,17 @@
 {
-    "name": "@peacock/statemachines",
+    "name": "@peacock/statemachine-parser",
     "version": "1.0.0",
     "description": "IOI state machine conditional parser.",
-    "main": "index.js",
+    "main": "build/cjs/index.js",
+    "module": "build/esm/index.js",
+    "homepage": "https://thepeacockproject.org",
+    "keywords": [
+        "ioi",
+        "state",
+        "machines",
+        "glacier",
+        "modding"
+    ],
     "repository": "https://github.com/thepeacockproject/StateMachineParser",
     "author": "The Peacock Project <admin@thepeacockproject.org> (https://thepeacockproject.org)",
     "license": "EPL-2.0",
@@ -15,10 +24,14 @@
     },
     "scripts": {
         "prettier": "prettier --write \"**/*.{ts,md,json}\"",
-        "build": "tsc && tsc -p ./tsconfig-cjs.json"
+        "build": "tsc && tsc -p ./tsconfig-cjs.json",
+        "postinstall": "yarn build"
     },
     "prettier": {
         "semi": false,
         "tabWidth": 4
+    },
+    "dependencies": {
+        "tslib": "^2.3.1"
     }
 }

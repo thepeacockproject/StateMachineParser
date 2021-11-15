@@ -5,12 +5,13 @@ __metadata:
   version: 5
   cacheKey: 8
 
-"@peacock/statemachines@workspace:.":
+"@peacock/statemachine-parser@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@peacock/statemachines@workspace:."
+  resolution: "@peacock/statemachine-parser@workspace:."
   dependencies:
     "@types/node": ^16.11.7
     prettier: ^2.4.1
+    tslib: ^2.3.1
     typescript: ^4.4.4
   languageName: unknown
   linkType: soft
@@ -28,6 +29,13 @@ __metadata:
   bin:
     prettier: bin-prettier.js
   checksum: cc6830588b401b0d742862fe9c46bc9118204fb307c3abe0e49e95b35ed23629573807ffdf9cdd65289c252a0bb51fc0171437f6626ee36378dea80f0ee80b91
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "tslib@npm:2.3.1"
+  checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
   languageName: node
   linkType: hard
 

@@ -8,6 +8,8 @@
         "declaration": true,
         "declarationMap": true,
         "strict": false,
+        "importHelpers": true,
+        "noEmitHelpers": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
         "isolatedModules": true,
