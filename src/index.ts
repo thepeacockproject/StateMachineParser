@@ -1,33 +1,51 @@
 import { createHash } from "crypto"
 
 export type Globals = Record<string, string | boolean | number>
+export type NodeData =
+    | string
+    | INode
+    | Record<string, unknown>
+    | boolean
+    | Array<NodeData>
 
 export const _globalsCache: Map<string, Record<string, unknown>> = new Map()
 
 abstract class INode {
-    protected constructor(data: unknown | unknown[], globalsHash: string) {
+    protected constructor(data: NodeData, globalsHash: string) {
         this.data = data
         this.globalsHash = globalsHash
-        this.serialize()
     }
 
+    /**
+     * Used to determine if a data object is a node instance or not.
+     */
     isNode = true
 
-    data: unknown | unknown[]
+    data: NodeData
     globalsHash: string
 
-    protected serialize() {
+    /**
+     * Modifies the data fields to match what they would at runtime.
+     * Also transforms object children into INode instances.
+     *
+     * @protected
+     */
+    protected serialize(): void {
         let i = 0
 
         while (this.data && this.data[i]) {
-            let item = this.data[i]
+            let item: NodeData = this.data[i]
 
             if (typeof item === "string" && item.includes(".")) {
                 item = $referenceToData(item, this.globalsHash)
             }
 
             if (typeof item === "object") {
-                item = getNewNodes(item, this.globalsHash)
+                item = getNewNodes(item, this.globalsHash)!
+
+                if (item === undefined) {
+                    continue
+                }
             }
 
             this.data[i] = item
@@ -38,7 +56,10 @@ abstract class INode {
     abstract solve(): boolean | number
 }
 
-function $referenceToData(reference: unknown, globalsHash: string): unknown | boolean {
+function $referenceToData(
+    reference: unknown,
+    globalsHash: string
+): NodeData | boolean {
     const clone = `${reference}`
     reference = _globalsCache.get(globalsHash)
     // the thing has a dot in it, which means that its accessing a global
@@ -49,12 +70,14 @@ function $referenceToData(reference: unknown, globalsHash: string): unknown | bo
         reference = reference?.[part]
     }
 
+    // @ts-expect-error Literal object child finding.
     return reference
 }
 
 class EqNode extends INode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData, globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): boolean {
@@ -74,8 +97,9 @@ class EqNode extends INode {
 }
 
 class AndNode extends INode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData | NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): boolean {
@@ -100,8 +124,9 @@ class AndNode extends INode {
 }
 
 class NotNode extends INode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData, globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): boolean {
@@ -117,8 +142,9 @@ class NotNode extends INode {
 }
 
 class PushUniqueNode extends INode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): boolean {
@@ -132,8 +158,9 @@ class PushUniqueNode extends INode {
 }
 
 class MulNode extends INode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): number {
@@ -155,8 +182,9 @@ class MulNode extends INode {
  * A math based node.
  */
 abstract class MathNode extends INode {
-    protected constructor(data: unknown | unknown[], globalsHash: string) {
+    protected constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     protected get items() {
@@ -176,8 +204,9 @@ abstract class MathNode extends INode {
 }
 
 class LeNode extends MathNode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): boolean {
@@ -188,8 +217,9 @@ class LeNode extends MathNode {
 }
 
 class GeNode extends MathNode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): boolean {
@@ -202,8 +232,9 @@ class GeNode extends MathNode {
 //#endregion
 
 class TimerAfterNode extends INode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData, globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     solve(): boolean {
@@ -213,8 +244,9 @@ class TimerAfterNode extends INode {
 }
 
 class OrNode extends INode {
-    public constructor(data: unknown | unknown[], globalsHash: string) {
+    public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.serialize()
     }
 
     override solve(): boolean {
@@ -239,18 +271,22 @@ class OrNode extends INode {
 }
 
 function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
+    type D = NodeData
+
     const node = parent as {
-        $eq?: unknown
-        $and?: unknown
-        $not?: unknown
-        $pushunique?: unknown
-        $mul?: unknown
-        $ge?: unknown
-        $le?: unknown
-        $after?: unknown
-        $or?: unknown
-        in?: string
-        "?"?: unknown
+        $eq?: D
+        $and?: D
+        $not?: D
+        $pushunique?: D
+        $mul?: D
+        $ge?: D
+        $le?: D
+        $after?: D
+        $or?: D
+        $inarray: {
+            in?: D
+            "?"?: D
+        }
     }
 
     if (node.$eq) {
@@ -266,18 +302,22 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
     }
 
     if (node.$pushunique) {
+        // @ts-expect-error Array.
         return new PushUniqueNode(node.$pushunique, globalsHash)
     }
 
     if (node.$mul) {
+        // @ts-expect-error Array.
         return new MulNode(node.$mul, globalsHash)
     }
 
     if (node.$ge) {
+        // @ts-expect-error Array.
         return new GeNode(node.$ge, globalsHash)
     }
 
     if (node.$le) {
+        // @ts-expect-error Array.
         return new LeNode(node.$le, globalsHash)
     }
 
@@ -286,8 +326,12 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
     }
 
     if (node.$or) {
+        // @ts-expect-error Array.
         return new OrNode(node.$or, globalsHash)
     }
+
+    console.warn(`no possible solver for ${JSON.stringify(node)}`)
+    return null
 }
 
 function calculateGlobalsHash(globals: Globals): string {
@@ -298,17 +342,15 @@ function calculateGlobalsHash(globals: Globals): string {
     return hash.digest("hex")
 }
 
-export class StateMachine {
-    protected _globalsHash: string
+export function check(stateMachineConds: unknown, globals: Globals): boolean {
+    const globalsHash = calculateGlobalsHash(globals)
+    _globalsCache.set(globalsHash, globals)
 
-    public constructor(globals: Globals) {
-        const globalsHash = (this._globalsHash = calculateGlobalsHash(globals))
+    const n = getNewNodes(stateMachineConds, globalsHash)
 
-        _globalsCache.set(globalsHash, globals)
-    }
+    const result = n?.solve() as boolean // should be a boolean
 
-    public check(params: unknown): boolean {
-        const n = getNewNodes(params, this._globalsHash)
-        return n.solve() as boolean // should be a boolean
-    }
+    _globalsCache.delete(globalsHash)
+
+    return result
 }

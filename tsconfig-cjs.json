@@ -3,6 +3,7 @@
     "compilerOptions": {
         "outDir": "build/cjs",
         "module": "CommonJS",
-        "rootDir": "src"
+        "rootDir": "src",
+        "target": "ES2018"
     }
 }

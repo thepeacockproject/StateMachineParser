@@ -10,10 +10,7 @@ For example:
 
 ```json
 {
-    "$eq": [
-        "$Value.MyParameter",
-        "Hello"
-    ]
+    "$eq": ["$Value.MyParameter", "Hello"]
 }
 ```
 
@@ -45,15 +42,10 @@ then you can add the files from the `build` folder to your project manually.
 ## Usage
 
 ```js
-const { StateMachine } = require("@peacockproject/statemachine-parser")
+const { check } = require("@peacockproject/statemachine-parser")
 
-const s = new StateMachine(
-    {} // the condition is the only param that the constructor should be given. it is required!
+const result = check(
+    {}, // the state machine condition
+    { $Value: {} }, // the globals object, which is essentially the input values.
 )
-
-s.check(
-    { $Value: {} }
-) // the check method accepts the globals object, which is essentially the input values.
-
-// this specific example wouldn't work, because `{}` isn't a valid state machine.
 ```
