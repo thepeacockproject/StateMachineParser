@@ -38,7 +38,7 @@ abstract class INode {
     abstract solve(): boolean | number
 }
 
-function $referenceToData(reference: unknown, globalsHash: string) {
+function $referenceToData(reference: unknown, globalsHash: string): unknown | boolean {
     const clone = `${reference}`
     reference = _globalsCache.get(globalsHash)
     // the thing has a dot in it, which means that its accessing a global
@@ -149,6 +149,11 @@ class MulNode extends INode {
     }
 }
 
+//#region Math ($gt, $lt)
+
+/**
+ * A math based node.
+ */
 abstract class MathNode extends INode {
     protected constructor(data: unknown | unknown[], globalsHash: string) {
         super(data, globalsHash)
@@ -194,6 +199,8 @@ class GeNode extends MathNode {
     }
 }
 
+//#endregion
+
 class TimerAfterNode extends INode {
     public constructor(data: unknown | unknown[], globalsHash: string) {
         super(data, globalsHash)
@@ -205,41 +212,81 @@ class TimerAfterNode extends INode {
     }
 }
 
-function hasOwn(target: unknown, value: string): boolean {
-    return Object.prototype.hasOwnProperty.call(target, value)
+class OrNode extends INode {
+    public constructor(data: unknown | unknown[], globalsHash: string) {
+        super(data, globalsHash)
+    }
+
+    override solve(): boolean {
+        let i = 0
+
+        while (this.data && this.data[i]) {
+            let item = this.data[i]
+
+            if (item.isNode) {
+                item = item.solve() as boolean
+            }
+
+            if (item === true) {
+                return true
+            }
+
+            i++
+        }
+
+        return false
+    }
 }
 
 function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
-    if (hasOwn(parent, "$eq")) {
-        return new EqNode((parent as { $eq: unknown })["$eq"], globalsHash)
+    const node = parent as {
+        $eq?: unknown
+        $and?: unknown
+        $not?: unknown
+        $pushunique?: unknown
+        $mul?: unknown
+        $ge?: unknown
+        $le?: unknown
+        $after?: unknown
+        $or?: unknown
+        in?: string
+        "?"?: unknown
     }
 
-    if (hasOwn(parent, "$and")) {
-        return new AndNode(parent["$and"], globalsHash)
+    if (node.$eq) {
+        return new EqNode(node.$eq, globalsHash)
     }
 
-    if (hasOwn(parent, "$not")) {
-        return new NotNode(parent["$not"], globalsHash)
+    if (node.$and) {
+        return new AndNode(node.$and, globalsHash)
     }
 
-    if (hasOwn(parent, "$pushunique")) {
-        return new PushUniqueNode(parent["$pushunique"], globalsHash)
+    if (node.$not) {
+        return new NotNode(node.$not, globalsHash)
     }
 
-    if (hasOwn(parent, "$mul")) {
-        return new MulNode(parent["$mul"], globalsHash)
+    if (node.$pushunique) {
+        return new PushUniqueNode(node.$pushunique, globalsHash)
     }
 
-    if (hasOwn(parent, "$ge")) {
-        return new GeNode(parent["$ge"], globalsHash)
+    if (node.$mul) {
+        return new MulNode(node.$mul, globalsHash)
     }
 
-    if (hasOwn(parent, "$le")) {
-        return new LeNode(parent["$le"], globalsHash)
+    if (node.$ge) {
+        return new GeNode(node.$ge, globalsHash)
     }
 
-    if (hasOwn(parent, "$after")) {
-        return new TimerAfterNode(parent["$after"], globalsHash)
+    if (node.$le) {
+        return new LeNode(node.$le, globalsHash)
+    }
+
+    if (node.$after) {
+        return new TimerAfterNode(node.$after, globalsHash)
+    }
+
+    if (node.$or) {
+        return new OrNode(node.$or, globalsHash)
     }
 }
 
