@@ -1,4 +1,5 @@
 import { createHash } from "crypto"
+import arrayEqual from "array-equal"
 
 export type Globals = Record<string, string | boolean | number>
 export type NodeData =
@@ -31,26 +32,27 @@ abstract class INode {
      * @protected
      */
     protected serialize(): void {
-        let i = 0
-
-        while (this.data && this.data[i]) {
-            let item: NodeData = this.data[i]
-
+        const eachItemPredicate = (item: NodeData) => {
             if (typeof item === "string" && item.includes(".")) {
-                item = $referenceToData(item, this.globalsHash)
+                return $referenceToData(item, this.globalsHash)
             }
 
-            if (typeof item === "object") {
-                item = getNewNodes(item, this.globalsHash)!
-
-                if (item === undefined) {
-                    continue
-                }
+            if (typeof item === "object" && !Array.isArray(item)) {
+                return getNewNodes(item, this.globalsHash)!
             }
 
-            this.data[i] = item
-            i++
+            return item
         }
+
+        if (!Array.isArray(this.data)) {
+            Object.keys(this.data).forEach((key) => {
+                this.data[key] = eachItemPredicate(this.data[key])
+            })
+
+            return
+        }
+
+        this.data = this.data.map(eachItemPredicate)
     }
 
     abstract solve(): boolean | number
@@ -75,7 +77,7 @@ function $referenceToData(
 }
 
 class EqNode extends INode {
-    public constructor(data: NodeData, globalsHash: string) {
+    public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
         this.serialize()
     }
@@ -83,6 +85,14 @@ class EqNode extends INode {
     override solve(): boolean {
         let item1 = this.data[0]
         let item2 = this.data[1]
+
+        if (!item1 && item1 !== false) {
+            return false
+        }
+
+        if (!item2 && item2 !== false) {
+            return false
+        }
 
         if (item1.isNode) {
             item1 = item1.solve()
@@ -92,12 +102,14 @@ class EqNode extends INode {
             item2 = item2.solve()
         }
 
-        return item1 === item2
+        return Array.isArray(item1) || Array.isArray(item2)
+            ? arrayEqual(item1, item2)
+            : item1 === item2
     }
 }
 
 class AndNode extends INode {
-    public constructor(data: NodeData | NodeData[], globalsHash: string) {
+    public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
         this.serialize()
     }
@@ -112,7 +124,13 @@ class AndNode extends INode {
                 item = item.solve() as boolean
             }
 
-            if (!item) {
+            if (item === null || item === undefined) {
+                throw new Error(
+                    "Looks like your item is either null or undefined, that's not a boolean!!"
+                )
+            }
+
+            if (item === false) {
                 return false
             }
 
@@ -182,11 +200,6 @@ class MulNode extends INode {
  * A math based node.
  */
 abstract class MathNode extends INode {
-    protected constructor(data: NodeData[], globalsHash: string) {
-        super(data, globalsHash)
-        this.serialize()
-    }
-
     protected get items() {
         let item1 = this.data[0]
         let item2 = this.data[1]
@@ -250,23 +263,17 @@ class OrNode extends INode {
     }
 
     override solve(): boolean {
-        let i = 0
-
-        while (this.data && this.data[i]) {
-            let item = this.data[i]
-
-            if (item.isNode) {
-                item = item.solve() as boolean
-            }
-
-            if (item === true) {
-                return true
-            }
-
-            i++
+        if (!Array.isArray(this.data)) {
+            return false
         }
 
-        return false
+        return this.data.some((item) => {
+            if ((item as INode).isNode) {
+                item = (item as INode).solve() as boolean
+            }
+
+            return item === true
+        })
     }
 }
 
@@ -289,11 +296,17 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
         }
     }
 
+    if (node === null) {
+        return null
+    }
+
     if (node.$eq) {
+        // @ts-expect-error Array.
         return new EqNode(node.$eq, globalsHash)
     }
 
     if (node.$and) {
+        // @ts-expect-error Array.
         return new AndNode(node.$and, globalsHash)
     }
 
