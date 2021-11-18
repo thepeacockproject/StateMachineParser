@@ -14,8 +14,7 @@
     ],
     "repository": "https://github.com/thepeacockproject/StateMachineParser",
     "author": "The Peacock Project <admin@thepeacockproject.org> (https://thepeacockproject.org)",
-    "license": "EPL-2.0",
-    "private": true,
+    "license": "Apache-2.0",
     "packageManager": "yarn@3.1.0",
     "devDependencies": {
         "@types/jest": "^27.0.2",
@@ -37,5 +36,8 @@
     "dependencies": {
         "array-equal": "^1.0.0",
         "tslib": "^2.3.1"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }
