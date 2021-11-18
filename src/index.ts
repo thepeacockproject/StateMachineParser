@@ -229,7 +229,7 @@ class LeNode extends MathNode {
     }
 }
 
-class GeNode extends MathNode {
+class GtNode extends MathNode {
     public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
         this.serialize()
@@ -238,7 +238,7 @@ class GeNode extends MathNode {
     override solve(): boolean {
         const [item1, item2] = this.items
 
-        return item1 >= item2
+        return item1 > item2
     }
 }
 
@@ -286,7 +286,7 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
         $not?: D
         $pushunique?: D
         $mul?: D
-        $ge?: D
+        $gt?: D
         $le?: D
         $after?: D
         $or?: D
@@ -324,9 +324,9 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
         return new MulNode(node.$mul, globalsHash)
     }
 
-    if (node.$ge) {
+    if (node.$gt) {
         // @ts-expect-error Array.
-        return new GeNode(node.$ge, globalsHash)
+        return new GtNode(node.$gt, globalsHash)
     }
 
     if (node.$le) {
