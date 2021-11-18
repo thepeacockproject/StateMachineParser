@@ -13,7 +13,8 @@
         "moduleResolution": "node",
         "isolatedModules": true,
         "outDir": "build/esm",
-        "rootDir": "src"
+        "rootDir": "src",
+        "skipLibCheck": true
     },
     "include": ["src"]
 }
