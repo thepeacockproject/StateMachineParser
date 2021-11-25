@@ -20,24 +20,28 @@ Normally, only the actual Glacier engine could check the output of this conditio
 
 ## How to Use
 
-Right now, the package isn't published on npm, so you need to install from source.
+### Install from npm
 
-If you use yarn v2 or v3:
+You can run:
 
 ```shell
-yarn add @peacockproject/statemachine-parser@thepeacockproject/StateMachineParser
+yarn add @peacockproject/statemachine-parser
 ```
 
-Or, if you use something else:
+Or, if you use npm:
+
+```shell
+npm i @peacockproject/statemachine-parser
+```
+
+### Build from Source
 
 ```shell
 git clone https://github.com/thepeacockproject/StateMachineParser
 cd StateMachineParser
 # installs dependencies and builds
-yarn
+yarn && yarn build
 ```
-
-then you can add the files from the `build` folder to your project manually.
 
 ## Usage
 
