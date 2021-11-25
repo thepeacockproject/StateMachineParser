@@ -4,4 +4,5 @@ Test_task:
   Yarn_cache:
     folder: .yarn/cache
   Populate_script: yarn
+  Build_script: yarn build
   Run_Tests_script: yarn test
