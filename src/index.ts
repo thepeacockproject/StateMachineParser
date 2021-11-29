@@ -50,7 +50,7 @@ abstract class INode {
     protected serialize(): void {
         const eachItemPredicate = (item: NodeData) => {
             if (typeof item === "string" && item.includes(".")) {
-                return $referenceToData(item, this.globalsHash)
+                return findObjectChild(item, this.globalsHash)
             }
 
             if (typeof item === "object" && !Array.isArray(item)) {
@@ -74,22 +74,38 @@ abstract class INode {
     abstract solve(): boolean | number
 }
 
-function $referenceToData(
-    reference: unknown,
+function findObjectChild(
+    reference: string,
     globalsHash: string
 ): NodeData | boolean {
-    const clone = `${reference}`
-    reference = _globalsCache.get(globalsHash)
     // the thing has a dot in it, which means that its accessing a global
-    const parts = clone.split(".")
+    const parts = reference.split(".")
 
-    // this should iterate through it until we have the final child
-    for (const part of parts) {
-        reference = reference?.[part]
+    let obj: any = _globalsCache.get(globalsHash)
+
+    for (let part of parts) {
+        obj = obj?.[part]
     }
 
-    // @ts-expect-error Literal object child finding.
-    return reference
+    return obj as NodeData
+}
+
+function setObjectChild(
+    reference: string,
+    newData: any,
+    globalsHash: string
+): void {
+    let obj: any = _globalsCache.get(globalsHash)
+
+    const parts = reference.split(".")
+
+    for (let part of parts.slice(0, -1)) {
+        obj = obj[part]
+    }
+
+    obj[parts[parts.length - 1]] = newData
+
+    _globalsCache.set(globalsHash, obj)
 }
 
 class EqNode extends INode {
@@ -232,7 +248,7 @@ abstract class MathNode extends INode {
     }
 }
 
-class LeNode extends MathNode {
+class LtNode extends MathNode {
     public constructor(data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
         this.serialize()
@@ -241,7 +257,7 @@ class LeNode extends MathNode {
     override solve(): boolean {
         const [item1, item2] = this.items
 
-        return item1 <= item2
+        return item1 < item2
     }
 }
 
@@ -293,6 +309,99 @@ class OrNode extends INode {
     }
 }
 
+abstract class ISideEffectNode extends INode {
+    abstract solveSideEffects(globals: Globals): void
+
+    solve(): boolean {
+        this.solveSideEffects(
+            _globalsCache.get(this.globalsHash) as unknown as Globals
+        )
+
+        return true
+    }
+}
+
+export enum BasicMathOperator {
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division,
+}
+
+class BasicMathOperationsNode extends ISideEffectNode {
+    data: NodeData | NodeData[]
+    protected readonly mathOperator: BasicMathOperator
+
+    public constructor(
+        mathOperator: BasicMathOperator,
+        data: NodeData | NodeData[],
+        globalsHash: string
+    ) {
+        super(data, globalsHash)
+        this.mathOperator = mathOperator
+    }
+
+    override solveSideEffects(globals: Globals): void {
+        if (Array.isArray(this.data)) {
+            if (this.data.length < 1) {
+                throw new Error(
+                    "That's not valid, you can't do $inc on an empty array!"
+                )
+            }
+
+            if (this.data.length === 2) {
+                setObjectChild(
+                    this.data[0] as string,
+                    findObjectChild(
+                        this.data[1] as string,
+                        this.globalsHash
+                    ) as unknown as number,
+                    this.globalsHash
+                )
+                return
+            }
+
+            if (this.data.length === 3) {
+                const [oc1, oc2]: number[] = [
+                    findObjectChild(
+                        this.data[0] as any,
+                        this.globalsHash
+                    ) as any,
+                    findObjectChild(
+                        this.data[1] as any,
+                        this.globalsHash
+                    ) as any,
+                ]
+
+                // 1 * 2 = 3
+                setObjectChild(
+                    this.data[2] as string,
+                    this.mathOperator === BasicMathOperator.Multiplication
+                        ? oc1 * oc2
+                        : oc1 / oc2,
+                    this.globalsHash
+                )
+                return
+            }
+
+            if (this.data.length === 1) {
+                this.data = this.data[0]
+            }
+        }
+
+        const n: number = findObjectChild(
+            this.data as string,
+            this.globalsHash
+        ) as unknown as number
+
+        setObjectChild(
+            this.data as string,
+            this.mathOperator === BasicMathOperator.Addition ? n + 1 : n - 1,
+            this.globalsHash
+        )
+    }
+}
+
 function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
     type D = NodeData
 
@@ -302,8 +411,11 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
         $not?: D
         $pushunique?: D
         $mul?: D
+        $div?: D
+        $inc?: D
+        $dec?: D
         $gt?: D
-        $le?: D
+        $lt?: D
         $after?: D
         $or?: D
         $inarray: {
@@ -345,9 +457,25 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
         return new GtNode(node.$gt, globalsHash)
     }
 
-    if (node.$le) {
+    if (node.$lt) {
         // @ts-expect-error Array.
-        return new LeNode(node.$le, globalsHash)
+        return new LtNode(node.$lt, globalsHash)
+    }
+
+    if (node.$inc) {
+        return new BasicMathOperationsNode(BasicMathOperator.Addition, node.$inc, globalsHash)
+    }
+
+    if (node.$dec) {
+        return new BasicMathOperationsNode(BasicMathOperator.Subtraction, node.$dec, globalsHash)
+    }
+
+    if (node.$mul) {
+        return new BasicMathOperationsNode(BasicMathOperator.Multiplication, node.$mul, globalsHash)
+    }
+
+    if (node.$div) {
+        return new BasicMathOperationsNode(BasicMathOperator.Division, node.$div, globalsHash)
     }
 
     if (node.$after) {
@@ -371,7 +499,12 @@ function calculateGlobalsHash(globals: Globals): string {
     return hash.digest("hex")
 }
 
-export function check(stateMachineConds: unknown, globals: Globals): boolean {
+export interface CheckResult {
+    bool: boolean
+    globals: Globals
+}
+
+export function check(stateMachineConds: unknown, globals: Globals): CheckResult {
     const globalsHash = calculateGlobalsHash(globals)
     _globalsCache.set(globalsHash, globals)
 
@@ -379,7 +512,12 @@ export function check(stateMachineConds: unknown, globals: Globals): boolean {
 
     const result = n?.solve() as boolean // should be a boolean
 
+    const finalGlobals = _globalsCache.get(globalsHash)
+
     _globalsCache.delete(globalsHash)
 
-    return result
+    return {
+        bool: result,
+        globals: finalGlobals as Globals,
+    }
 }

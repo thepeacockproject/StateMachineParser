@@ -5,8 +5,8 @@ const data = {
         {
             $after: 10,
         },
-        {}
-    ]
+        {},
+    ],
 }
 
 it("returns true with a basic timer", () => {

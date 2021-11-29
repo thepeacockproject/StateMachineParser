@@ -11,10 +11,10 @@ const data = {
         {
             $or: [
                 {
-                    $eq: ["$Value.IsTrue", true]
+                    $eq: ["$Value.IsTrue", true],
                 },
                 {
-                    $eq: ["$Value.IsUndefined", "nothing here"]
+                    $eq: ["$Value.IsUndefined", "nothing here"],
                 },
             ],
         },
@@ -34,7 +34,7 @@ const data = {
             ],
         },
         {},
-    ]
+    ],
 }
 
 it("can do $or with booleans", () => {

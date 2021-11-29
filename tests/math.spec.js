@@ -10,7 +10,7 @@ const data = {
                 true,
             ],
         },
-        {}
+        {},
     ],
     Gt2: [
         {
@@ -21,7 +21,7 @@ const data = {
                 true,
             ],
         },
-        {}
+        {},
     ],
     Gt3: [
         {
@@ -32,8 +32,8 @@ const data = {
                 true,
             ],
         },
-        {}
-    ]
+        {},
+    ],
 }
 
 describe("$gt", () => {
