@@ -64,18 +64,18 @@ const data = {
 
 it("understands $and with equality", () => {
     const [sm, globals] = data.And1
-    expect(check(sm, globals)).toBe(true)
+    expect(check(sm, globals).bool).toBe(true)
 })
 
 it("$and fails when a condition is not met", () => {
     const [sm, globals] = data.And2
-    expect(check(sm, globals)).toBe(false)
+    expect(check(sm, globals).bool).toBe(false)
 })
 
 it("$and works with less and more than 2 conditions", () => {
     const [sm, globals] = data.And3
-    expect(check(sm, globals)).toBe(true)
+    expect(check(sm, globals).bool).toBe(true)
 
     const [sm2, globals2] = data.And4
-    expect(check(sm2, globals2)).toBe(true)
+    expect(check(sm2, globals2).bool).toBe(true)
 })

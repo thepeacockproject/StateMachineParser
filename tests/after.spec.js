@@ -11,5 +11,5 @@ const data = {
 
 it("returns true with a basic timer", () => {
     const [sm, globals] = data.After1
-    expect(check(sm, globals)).toBe(true)
+    expect(check(sm, globals).bool).toBe(true)
 })

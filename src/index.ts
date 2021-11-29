@@ -54,7 +54,7 @@ abstract class INode {
             }
 
             if (typeof item === "object" && !Array.isArray(item)) {
-                return getNewNodes(item, this.globalsHash)!
+                return getNewNodes(item, this.globalsHash) ?? item
             }
 
             return item
@@ -310,12 +310,10 @@ class OrNode extends INode {
 }
 
 abstract class ISideEffectNode extends INode {
-    abstract solveSideEffects(globals: Globals): void
+    abstract solveSideEffects(): void
 
     solve(): boolean {
-        this.solveSideEffects(
-            _globalsCache.get(this.globalsHash) as unknown as Globals
-        )
+        this.solveSideEffects()
 
         return true
     }
@@ -341,11 +339,11 @@ class BasicMathOperationsNode extends ISideEffectNode {
         this.mathOperator = mathOperator
     }
 
-    override solveSideEffects(globals: Globals): void {
+    override solveSideEffects(): void {
         if (Array.isArray(this.data)) {
             if (this.data.length < 1) {
                 throw new Error(
-                    "That's not valid, you can't do $inc on an empty array!"
+                    "That's not valid, you can't do $inc or $dec on an empty array!"
                 )
             }
 
@@ -402,6 +400,37 @@ class BasicMathOperationsNode extends ISideEffectNode {
     }
 }
 
+class SetNode extends ISideEffectNode {
+    public constructor(data: NodeData[], globalsHash: string) {
+        super(data, globalsHash)
+    }
+
+    override solveSideEffects(): void {
+        setObjectChild(
+            this.data[0],
+            findObjectChild(this.data[1], this.globalsHash),
+            this.globalsHash
+        )
+    }
+}
+
+class PushNode extends ISideEffectNode {
+    public constructor(data: NodeData[], globalsHash: string) {
+        super(data, globalsHash)
+    }
+
+    override solveSideEffects(): void {
+        const newArray: any[] = findObjectChild(
+            this.data[1],
+            this.globalsHash
+        ) as any[]
+
+        newArray.push(this.data[1])
+
+        setObjectChild(this.data[0] as string, newArray, this.globalsHash)
+    }
+}
+
 function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
     type D = NodeData
 
@@ -418,9 +447,11 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
         $lt?: D
         $after?: D
         $or?: D
-        $inarray: {
-            in?: D
-            "?"?: D
+        $set?: D
+        $push?: D
+        $inarray?: {
+            in: D
+            "?": D
         }
     }
 
@@ -463,19 +494,45 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
     }
 
     if (node.$inc) {
-        return new BasicMathOperationsNode(BasicMathOperator.Addition, node.$inc, globalsHash)
+        return new BasicMathOperationsNode(
+            BasicMathOperator.Addition,
+            node.$inc,
+            globalsHash
+        )
     }
 
     if (node.$dec) {
-        return new BasicMathOperationsNode(BasicMathOperator.Subtraction, node.$dec, globalsHash)
+        return new BasicMathOperationsNode(
+            BasicMathOperator.Subtraction,
+            node.$dec,
+            globalsHash
+        )
     }
 
     if (node.$mul) {
-        return new BasicMathOperationsNode(BasicMathOperator.Multiplication, node.$mul, globalsHash)
+        return new BasicMathOperationsNode(
+            BasicMathOperator.Multiplication,
+            node.$mul,
+            globalsHash
+        )
     }
 
     if (node.$div) {
-        return new BasicMathOperationsNode(BasicMathOperator.Division, node.$div, globalsHash)
+        return new BasicMathOperationsNode(
+            BasicMathOperator.Division,
+            node.$div,
+            globalsHash
+        )
+    }
+
+    if (node.$set) {
+        // @ts-expect-error Array.
+        return new SetNode(node.$set, globalsHash)
+    }
+
+    if (node.$push) {
+        // @ts-expect-error Array.
+        return new PushNode(node.$push, globalsHash)
     }
 
     if (node.$after) {
@@ -504,7 +561,10 @@ export interface CheckResult {
     globals: Globals
 }
 
-export function check(stateMachineConds: unknown, globals: Globals): CheckResult {
+export function check(
+    stateMachineConds: unknown,
+    globals: Globals
+): CheckResult {
     const globalsHash = calculateGlobalsHash(globals)
     _globalsCache.set(globalsHash, globals)
 

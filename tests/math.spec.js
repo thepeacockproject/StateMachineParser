@@ -39,16 +39,16 @@ const data = {
 describe("$gt", () => {
     it("understands $gt with equality", () => {
         const [sm, globals] = data.Gt1
-        expect(check(sm, globals)).toBe(true)
+        expect(check(sm, globals).bool).toBe(true)
     })
 
     it("does the math correctly", () => {
         const [sm, globals] = data.Gt2
-        expect(check(sm, globals)).toBe(false)
+        expect(check(sm, globals).bool).toBe(false)
     })
 
     it("fails with the same numbers", () => {
         const [sm, globals] = data.Gt3
-        expect(check(sm, globals)).toBe(false)
+        expect(check(sm, globals).bool).toBe(false)
     })
 })

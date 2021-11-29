@@ -39,15 +39,15 @@ const data = {
 
 it("can do $or with booleans", () => {
     const [sm, globals] = data.Or1
-    expect(check(sm, globals)).toBe(true)
+    expect(check(sm, globals).bool).toBe(true)
 })
 
 it("can do $or with equality", () => {
     const [sm, globals] = data.Or2
-    expect(check(sm, globals)).toBe(true)
+    expect(check(sm, globals).bool).toBe(true)
 })
 
 it("fails when neither condition is true", () => {
     const [sm, globals] = data.Or3
-    expect(check(sm, globals)).toBe(false)
+    expect(check(sm, globals).bool).toBe(false)
 })
