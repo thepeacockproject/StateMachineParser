@@ -456,7 +456,7 @@ class InArrayNode extends INode {
         const nodeCast = theItem as EqNode
         const nodeData = nodeCast.data as NodeData[]
 
-        let arrayItemIndex = (nodeData[0] as string).includes("#") ? 0 : 1
+        const arrayItemIndex = (nodeData[0] as string).includes("#") ? 0 : 1
 
         const e: string[][] = []
 
