@@ -78,6 +78,10 @@ function findObjectChild(
     reference: string,
     globalsHash: string
 ): NodeData | boolean {
+    if (reference.includes("#")) {
+        return reference
+    }
+
     // the thing has a dot in it, which means that its accessing a global
     const parts = reference.split(".")
 
@@ -181,7 +185,7 @@ class NotNode extends INode {
 
     override solve(): boolean {
         let item = this.data as INode
-        let bool = false
+        let bool: any = item
 
         if ((item as INode).isNode) {
             bool = item.solve() as boolean
@@ -312,7 +316,7 @@ class OrNode extends INode {
 abstract class ISideEffectNode extends INode {
     abstract solveSideEffects(): void
 
-    solve(): boolean {
+    override solve(): boolean {
         this.solveSideEffects()
 
         return true
@@ -431,6 +435,49 @@ class PushNode extends ISideEffectNode {
     }
 }
 
+/**
+ * The inarray node implementation is special, because it would be extremely difficult to account for
+ * every node appearing as the condition inside the "?" key, we instead assume it's an $eq node, and
+ * try to transform it into an or node containing an eq node for each item inside the target array.
+ *
+ * This is a messy solution, and it would be very cool if we didn't have to do this, but here we are.
+ */
+class InArrayNode extends INode {
+    public constructor(data: NodeData, globalsHash: string) {
+        super(data, globalsHash)
+        this.serialize()
+    }
+
+    override solve(): boolean {
+        const theArray = this.data["in"]
+
+        const theItem = this.data["?"]
+
+        const nodeCast = theItem as EqNode
+        const nodeData = nodeCast.data as NodeData[]
+
+        let arrayItemIndex = (nodeData[0] as string).includes("#") ? 0 : 1
+
+        const e: string[][] = []
+
+        theArray.forEach((val) => {
+            if (arrayItemIndex === 0) {
+                e.push([val, nodeData[1]])
+            } else {
+                e.push([nodeData[0], val])
+            }
+        })
+
+        // it better be an equals node, or I will literally scream at the top of my lungs "WHYYY"
+        this.data["?"] = new OrNode(
+            e.map((conds) => new EqNode(conds, this.globalsHash)),
+            this.globalsHash
+        )
+
+        return (this.data["?"] as OrNode).solve()
+    }
+}
+
 function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
     type D = NodeData
 
@@ -457,6 +504,11 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
 
     if (node === null) {
         return null
+    }
+
+    if ((node as INode).isNode) {
+        // @ts-expect-error This node is already a class object.
+        return node
     }
 
     if (node.$eq) {
@@ -542,6 +594,10 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
     if (node.$or) {
         // @ts-expect-error Array.
         return new OrNode(node.$or, globalsHash)
+    }
+
+    if (node.$inarray) {
+        return new InArrayNode(node.$inarray, globalsHash)
     }
 
     console.warn(`no possible solver for ${JSON.stringify(node)}`)

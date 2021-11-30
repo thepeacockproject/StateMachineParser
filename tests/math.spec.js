@@ -34,6 +34,34 @@ const data = {
         },
         {},
     ],
+    Lt1: [
+        {
+            $eq: [
+                {
+                    $lt: [5, 10],
+                },
+                true,
+            ],
+        },
+        {},
+    ],
+    Lt2: [
+        {
+            $lt: [10, 5],
+        },
+        {},
+    ],
+    Lt3: [
+        {
+            $eq: [
+                {
+                    $lt: [3, 3],
+                },
+                true,
+            ],
+        },
+        {},
+    ],
 }
 
 describe("$gt", () => {
@@ -49,6 +77,23 @@ describe("$gt", () => {
 
     it("fails with the same numbers", () => {
         const [sm, globals] = data.Gt3
+        expect(check(sm, globals).bool).toBe(false)
+    })
+})
+
+describe("$lt", () => {
+    it("understands $lt with equality", () => {
+        const [sm, globals] = data.Lt1
+        expect(check(sm, globals).bool).toBe(true)
+    })
+
+    it("does the math correctly", () => {
+        const [sm, globals] = data.Lt2
+        expect(check(sm, globals).bool).toBe(false)
+    })
+
+    it("fails with the same numbers", () => {
+        const [sm, globals] = data.Lt3
         expect(check(sm, globals).bool).toBe(false)
     })
 })

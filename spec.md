@@ -20,16 +20,13 @@ Example:
 
 ```json5
 {
-    $eq: [
-        true,
-        true
-    ] // -> true
+    $eq: [true, true], // -> true
 }
 ```
 
 ```json5
 {
-    $eq: [5, 6] // -> false, 5 is not 6
+    $eq: [5, 6], // -> false, 5 is not 6
 }
 ```
 
@@ -47,12 +44,12 @@ Example:
 {
     $and: [
         {
-            $eq: [40, 40]
+            $eq: [40, 40],
         }, // -> true
         {
-            $eq: ["hello world", "hello world"]
-        } // -> true
-    ] // -> true
+            $eq: ["hello world", "hello world"],
+        }, // -> true
+    ], // -> true
 }
 ```
 
@@ -60,12 +57,12 @@ Example:
 {
     $and: [
         {
-            $eq: [40, 50]
+            $eq: [40, 50],
         }, // -> false
         {
-            $eq: ["hello world", "hello world"]
-        } // -> true
-    ] // -> false
+            $eq: ["hello world", "hello world"],
+        }, // -> true
+    ], // -> false
 }
 ```
 
@@ -77,9 +74,7 @@ Example:
 
 ```json5
 {
-    $or: [
-        true, false
-    ] // -> true
+    $or: [true, false], // -> true
 }
 ```
 
@@ -87,10 +82,10 @@ Example:
 {
     $or: [
         {
-            $eq: ["chicken", "steak"]
+            $eq: ["chicken", "steak"],
         }, // -> false
-        false
-    ] // -> false
+        false,
+    ], // -> false
 }
 ```
 
@@ -105,11 +100,8 @@ Example:
 ```json5
 {
     $not: {
-        $eq: [
-            "lettuce",
-            "tomato"
-        ] // -> false
-    } // -> true
+        $eq: ["lettuce", "tomato"], // -> false
+    }, // -> true
 }
 ```
 
