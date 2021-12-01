@@ -374,7 +374,7 @@ export enum BasicMathOperator {
 }
 
 class BasicMathOperationsNode extends ISideEffectNode {
-    data: NodeData | NodeData[]
+    override data: NodeData | NodeData[]
     protected readonly mathOperator: BasicMathOperator
 
     public constructor(
@@ -395,12 +395,18 @@ class BasicMathOperationsNode extends ISideEffectNode {
             }
 
             if (this.data.length === 2) {
+                // @ts-expect-error
+                const curr = findObjectChild(this.data[0], this.globalsHash)
+                // @ts-expect-error
+                const target = findObjectChild(this.data[1], this.globalsHash)
                 setObjectChild(
-                    this.data[0] as string,
-                    findObjectChild(
-                        this.data[1] as string,
-                        this.globalsHash
-                    ) as unknown as number,
+                    // @ts-expect-error
+                    this.data[0],
+                    this.mathOperator === BasicMathOperator.Addition
+                        // @ts-expect-error
+                        ? curr + target
+                        // @ts-expect-error
+                        : curr - target,
                     this.globalsHash
                 )
                 return
@@ -468,7 +474,7 @@ class PushNode extends ISideEffectNode {
 
     override solveSideEffects(): void {
         const newArray: any[] = findObjectChild(
-            this.data[1],
+            this.data[0],
             this.globalsHash
         ) as any[]
 
