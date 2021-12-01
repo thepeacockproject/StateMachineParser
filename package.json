@@ -29,13 +29,13 @@
     "repository": "https://github.com/thepeacockproject/StateMachineParser",
     "author": "The Peacock Project <admin@thepeacockproject.org> (https://thepeacockproject.org)",
     "license": "Apache-2.0",
-    "packageManager": "yarn@3.1.0",
+    "packageManager": "yarn@3.1.1",
     "devDependencies": {
         "@types/jest": "^27.0.2",
         "@types/node": "^16.11.7",
         "jest": "^27.3.1",
         "prettier": "^2.4.1",
-        "typescript": "4.4.4"
+        "typescript": "4.5.2"
     },
     "scripts": {
         "prettier": "prettier --write \"**/*.{ts,md,json,js}\"",
