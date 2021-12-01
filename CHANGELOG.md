@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.0.0
+
+-   The statemachine conditions can no longer be null or undefined.
+-   The globals can no longer be null or undefined.
+-   Support side effect nodes (`$set`, `$mul`, `$inc`, `$dec`, `$div` all work properly now).
+-   The `check` method now returns an object in the format of `{ bool: boolean, globals: any }`, because side effect nodes can modify the globals object.
+-   `findObjectChild` (formerly `$referenceToData`) and `setObjectChild` are now exported.
+-   Added inline JSDoc.
+
 ## v1.0.1
 
 -   Same as v1.0.0 but re-published due to a bug.

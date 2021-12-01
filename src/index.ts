@@ -687,7 +687,9 @@ export function check<Globals = any>(
     globals: Globals
 ): CheckResult<Globals> {
     if (stateMachineConds === undefined || stateMachineConds === null) {
-        throw new TypeError("The statemachine conditions can't be null or undefined!")
+        throw new TypeError(
+            "The statemachine conditions can't be null or undefined!"
+        )
     }
 
     if (globals === undefined || globals === null) {

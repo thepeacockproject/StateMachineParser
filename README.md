@@ -49,7 +49,7 @@ yarn && yarn build
 const { check } = require("@peacockproject/statemachine-parser")
 
 const result = check(
-    {}, // the state machine condition
+    { $eq: [true, true] }, // the state machine condition
     { $Value: {} } // the globals object, which is essentially the input values.
-)
+).bool
 ```
