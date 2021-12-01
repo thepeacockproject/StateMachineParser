@@ -17,7 +17,7 @@
 import { createHash } from "crypto"
 import arrayEqual from "array-equal"
 
-export type Globals = Record<string, string | boolean | number>
+export type Globals = any
 export type NodeData =
     | string
     | INode
@@ -25,6 +25,15 @@ export type NodeData =
     | boolean
     | Array<NodeData>
 
+/**
+ * The globals cache is a map of the globals object's original hash (when stringified) to the current value.
+ * This is needed because some nodes change the value, and we need the object to remain consistent, but also
+ * because we don't want to have to pass the globals object to basically every function call.
+ *
+ * If you are using APIs such as {@link findObjectChild} or {@link setObjectChild}, you will need to inject
+ * your own globals into this map. The hash doesn't really matter, as long as it doesn't collide with an existing
+ * value in the map.
+ */
 export const _globalsCache: Map<string, Record<string, unknown>> = new Map()
 
 abstract class INode {
@@ -74,7 +83,20 @@ abstract class INode {
     abstract solve(): boolean | number
 }
 
-function findObjectChild(
+/**
+ * Given a reference, find the value of a thing which is inside the globals object.
+ *
+ * @example
+ *   // returns globalsObj["$Value"]["RepositoryId"]
+ *   findObjectChild("$Value.RepositoryId", someGlobalsHash)
+ *
+ * @param reference The string that points to the target value.
+ * @param globalsHash The hash of the value in the globals cache.
+ * @returns The child object, if found, or undefined.
+ * @see _globalsCache
+ * @see setObjectChild
+ */
+export function findObjectChild(
     reference: string,
     globalsHash: string
 ): NodeData | boolean {
@@ -82,10 +104,15 @@ function findObjectChild(
         return reference
     }
 
+    let obj: any = _globalsCache.get(globalsHash)
+
+    // if we have a global matching the exact name of the reference, this is probably what we want
+    if (Object.prototype.hasOwnProperty.call(obj, "reference")) {
+        return obj[reference]
+    }
+
     // the thing has a dot in it, which means that its accessing a global
     const parts = reference.split(".")
-
-    let obj: any = _globalsCache.get(globalsHash)
 
     for (let part of parts) {
         obj = obj?.[part]
@@ -94,7 +121,23 @@ function findObjectChild(
     return obj as NodeData
 }
 
-function setObjectChild(
+/**
+ * Given a reference, set the value of a thing which is inside the globals object.
+ * Will throw an error if the globals object doesn't contain a value with the matching name.
+ *
+ * @example
+ *   // sets globalsObj["$Value"]["RepositoryId"] to "hi world :)"
+ *   // (and sets the globals cache to the new object)
+ *   setObjectChild("$Value.RepositoryId", "hi world :)", someGlobalsHash)
+ *
+ * @param reference The string that points to the target value.
+ * @param newData The thing that the target value should be assigned to.
+ * @param globalsHash The hash of the value in the globals cache.
+ * @see _globalsCache
+ * @see findObjectChild
+ * @throws TypeError
+ */
+export function setObjectChild(
     reference: string,
     newData: any,
     globalsHash: string
@@ -612,16 +655,47 @@ function calculateGlobalsHash(globals: Globals): string {
     return hash.digest("hex")
 }
 
-export interface CheckResult {
+/**
+ * The result returned by {@link check}.
+ *
+ * @see check
+ */
+export type CheckResult<Globals> = {
+    /**
+     * If the statemachine returned true or not.
+     */
     bool: boolean
+    /**
+     * The new (and potentially modified) globals object.
+     */
     globals: Globals
 }
 
-export function check(
-    stateMachineConds: unknown,
+/**
+ * Check if the given statemachine would return true, with globals as the context it is run in.
+ *
+ * @example
+ *   check({ $eq: [true, true] }, {}).bool // -> true, since true equals true
+ *
+ * @param stateMachineConds The statemachine.
+ * @param globals The context the statemachine is being run in (e.g. an event value or the `Context` object in an objective's definition).
+ * @returns The result of the check.
+ * @throws Error
+ */
+export function check<Globals = any>(
+    stateMachineConds: any,
     globals: Globals
-): CheckResult {
+): CheckResult<Globals> {
+    if (stateMachineConds === undefined || stateMachineConds === null) {
+        throw new TypeError("The statemachine conditions can't be null or undefined!")
+    }
+
+    if (globals === undefined || globals === null) {
+        throw new TypeError("Globals can't be null or undefined!")
+    }
+
     const globalsHash = calculateGlobalsHash(globals)
+    // @ts-expect-error Record mismatch.
     _globalsCache.set(globalsHash, globals)
 
     const n = getNewNodes(stateMachineConds, globalsHash)
