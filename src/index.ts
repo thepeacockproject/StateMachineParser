@@ -16,6 +16,7 @@
 
 import { createHash } from "crypto"
 import arrayEqual from "array-equal"
+import { set } from "./lodash-set.js"
 
 export type Globals = any
 export type NodeData =
@@ -144,13 +145,7 @@ export function setObjectChild(
 ): void {
     let obj: any = _globalsCache.get(globalsHash)
 
-    const parts = reference.split(".")
-
-    for (let part of parts.slice(0, -1)) {
-        obj = obj[part]
-    }
-
-    obj[parts[parts.length - 1]] = newData
+    set(obj, reference, newData)
 
     _globalsCache.set(globalsHash, obj)
 }
@@ -403,10 +398,10 @@ class BasicMathOperationsNode extends ISideEffectNode {
                     // @ts-expect-error
                     this.data[0],
                     this.mathOperator === BasicMathOperator.Addition
-                        // @ts-expect-error
-                        ? curr + target
-                        // @ts-expect-error
-                        : curr - target,
+                        ? // @ts-expect-error
+                          curr + target
+                        : // @ts-expect-error
+                          curr - target,
                     this.globalsHash
                 )
                 return
@@ -461,7 +456,9 @@ class SetNode extends ISideEffectNode {
     override solveSideEffects(): void {
         setObjectChild(
             this.data[0],
-            findObjectChild(this.data[1], this.globalsHash),
+            typeof this.data[1] === "string"
+                ? findObjectChild(this.data[1], this.globalsHash)
+                : this.data[1],
             this.globalsHash
         )
     }
