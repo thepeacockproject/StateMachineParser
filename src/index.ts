@@ -101,6 +101,10 @@ export function findObjectChild(
     reference: string,
     globalsHash: string
 ): NodeData | boolean {
+    if (typeof reference !== "string") {
+        return reference
+    }
+
     if (reference.includes("#")) {
         return reference
     }
@@ -222,7 +226,7 @@ class NotNode extends INode {
     }
 
     override solve(): boolean {
-        let item = this.data as INode
+        const item = this.data as INode
         let bool: any = item
 
         if ((item as INode).isNode) {
@@ -230,22 +234,6 @@ class NotNode extends INode {
         }
 
         return !bool
-    }
-}
-
-class PushUniqueNode extends INode {
-    public constructor(data: NodeData[], globalsHash: string) {
-        super(data, globalsHash)
-        this.serialize()
-    }
-
-    override solve(): boolean {
-        let item1 = this.data[0]
-        let item2 = this.data[1] as unknown[]
-
-        const currentLength = item2.length
-
-        return currentLength !== item2.push(item1)
     }
 }
 
@@ -394,6 +382,7 @@ class BasicMathOperationsNode extends ISideEffectNode {
                 const curr = findObjectChild(this.data[0], this.globalsHash)
                 // @ts-expect-error
                 const target = findObjectChild(this.data[1], this.globalsHash)
+
                 setObjectChild(
                     // @ts-expect-error
                     this.data[0],
@@ -465,19 +454,34 @@ class SetNode extends ISideEffectNode {
 }
 
 class PushNode extends ISideEffectNode {
-    public constructor(data: NodeData[], globalsHash: string) {
+    protected readonly unique: boolean
+
+    public constructor(unique: boolean, data: NodeData[], globalsHash: string) {
         super(data, globalsHash)
+        this.unique = unique
     }
 
-    override solveSideEffects(): void {
+    override solve(): boolean {
+        return this.solveSideEffects()
+    }
+
+    override solveSideEffects(): boolean {
         const newArray: any[] = findObjectChild(
             this.data[0],
             this.globalsHash
         ) as any[]
+        const existingItems = new Set(newArray)
+
+        // if this is pushunique and the items already contains the value,
+        if (this.unique && existingItems.has(this.data[1])) {
+            return false
+        }
 
         newArray.push(this.data[1])
 
         setObjectChild(this.data[0] as string, newArray, this.globalsHash)
+
+        return true
     }
 }
 
@@ -573,7 +577,7 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
 
     if (node.$pushunique) {
         // @ts-expect-error Array.
-        return new PushUniqueNode(node.$pushunique, globalsHash)
+        return new PushNode(true, node.$pushunique, globalsHash)
     }
 
     if (node.$mul) {
@@ -630,7 +634,7 @@ function getNewNodes(parent: unknown, globalsHash: string): undefined | INode {
 
     if (node.$push) {
         // @ts-expect-error Array.
-        return new PushNode(node.$push, globalsHash)
+        return new PushNode(false, node.$push, globalsHash)
     }
 
     if (node.$after) {
