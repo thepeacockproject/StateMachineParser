@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.1.0
+
+-   `$pushunique` and `$push` nodes now use the same implementation.
+-   Added tests for `$inc` and `$dec` (+ fixed associated bugs).
+-   Excluded TypeScript build info files from release files.
+-   Replaced our implementation of `setObjectChild` with Lodash's version.
+-   Updated dependencies.
+
 ## v2.0.0
 
 -   The statemachine conditions can no longer be null or undefined.
