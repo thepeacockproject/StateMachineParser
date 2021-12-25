@@ -83,7 +83,7 @@ export function handleEvent<Context = unknown>(
     const shouldPerformActions =
         !!definition.States[currentState][eventName].Actions
 
-    // do we need to perform actions?
+    // do we need to perform a transition?
     const shouldPerformTransition =
         !!definition.States[currentState][eventName].Transition
 
@@ -102,10 +102,29 @@ export function handleEvent<Context = unknown>(
     let newContext = definition.Context
 
     if (conditionResult && shouldPerformActions) {
-        newContext = check<Context>(
-            definition.States[currentState][eventName].Actions,
-            newContext
-        ).globals
+        let { Actions } = definition.States[currentState][eventName]
+
+        if (!Array.isArray(Actions)) {
+            Actions = [Actions]
+        }
+
+        for (const actionSet of Actions as unknown[]) {
+            for (const action of Object.keys(actionSet)) {
+                newContext = check<Context>(
+                    definition.States[currentState][eventName].Condition,
+                    {
+                        $Value: event,
+                        ...newContext,
+                    }
+                ).globals
+            }
+        }
+
+        // @ts-expect-error not defined
+        if (newContext.$Value) {
+            // @ts-expect-error not defined
+            delete newContext.$Value
+        }
     }
 
     let state = currentState
