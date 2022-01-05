@@ -1,5 +1,5 @@
 /**
- *    Copyright 2021 The Peacock Project
+ *    Copyright 2022 The Peacock Project
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 import { createHash } from "crypto"
 import arrayEqual from "array-equal"
 import { set } from "./lodash-set.js"
+import { handleEvent as handleEvent1 } from "./handleEvent.js"
+
+// we alias it to handleEvent1 because the TS compiler uses Object.defineProperty with export { handleEvent }
+// which is bad for tree-shaking.
 
 export type Globals = any
 export type NodeData =
@@ -720,3 +724,5 @@ export function check<Globals = any>(
         globals: finalGlobals as Globals,
     }
 }
+
+export const handleEvent = handleEvent1
