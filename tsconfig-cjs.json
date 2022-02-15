@@ -4,6 +4,6 @@
         "outDir": "build/cjs",
         "module": "CommonJS",
         "rootDir": "src",
-        "target": "ES2018"
+        "target": "ES2020"
     }
 }
