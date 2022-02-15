@@ -1,4 +1,4 @@
-const { check } = require("../build/cjs/index")
+const { test } = require("../src/index")
 
 const data = {
     After1: [
@@ -11,5 +11,5 @@ const data = {
 
 it("returns true with a basic timer", () => {
     const [sm, globals] = data.After1
-    expect(check(sm, globals).bool).toBe(true)
+    expect(test(sm, globals)).toBe(true)
 })

@@ -50,6 +50,6 @@ const { check } = require("@peacockproject/statemachine-parser")
 
 const result = check(
     { $eq: [true, true] }, // the state machine condition
-    { $Value: {} } // the globals object, which is essentially the input values.
-).bool
+    { Value: {} } // the globals object, which is essentially the input values.
+)
 ```

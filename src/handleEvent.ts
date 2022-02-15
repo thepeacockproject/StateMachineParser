@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { check } from "./index.js"
+import { test } from "./index.js"
 
 /**
  * Options that are passed to {@link handleEvent}.
@@ -121,15 +121,14 @@ export function handleEvent<Context = unknown>(
     let conditionResult = true
 
     if (shouldCheckConditions) {
-        conditionResult = check<Context>(
+        conditionResult = test(
             definition.States[currentState][eventName].Condition,
-            // @ts-expect-error No idea what the arbitrary type warnings are about
             {
-                $Value: event,
+                Value: event,
                 ...(definition.Context ?? {}),
                 ...(definition.Constants ?? {}),
             }
-        ).bool
+        )
     }
 
     let newContext = definition.Context
@@ -151,10 +150,10 @@ export function handleEvent<Context = unknown>(
 
         for (const actionSet of Actions as unknown[]) {
             for (const action of Object.keys(actionSet)) {
-                newContext = check<Context>(
+                newContext = test(
                     definition.States[currentState][eventName].Condition,
                     {
-                        $Value: event,
+                        Value: event,
                         ...newContext,
                     }
                 ).globals
@@ -163,9 +162,9 @@ export function handleEvent<Context = unknown>(
 
         // drop this specific event's value
         // @ts-expect-error not defined
-        if (newContext.$Value) {
+        if (newContext.Value) {
             // @ts-expect-error not defined
-            delete newContext.$Value
+            delete newContext.Value
         }
 
         // drop the constants

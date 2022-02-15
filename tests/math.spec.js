@@ -1,4 +1,4 @@
-const { check } = require("../build/cjs/index")
+const { test } = require("../src/index")
 
 const data = {
     Gt1: [
@@ -67,33 +67,33 @@ const data = {
 describe("$gt", () => {
     it("understands $gt with equality", () => {
         const [sm, globals] = data.Gt1
-        expect(check(sm, globals).bool).toBe(true)
+        expect(test(sm, globals)).toBe(true)
     })
 
     it("does the math correctly", () => {
         const [sm, globals] = data.Gt2
-        expect(check(sm, globals).bool).toBe(false)
+        expect(test(sm, globals)).toBe(false)
     })
 
     it("fails with the same numbers", () => {
         const [sm, globals] = data.Gt3
-        expect(check(sm, globals).bool).toBe(false)
+        expect(test(sm, globals)).toBe(false)
     })
 })
 
 describe("$lt", () => {
     it("understands $lt with equality", () => {
         const [sm, globals] = data.Lt1
-        expect(check(sm, globals).bool).toBe(true)
+        expect(test(sm, globals)).toBe(true)
     })
 
     it("does the math correctly", () => {
         const [sm, globals] = data.Lt2
-        expect(check(sm, globals).bool).toBe(false)
+        expect(test(sm, globals)).toBe(false)
     })
 
     it("fails with the same numbers", () => {
         const [sm, globals] = data.Lt3
-        expect(check(sm, globals).bool).toBe(false)
+        expect(test(sm, globals)).toBe(false)
     })
 })

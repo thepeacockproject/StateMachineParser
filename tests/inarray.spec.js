@@ -1,4 +1,4 @@
-const { check } = require("../build/cjs/index")
+const { test } = require("../src/index")
 
 const data = {
     Inarray1: [
@@ -11,7 +11,7 @@ const data = {
             },
         },
         {
-            $Value: {
+            Value: {
                 Objs: ["the", "world", "is", "quiet", "here"],
             },
         },
@@ -26,19 +26,21 @@ const data = {
             },
         },
         {
-            $Value: {
+            Value: {
                 Objs: ["flute", "saxophone", "trumpet", "bass guitar", "drums"],
             },
         },
     ],
 }
 
-it("can find a string in a context array", () => {
-    const [sm, globals] = data.Inarray1
-    expect(check(sm, globals).bool).toBe(true)
-})
+describe("$inarray", () => {
+    it("can find a string in a context array", () => {
+        const [sm, globals] = data.Inarray1
+        expect(test(sm, globals)).toBe(true)
+    })
 
-it("returns false if the item isn't present", () => {
-    const [sm, globals] = data.Inarray2
-    expect(check(sm, globals).bool).toBe(false)
+    it("returns false if the item isn't present", () => {
+        const [sm, globals] = data.Inarray2
+        expect(test(sm, globals)).toBe(false)
+    })
 })

@@ -13,14 +13,10 @@
 
 // @ts-nocheck
 
-const FUNC_ERROR_TEXT = "Expected a function"
-
 const HASH_UNDEFINED = "__peacock_lodash_hash_undefined__"
 
 const INFINITY = 1 / 0,
     MAX_SAFE_INTEGER = 9007199254740991
-
-const symbolTag = "[object Symbol]"
 
 const reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
     reIsPlainProp = /^\w*$/,
@@ -31,13 +27,10 @@ const reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
 const reEscapeChar = /\\(\\)?/g
 const reIsUint = /^(?:0|[1-9]\d*)$/
 
-const arrayProto = Array.prototype,
-    objectProto = Object.prototype
+const objectProto = Object.prototype
 
 const hasOwnProperty = objectProto.hasOwnProperty
 const objectToString = objectProto.toString
-
-const splice = arrayProto.splice
 
 const symbolToString = Symbol.prototype.toString
 
@@ -84,67 +77,6 @@ Hash.prototype.get = hashGet
 Hash.prototype.has = hashHas
 Hash.prototype.set = hashSet
 
-function ListCache(entries) {
-    let index = -1,
-        length = entries ? entries.length : 0
-
-    this.clear()
-    while (++index < length) {
-        const entry = entries[index]
-        this.set(entry[0], entry[1])
-    }
-}
-
-function listCacheClear(): void {
-    this.__data__ = []
-}
-
-function listCacheDelete(key) {
-    const data = this.__data__,
-        index = assocIndexOf(data, key)
-
-    if (index < 0) {
-        return false
-    }
-    const lastIndex = data.length - 1
-    if (index === lastIndex) {
-        data.pop()
-    } else {
-        splice.call(data, index, 1)
-    }
-    return true
-}
-
-function listCacheGet(key) {
-    const data = this.__data__,
-        index = assocIndexOf(data, key)
-
-    return index < 0 ? undefined : data[index][1]
-}
-
-function listCacheHas(key): boolean {
-    return assocIndexOf(this.__data__, key) > -1
-}
-
-function listCacheSet(key, value) {
-    const data = this.__data__,
-        index = assocIndexOf(data, key)
-
-    if (index < 0) {
-        data.push([key, value])
-    } else {
-        data[index][1] = value
-    }
-    return this
-}
-
-// Add methods to `ListCache`.
-ListCache.prototype.clear = listCacheClear
-ListCache.prototype["delete"] = listCacheDelete
-ListCache.prototype.get = listCacheGet
-ListCache.prototype.has = listCacheHas
-ListCache.prototype.set = listCacheSet
-
 function MapCache(entries) {
     let index = -1,
         length = entries ? entries.length : 0
@@ -159,7 +91,7 @@ function MapCache(entries) {
 function mapCacheClear() {
     this.__data__ = {
         hash: new Hash(),
-        map: new (Map || ListCache)(),
+        map: new Map(),
         string: new Hash(),
     }
 }
@@ -196,16 +128,6 @@ function assignValue(object, key, value) {
     ) {
         object[key] = value
     }
-}
-
-function assocIndexOf(array, key): number {
-    let length = array.length
-    while (length--) {
-        if (eq(array[length][0], key)) {
-            return length
-        }
-    }
-    return -1
 }
 
 function baseSet(object, path, value, customizer) {
@@ -335,7 +257,7 @@ function memoize(func, resolver) {
         typeof func != "function" ||
         (resolver && typeof resolver != "function")
     ) {
-        throw new TypeError(FUNC_ERROR_TEXT)
+        throw new TypeError("Expected a function")
     }
     const memoized = function () {
         const args = arguments,
@@ -374,7 +296,8 @@ function isObjectLike(value): boolean {
 function isSymbol(value): boolean {
     return (
         typeof value == "symbol" ||
-        (isObjectLike(value) && objectToString.call(value) === symbolTag)
+        (isObjectLike(value) &&
+            objectToString.call(value) === "[object Symbol]")
     )
 }
 

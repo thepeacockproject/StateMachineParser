@@ -1,4 +1,4 @@
-const { check } = require("../build/cjs/index")
+const { test } = require("../src/index")
 
 const data = {
     Or1: [
@@ -19,7 +19,7 @@ const data = {
             ],
         },
         {
-            $Value: {
+            Value: {
                 IsTrue: true,
             },
         },
@@ -39,15 +39,15 @@ const data = {
 
 it("can do $or with booleans", () => {
     const [sm, globals] = data.Or1
-    expect(check(sm, globals).bool).toBe(true)
+    expect(test(sm, globals)).toBe(true)
 })
 
 it("can do $or with equality", () => {
     const [sm, globals] = data.Or2
-    expect(check(sm, globals).bool).toBe(true)
+    expect(test(sm, globals)).toBe(true)
 })
 
 it("fails when neither condition is true", () => {
     const [sm, globals] = data.Or3
-    expect(check(sm, globals).bool).toBe(false)
+    expect(test(sm, globals)).toBe(false)
 })
