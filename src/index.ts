@@ -141,10 +141,10 @@ function realTest(input: any, variables: Record<string, unknown>): any {
             )
         }
 
-        if (input.hasOwnProperty("$inarray")) {
-            const array = realTest(input["$inarray"]["in"], variables)
+        const inarray = (op: string): boolean => {
+            const array = realTest(input[op]["in"], variables)
 
-            const equalityCheck = input["$inarray"]["?"]["$eq"] as unknown[]
+            const equalityCheck = input[op]["?"]["$eq"] as unknown[]
             // where the current item in the array is in the equals check
             const locationOfComparator = equalityCheck.indexOf("$.#")
 
@@ -162,6 +162,14 @@ function realTest(input: any, variables: Record<string, unknown>): any {
             }
 
             return false
+        }
+
+        if (input.hasOwnProperty("$inarray")) {
+            return inarray("$inarray")
+        }
+
+        if (input.hasOwnProperty("$any")) {
+            return inarray("$any")
         }
 
         if (input.hasOwnProperty("$after")) {
@@ -275,6 +283,41 @@ export function handleActions(
         const value = findNamedChild(input["$set"][1], variables)
 
         set(variables, reference, value)
+    }
+
+    const push = (unique: boolean): void => {
+        let reference = input["$push"][0]
+
+        if (reference.startsWith("$")) {
+            reference = reference.substring(1)
+        }
+
+        const value = findNamedChild(input["$push"][1], variables)
+
+        // clone the thing
+        const array = JSON.parse(
+            JSON.stringify(findNamedChild(reference, variables))
+        )
+
+        if (unique) {
+            if (array.indexOf(value) === -1) {
+                array.push(value)
+            } else {
+                return
+            }
+        } else {
+            array.push(value)
+        }
+
+        set(variables, reference, array)
+    }
+
+    if (input.hasOwnProperty("$push")) {
+        push(false)
+    }
+
+    if (input.hasOwnProperty("$pushunique")) {
+        push(true)
     }
 
     return variables
