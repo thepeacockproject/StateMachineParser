@@ -34,7 +34,7 @@ export interface HandleEventReturn<Context> {
 }
 
 interface State {
-    Condition?: unknown
+    Condition?: unknown | unknown[]
     Actions?: unknown | unknown[]
     Transition?: string
 }

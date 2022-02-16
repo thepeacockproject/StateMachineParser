@@ -166,7 +166,7 @@ function baseSet(object, path, value, customizer) {
 
 function baseToString(value) {
     // Exit early for strings to avoid a performance hit in some environments.
-    if (typeof value == "string") {
+    if (typeof value === "string") {
         return value
     }
     if (isSymbol(value)) {
@@ -290,23 +290,23 @@ function isObject(value): boolean {
 }
 
 function isObjectLike(value): boolean {
-    return !!value && typeof value == "object"
+    return !!value && typeof value === "object"
 }
 
 function isSymbol(value): boolean {
     return (
-        typeof value == "symbol" ||
+        typeof value === "symbol" ||
         (isObjectLike(value) &&
             objectToString.call(value) === "[object Symbol]")
     )
 }
 
 function toString(value): string {
-    return value == null ? "" : baseToString(value)
+    return value === null ? "" : baseToString(value)
 }
 
 function set(object: any, path: string, value: any) {
-    return object == null ? object : baseSet(object, path, value)
+    return object === null ? object : baseSet(object, path, value)
 }
 
 export { set }
