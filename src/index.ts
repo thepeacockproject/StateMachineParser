@@ -54,7 +54,18 @@ function findNamedChild(
     return reference // it's just a string
 }
 
-export function test(input: any, variables: Record<string, unknown>): any {
+export interface Options {
+    /**
+     * The path to the current value in the current object, for interactive debugger stepping.
+     */
+    _path?: string
+}
+
+export function test(
+    input: any,
+    variables: Record<string, unknown>,
+    options?: Options
+): any {
     if (input === null || input === undefined) {
         throw new Error("State machine is null or undefined")
     }
@@ -63,10 +74,21 @@ export function test(input: any, variables: Record<string, unknown>): any {
         throw new Error("Variables are null or undefined")
     }
 
-    return realTest(input, variables)
+    if (options._path) {
+        throw new Error("Hey, I make the paths, not you!!")
+    }
+
+    return realTest(input, variables, {
+        ...options,
+        _path: "ROOTOBJ",
+    })
 }
 
-function realTest(input: any, variables: Record<string, unknown>): any {
+function realTest(
+    input: any,
+    variables: Record<string, unknown>,
+    options: Options
+): any {
     if (
         typeof input === "number" ||
         typeof input === "boolean" ||
@@ -85,7 +107,11 @@ function realTest(input: any, variables: Record<string, unknown>): any {
     if (typeof input === "object") {
         if (input.hasOwnProperty("$eq")) {
             // transform any strings inside these arrays into their intended context values
-            const predicate = (val) => realTest(val, variables)
+            const predicate = (val, index) =>
+                realTest(val, variables, {
+                    ...options,
+                    _path: `${options._path}.$eq[${index}]`,
+                })
 
             if (Array.isArray(input.$eq[0] || input.$eq[1])) {
                 return arrayEqual(
@@ -96,68 +122,123 @@ function realTest(input: any, variables: Record<string, unknown>): any {
 
             return (
                 // we test twice because we need to make sure that the value is fixed if it's a variable
-                realTest(input["$eq"][0], variables) ===
-                realTest(input["$eq"][1], variables)
+                realTest(input["$eq"][0], variables, {
+                    ...options,
+                    _path: `${options._path}.$eq[0]`,
+                }) ===
+                realTest(input["$eq"][1], variables, {
+                    ...options,
+                    _path: `${options._path}.$eq[1]`,
+                })
             )
         }
 
         if (input.hasOwnProperty("$not")) {
-            return !realTest(input["$not"], variables)
+            return !realTest(input["$not"], variables, {
+                ...options,
+                _path: `${options._path}.$not`,
+            })
         }
 
         if (input.hasOwnProperty("$and")) {
-            return input["$and"].every((val) => realTest(val, variables))
+            return input["$and"].every((val, index) =>
+                realTest(val, variables, {
+                    ...options,
+                    _path: `${options._path}.$and[${index}]`,
+                })
+            )
         }
 
         if (input.hasOwnProperty("$or")) {
-            return input["$or"].some((val) => realTest(val, variables))
+            return input["$or"].some((val, index) =>
+                realTest(val, variables, {
+                    ...options,
+                    _path: `${options._path}.$or[${index}]`,
+                })
+            )
         }
 
         if (input.hasOwnProperty("$gt")) {
             return (
-                realTest(input["$gt"][0], variables) >
-                realTest(input["$gt"][1], variables)
+                realTest(input["$gt"][0], variables, {
+                    ...options,
+                    _path: `${options._path}.$gt[0]`,
+                }) >
+                realTest(input["$gt"][1], variables, {
+                    ...options,
+                    _path: `${options._path}.$gt[1]`,
+                })
             )
         }
 
         if (input.hasOwnProperty("$gte")) {
             return (
-                realTest(input["$gte"][0], variables) >=
-                realTest(input["$gte"][1], variables)
+                realTest(input["$gte"][0], variables, {
+                    ...options,
+                    _path: `${options._path}.$gte[0]`,
+                }) >=
+                realTest(input["$gte"][1], variables, {
+                    ...options,
+                    _path: `${options._path}.$gte[1]`,
+                })
             )
         }
 
         if (input.hasOwnProperty("$lt")) {
             return (
-                realTest(input["$lt"][0], variables) <
-                realTest(input["$lt"][1], variables)
+                realTest(input["$lt"][0], variables, {
+                    ...options,
+                    _path: `${options._path}.$lt[0]`,
+                }) <
+                realTest(input["$lt"][1], variables, {
+                    ...options,
+                    _path: `${options._path}.$lt[1]`,
+                })
             )
         }
 
         if (input.hasOwnProperty("$lte")) {
             return (
-                realTest(input["$lte"][0], variables) <=
-                realTest(input["$lte"][1], variables)
+                realTest(input["$lte"][0], variables, {
+                    ...options,
+                    _path: `${options._path}.$lte[0]`,
+                }) <=
+                realTest(input["$lte"][1], variables, {
+                    ...options,
+                    _path: `${options._path}.$lte[1]`,
+                })
             )
         }
 
-        const inarray = (op: string): boolean => {
-            const array = realTest(input[op]["in"], variables)
+        const inarray = (op: string, all: boolean): boolean => {
+            const array = realTest(input[op]["in"], variables, {
+                ...options,
+                _path: `${options._path}["${op}"]["in"]`,
+            })
 
-            const equalityCheck = input[op]["?"]["$eq"] as unknown[]
+            const nodeOpts = Object.keys(input[op]["?"])
+            const firstOp = input[op]["?"][nodeOpts[0]]! as unknown[]
             // where the current item in the array is in the equals check
-            const locationOfComparator = equalityCheck.indexOf("$.#")
-
-            const expected = realTest(
-                equalityCheck.find(
-                    (_, index) => index !== locationOfComparator
-                ),
-                variables
+            const locationOfComparator = firstOp.indexOf("$.#")
+            const firstNonComparandValue = firstOp.find(
+                (_, index) => index !== locationOfComparator
+            )
+            const firstNonComparandIndex = firstOp.indexOf(
+                firstNonComparandValue
             )
 
+            const expected = realTest(firstNonComparandValue, variables, {
+                ...options,
+                _path: `${options._path}["${op}"]["in"][${firstNonComparandIndex}]`,
+            })
+
             for (const item of array) {
-                if (item === realTest(expected, variables)) {
+                if (item === realTest(expected, variables, options)) {
                     return true
+                }
+
+                if (all) {
+                    return false
                 }
             }
 
@@ -165,11 +246,14 @@ function realTest(input: any, variables: Record<string, unknown>): any {
         }
 
         if (input.hasOwnProperty("$inarray")) {
-            return inarray("$inarray")
+            return inarray("$inarray", false)
         }
 
         if (input.hasOwnProperty("$any")) {
-            return inarray("$any")
+            return inarray("$any", false)
+        }
+
+        if (input.hasOwnProperty("$all")) {
         }
 
         if (input.hasOwnProperty("$after")) {
@@ -180,7 +264,7 @@ function realTest(input: any, variables: Record<string, unknown>): any {
 
     if (Array.isArray(input)) {
         if (input.some((val) => typeof val === "object")) {
-            return input.every((val) => realTest(val, variables))
+            return input.every((val) => realTest(val, variables, options))
         }
 
         return input.map((val) => {
