@@ -59,6 +59,11 @@ export interface Options {
      * The path to the current value in the current object, for interactive debugger stepping.
      */
     _path?: string
+
+    /**
+     * The findNamedChild function that should be used for resolution of variables.
+     */
+    findNamedChild: FindNamedChildFunc
 }
 
 export function test(
@@ -74,12 +79,13 @@ export function test(
         throw new Error("Variables are null or undefined")
     }
 
-    if (options._path) {
+    if (options?._path) {
         throw new Error("Hey, I make the paths, not you!!")
     }
 
     return realTest(input, variables, {
-        ...options,
+        findNamedChild: options?.findNamedChild ?? findNamedChild,
+        ...(options ?? {}),
         _path: "ROOTOBJ",
     })
 }
@@ -101,7 +107,16 @@ function realTest(
     if (typeof input === "string") {
         const realKeyName = input.startsWith("$") ? input.slice(1) : input
 
-        return findNamedChild(realKeyName, variables)
+        return options.findNamedChild(realKeyName, variables)
+    }
+
+    if (Array.isArray(input)) {
+        return input.map((val, index) =>
+            realTest(val, variables, {
+                ...options,
+                _path: `${options._path}[${index}]`,
+            })
+        )
     }
 
     if (typeof input === "object") {
@@ -262,22 +277,20 @@ function realTest(
         }
     }
 
-    if (Array.isArray(input)) {
-        if (input.some((val) => typeof val === "object")) {
-            return input.every((val) => realTest(val, variables, options))
-        }
-
-        return input.map((val) => {
-            return typeof val === "string" && val.includes(".")
-                ? findNamedChild(val, variables)
-                : val
-        })
-    }
-
     console.warn("Unhandled test", input)
 
     return false
 }
+
+/**
+ * @internal
+ */
+export type RealTestFunc = typeof realTest
+
+/**
+ * @internal
+ */
+export type FindNamedChildFunc = typeof findNamedChild
 
 export function handleActions(
     input: any,
