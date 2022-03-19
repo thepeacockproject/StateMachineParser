@@ -16,6 +16,7 @@
 
 import { set } from "./lodash-set"
 import arrayEqual from "array-equal"
+import { createArrayHandler } from "./array-handling"
 
 function findNamedChild(
     reference: string,
@@ -89,6 +90,8 @@ export function test(
         _path: "ROOTOBJ",
     })
 }
+
+const arrayHandler = createArrayHandler(realTest)
 
 function realTest(
     input: any,
@@ -225,50 +228,16 @@ function realTest(
             )
         }
 
-        const inarray = (op: string, all: boolean): boolean => {
-            const array = realTest(input[op]["in"], variables, {
-                ...options,
-                _path: `${options._path}["${op}"]["in"]`,
-            })
-
-            const nodeOpts = Object.keys(input[op]["?"])
-            const firstOp = input[op]["?"][nodeOpts[0]]! as unknown[]
-            // where the current item in the array is in the equals check
-            const locationOfComparator = firstOp.indexOf("$.#")
-            const firstNonComparandValue = firstOp.find(
-                (_, index) => index !== locationOfComparator
-            )
-            const firstNonComparandIndex = firstOp.indexOf(
-                firstNonComparandValue
-            )
-
-            const expected = realTest(firstNonComparandValue, variables, {
-                ...options,
-                _path: `${options._path}["${op}"]["in"][${firstNonComparandIndex}]`,
-            })
-
-            for (const item of array) {
-                if (item === realTest(expected, variables, options)) {
-                    return true
-                }
-
-                if (all) {
-                    return false
-                }
-            }
-
-            return false
-        }
-
         if (input.hasOwnProperty("$inarray")) {
-            return inarray("$inarray", false)
+            return arrayHandler(input, variables, "$inarray", options)
         }
 
         if (input.hasOwnProperty("$any")) {
-            return inarray("$any", false)
+            return arrayHandler(input, variables, "$any", options)
         }
 
         if (input.hasOwnProperty("$all")) {
+            return arrayHandler(input, variables, "$all", options)
         }
 
         if (input.hasOwnProperty("$after")) {
