@@ -4,4 +4,5 @@ module.exports = {
     transform: {
         "^.+\\.ts?$": "ts-jest",
     },
+    resolver: "jest-ts-webcompat-resolver",
 }

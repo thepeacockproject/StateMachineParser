@@ -183,12 +183,14 @@ function castPath(value) {
 function getMapData(map, key) {
     const data = map.__data__
     return isKeyable(key)
-        ? data[typeof key === "string" ? "string" : "hash"]
+        ? typeof key === "string"
+            ? data.string
+            : data.hash
         : data.map
 }
 
 function isIndex(value, length): boolean {
-    length = length == null ? MAX_SAFE_INTEGER : length
+    length = length === null ? MAX_SAFE_INTEGER : length
     return (
         !!length &&
         (typeof value == "number" || reIsUint.test(value)) &&
@@ -229,7 +231,7 @@ function isKeyable(value): boolean {
         : value === null
 }
 
-const stringToPath = memoize((string) => {
+const stringToPath = memoize((string: string) => {
     string = toString(string)
 
     const result = []
@@ -245,20 +247,14 @@ const stringToPath = memoize((string) => {
 })
 
 function toKey(value): string {
-    if (typeof value == "string" || isSymbol(value)) {
+    if (typeof value === "string" || isSymbol(value)) {
         return value
     }
     const result = value + ""
     return result === "0" && 1 / value === -INFINITY ? "-0" : result
 }
 
-function memoize(func, resolver) {
-    if (
-        typeof func != "function" ||
-        (resolver && typeof resolver != "function")
-    ) {
-        throw new TypeError("Expected a function")
-    }
+function memoize(func, resolver?) {
     const memoized = function () {
         const args = arguments,
             key = resolver ? resolver.apply(this, args) : args[0],
@@ -271,12 +267,9 @@ function memoize(func, resolver) {
         memoized.cache = cache.set(key, result)
         return result
     }
-    memoized.cache = new (memoize.Cache || MapCache)()
+    memoized.cache = new MapCache()
     return memoized
 }
-
-// Assign cache to `_.memoize`.
-memoize.Cache = MapCache
 
 function eq(value, other): boolean {
     return value === other || (value !== value && other !== other)
