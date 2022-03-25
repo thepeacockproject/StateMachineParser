@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-import { set } from "./lodash-set"
+import { set } from "./lodash-set.js"
 import arrayEqual from "array-equal"
-import { createArrayHandler } from "./array-handling"
+import { createArrayHandler } from "./array-handling.js"
+import { handleEvent as handleEvent1 } from "./handleEvent.js"
 
 function findNamedChild(
     reference: string,
@@ -140,11 +141,11 @@ function realTest(
 
             return (
                 // we test twice because we need to make sure that the value is fixed if it's a variable
-                realTest(input["$eq"][0], variables, {
+                realTest(input.$eq[0], variables, {
                     ...options,
                     _path: `${options._path}.$eq[0]`,
                 }) ===
-                realTest(input["$eq"][1], variables, {
+                realTest(input.$eq[1], variables, {
                     ...options,
                     _path: `${options._path}.$eq[1]`,
                 })
@@ -152,14 +153,14 @@ function realTest(
         }
 
         if (input.hasOwnProperty("$not")) {
-            return !realTest(input["$not"], variables, {
+            return !realTest(input.$not, variables, {
                 ...options,
                 _path: `${options._path}.$not`,
             })
         }
 
         if (input.hasOwnProperty("$and")) {
-            return input["$and"].every((val, index) =>
+            return input.$and.every((val, index) =>
                 realTest(val, variables, {
                     ...options,
                     _path: `${options._path}.$and[${index}]`,
@@ -168,7 +169,7 @@ function realTest(
         }
 
         if (input.hasOwnProperty("$or")) {
-            return input["$or"].some((val, index) =>
+            return input.$or.some((val, index) =>
                 realTest(val, variables, {
                     ...options,
                     _path: `${options._path}.$or[${index}]`,
@@ -178,11 +179,11 @@ function realTest(
 
         if (input.hasOwnProperty("$gt")) {
             return (
-                realTest(input["$gt"][0], variables, {
+                realTest(input.$gt[0], variables, {
                     ...options,
                     _path: `${options._path}.$gt[0]`,
                 }) >
-                realTest(input["$gt"][1], variables, {
+                realTest(input.$gt[1], variables, {
                     ...options,
                     _path: `${options._path}.$gt[1]`,
                 })
@@ -191,11 +192,11 @@ function realTest(
 
         if (input.hasOwnProperty("$gte")) {
             return (
-                realTest(input["$gte"][0], variables, {
+                realTest(input.$gte[0], variables, {
                     ...options,
                     _path: `${options._path}.$gte[0]`,
                 }) >=
-                realTest(input["$gte"][1], variables, {
+                realTest(input.$gte[1], variables, {
                     ...options,
                     _path: `${options._path}.$gte[1]`,
                 })
@@ -204,11 +205,11 @@ function realTest(
 
         if (input.hasOwnProperty("$lt")) {
             return (
-                realTest(input["$lt"][0], variables, {
+                realTest(input.$lt[0], variables, {
                     ...options,
                     _path: `${options._path}.$lt[0]`,
                 }) <
-                realTest(input["$lt"][1], variables, {
+                realTest(input.$lt[1], variables, {
                     ...options,
                     _path: `${options._path}.$lt[1]`,
                 })
@@ -217,11 +218,11 @@ function realTest(
 
         if (input.hasOwnProperty("$lte")) {
             return (
-                realTest(input["$lte"][0], variables, {
+                realTest(input.$lte[0], variables, {
                     ...options,
                     _path: `${options._path}.$lte[0]`,
                 }) <=
-                realTest(input["$lte"][1], variables, {
+                realTest(input.$lte[1], variables, {
                     ...options,
                     _path: `${options._path}.$lte[1]`,
                 })
@@ -340,25 +341,26 @@ export function handleActions(
     }
 
     if (input.hasOwnProperty("$set")) {
-        let reference = input["$set"][0]
+        let reference = input.$set[0]
 
         if (reference.startsWith("$")) {
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input["$set"][1], variables)
+        const value = findNamedChild(input.$set[1], variables)
 
         set(variables, reference, value)
     }
 
     const push = (unique: boolean): void => {
-        let reference = input["$push"][0]
+        const op = unique ? "$pushunique" : "$push"
+        let reference = input[op][0]
 
         if (reference.startsWith("$")) {
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input["$push"][1], variables)
+        const value = findNamedChild(input[op][1], variables)
 
         // clone the thing
         const array = JSON.parse(
@@ -388,3 +390,6 @@ export function handleActions(
 
     return variables
 }
+
+// bridge to avoid tsc generating dummy code
+export const handleEvent = handleEvent1

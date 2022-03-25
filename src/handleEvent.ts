@@ -33,10 +33,11 @@ export interface HandleEventReturn<Context> {
     context: Context
 }
 
-interface State {
+interface InStateEventHandler {
     Condition?: unknown | unknown[]
     Actions?: unknown | unknown[]
     Transition?: string
+    [additionalActions: string]: unknown
 }
 
 /**
@@ -61,7 +62,7 @@ interface StateMachineLike<Context, Constants = undefined> {
      */
     States: {
         [stateName: string]: {
-            [eventName: string]: State
+            [eventName: string]: InStateEventHandler | InStateEventHandler[]
         }
     }
 }
@@ -71,15 +72,17 @@ interface StateMachineLike<Context, Constants = undefined> {
  * Given a state machine definition, the event, and a few other things, you can inspect the results.
  *
  * @param definition The state machine definition.
+ * @param context The current context of the state machine.
  * @param event The event object.
  * @param options Various other settings and details needed for the implementation.
  * @returns The state machine and related data after performing the operation.
  */
 export function handleEvent<Context = unknown>(
-    definition: StateMachineLike<Context>,
+    definition: StateMachineLike<Partial<Context>>,
+    context: Partial<Context>,
     event: unknown,
     options: HandleEventOptions
-): HandleEventReturn<Context> {
+): HandleEventReturn<Partial<Context>> {
     const { eventName, currentState = "Start" } = options
 
     if (
@@ -95,92 +98,108 @@ export function handleEvent<Context = unknown>(
         }
     }
 
-    // do we need to check conditions?
-    const shouldCheckConditions =
-        !!definition.States[currentState][eventName].Condition
+    // ensure no circular references are present, and that this won't update the param by accident
+    let newContext = JSON.parse(JSON.stringify(context))
 
-    // does the event handler have any keys that look like actions?
-    // IOI sometimes puts the actions along-side keys like Transition and Condition,
-    // yet both still apply
-    const irregularEventKeys = Object.keys(
-        definition.States[currentState][eventName]
-    ).filter((k) => k.includes("$"))
-    const hasIrregularEventKeys = irregularEventKeys.length > 0
+    const doEventHandler = (handler: InStateEventHandler) => {
+        // do we need to check conditions?
+        const shouldCheckConditions = !!handler.Condition
 
-    // do we need to perform actions?
-    const shouldPerformActions =
-        !!definition.States[currentState][eventName].Actions ||
-        hasIrregularEventKeys
-
-    // do we need to perform a transition?
-    const shouldPerformTransition =
-        !!definition.States[currentState][eventName].Transition
-
-    const constantKeys = Object.keys(definition.Constants ?? {})
-
-    let conditionResult = true
-
-    if (shouldCheckConditions) {
-        conditionResult = test(
-            definition.States[currentState][eventName].Condition,
-            {
-                Value: event,
-                ...(definition.Context ?? {}),
-                ...(definition.Constants ?? {}),
-            }
+        // does the event handler have any keys that look like actions?
+        // IOI sometimes puts the actions along-side keys like Transition and Condition,
+        // yet both still apply
+        const irregularEventKeys = Object.keys(handler).filter((k) =>
+            k.includes("$")
         )
-    }
+        const hasIrregularEventKeys = irregularEventKeys.length > 0
 
-    let newContext = definition.Context
+        // do we need to perform actions?
+        const shouldPerformActions = !!handler.Actions || hasIrregularEventKeys
 
-    if (conditionResult && shouldPerformActions) {
-        let Actions = definition.States[currentState][eventName].Actions ?? []
+        // do we need to perform a transition?
+        const shouldPerformTransition = !!handler.Transition
 
-        if (!Array.isArray(Actions)) {
-            Actions = [Actions]
+        const constantKeys = Object.keys(definition.Constants ?? {})
+
+        let conditionResult = true
+
+        if (shouldCheckConditions) {
+            conditionResult = test(handler.Condition, {
+                Value: event,
+                ...(context ?? {}),
+                ...(definition.Constants ?? {}),
+            })
         }
 
-        if (hasIrregularEventKeys) {
-            ;(<unknown[]>Actions).push(
-                ...irregularEventKeys.map(
-                    (key) => definition.States[currentState][eventName][key]
+        if (conditionResult && shouldPerformActions) {
+            let Actions = handler.Actions ?? []
+
+            if (!Array.isArray(Actions)) {
+                Actions = [Actions]
+            }
+
+            if (hasIrregularEventKeys) {
+                ;(<unknown[]>Actions).push(
+                    ...irregularEventKeys.map((key) => handler[key])
                 )
-            )
-        }
+            }
 
-        for (const actionSet of Actions as unknown[]) {
-            for (const action of Object.keys(actionSet)) {
-                newContext = test(
-                    definition.States[currentState][eventName].Condition,
-                    {
+            for (const actionSet of Actions as unknown[]) {
+                for (const action of Object.keys(actionSet)) {
+                    newContext = test(handler.Condition, {
                         Value: event,
                         ...newContext,
-                    }
-                ).globals
+                    }).globals
+                }
+            }
+
+            // drop this specific event's value
+            if (newContext.Value) {
+                delete newContext.Value
+            }
+
+            // drop the constants
+            for (const constantKey of constantKeys) {
+                delete newContext[constantKey]
             }
         }
 
-        // drop this specific event's value
-        // @ts-expect-error not defined
-        if (newContext.Value) {
-            // @ts-expect-error not defined
-            delete newContext.Value
+        let state = currentState
+
+        if (conditionResult && shouldPerformTransition) {
+            state = handler.Transition
         }
 
-        // drop the constants
-        for (const constantKey of constantKeys) {
-            delete newContext[constantKey]
+        return {
+            context: newContext,
+            state,
         }
     }
 
-    let state = currentState
+    const eventHandlers = definition.States[currentState][eventName]
 
-    if (conditionResult && shouldPerformTransition) {
-        state = definition.States[currentState][eventName].Transition
+    if (Array.isArray(eventHandlers)) {
+        // this may get messy
+
+        for (const handler of eventHandlers) {
+            const out = doEventHandler(handler)
+
+            newContext = out.context
+
+            if (out.state !== currentState) {
+                // we swapped states while in a handler, so our work here is done
+                return {
+                    context: newContext,
+                    state: out.state,
+                }
+            }
+        }
+
+        return {
+            state: currentState,
+            context: newContext,
+        }
     }
 
-    return {
-        context: newContext,
-        state,
-    }
+    return doEventHandler(eventHandlers)
 }
