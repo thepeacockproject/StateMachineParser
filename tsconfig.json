@@ -1,20 +1,9 @@
 {
+    "extends": "./tsconfig-esm.json",
     "compilerOptions": {
-        "lib": ["ESNext"],
-        "target": "ES2019",
-        "module": "es2020",
-        "composite": true,
-        "sourceMap": true,
-        "declaration": true,
-        "declarationMap": true,
-        "importHelpers": true,
-        "noEmitHelpers": true,
-        "esModuleInterop": true,
-        "moduleResolution": "node",
-        "isolatedModules": true,
-        "outDir": "build/esm",
+        "outDir": "build/cjs",
+        "module": "CommonJS",
         "rootDir": "src",
-        "skipLibCheck": true
-    },
-    "include": ["src"]
+        "target": "ES2020"
+    }
 }

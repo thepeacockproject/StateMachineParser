@@ -1,4 +1,5 @@
 const { test } = require("../src/index")
+const assert = require("assert")
 
 const data = {
     Or1: [
@@ -39,15 +40,15 @@ const data = {
 
 it("can do $or with booleans", () => {
     const [sm, globals] = data.Or1
-    expect(test(sm, globals)).toBe(true)
+    assert.strictEqual(test(sm, globals), true)
 })
 
 it("can do $or with equality", () => {
     const [sm, globals] = data.Or2
-    expect(test(sm, globals)).toBe(true)
+    assert.strictEqual(test(sm, globals), true)
 })
 
 it("fails when neither condition is true", () => {
     const [sm, globals] = data.Or3
-    expect(test(sm, globals)).toBe(false)
+    assert.strictEqual(test(sm, globals), false)
 })

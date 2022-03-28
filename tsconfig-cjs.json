@@ -1,9 +1,0 @@
-{
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "outDir": "build/cjs",
-        "module": "CommonJS",
-        "rootDir": "src",
-        "target": "ES2020"
-    }
-}

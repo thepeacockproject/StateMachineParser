@@ -1,4 +1,5 @@
 const { handleActions } = require("../src/index")
+const assert = require("assert")
 
 const data = {
     Set1: [
@@ -92,14 +93,14 @@ describe("$set node", () => {
     it("can set a basic context object", () => {
         const [sm, globals] = data.Set1
         const r = handleActions(sm, globals)
-        expect(r.MyContextObject).toEqual(5)
-        expect(r.OtherContextObject).toEqual(5)
+        assert.strictEqual(r.MyContextObject, 5)
+        assert.strictEqual(r.OtherContextObject, 5)
     })
 
     it("can set a basic context object to a literal value", () => {
         const [sm, globals] = data.Set2
         const r = handleActions(sm, globals)
-        expect(r.Some.Context.Object).toEqual(103)
+        assert.strictEqual(r.Some.Context.Object, 103)
     })
 })
 
@@ -108,13 +109,13 @@ describe("math nodes", () => {
         it("can increment a context object", () => {
             const [sm, globals] = data.Inc1
             const r = handleActions(sm, globals)
-            expect(r.Some.Context.Object).toEqual(7)
+            assert.strictEqual(r.Some.Context.Object, 7)
         })
 
         it("can increment a context object with no amount specified", () => {
             const [sm, globals] = data.Inc2
             const r = handleActions(sm, globals)
-            expect(r.Context.Object).toEqual(150151)
+            assert.strictEqual(r.Context.Object, 150151)
         })
     })
 
@@ -122,13 +123,13 @@ describe("math nodes", () => {
         it("can decrement a context object", () => {
             const [sm, globals] = data.Dec1
             const r = handleActions(sm, globals)
-            expect(r.Some.Context.Object).toEqual(-1)
+            assert.strictEqual(r.Some.Context.Object, -1)
         })
 
         it("can decrement a context object with no amount specified", () => {
             const [sm, globals] = data.Dec2
             const r = handleActions(sm, globals)
-            expect(r.Context.Object).toEqual(150149)
+            assert.strictEqual(r.Context.Object, 150149)
         })
     })
 
@@ -136,7 +137,7 @@ describe("math nodes", () => {
         it("can multiply a context object", () => {
             const [sm, globals] = data.Mul1
             const r = handleActions(sm, globals)
-            expect(r.Context.Object).toEqual(90)
+            assert.strictEqual(r.Context.Object, 90)
         })
     })
 
@@ -144,7 +145,7 @@ describe("math nodes", () => {
         it("can divide a context object", () => {
             const [sm, globals] = data.Div1
             const r = handleActions(sm, globals)
-            expect(r.Context.Object).toEqual(18)
+            assert.strictEqual(r.Context.Object, 18)
         })
     })
 })

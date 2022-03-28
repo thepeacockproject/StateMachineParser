@@ -1,4 +1,5 @@
 const { test } = require("../src/index")
+const assert = require("assert")
 
 const data = {
     Gt1: [
@@ -67,33 +68,33 @@ const data = {
 describe("$gt", () => {
     it("understands $gt with equality", () => {
         const [sm, globals] = data.Gt1
-        expect(test(sm, globals)).toBe(true)
+        assert.strictEqual(test(sm, globals), true)
     })
 
     it("does the math correctly", () => {
         const [sm, globals] = data.Gt2
-        expect(test(sm, globals)).toBe(false)
+        assert.strictEqual(test(sm, globals), false)
     })
 
     it("fails with the same numbers", () => {
         const [sm, globals] = data.Gt3
-        expect(test(sm, globals)).toBe(false)
+        assert.strictEqual(test(sm, globals), false)
     })
 })
 
 describe("$lt", () => {
     it("understands $lt with equality", () => {
         const [sm, globals] = data.Lt1
-        expect(test(sm, globals)).toBe(true)
+        assert.strictEqual(test(sm, globals), true)
     })
 
     it("does the math correctly", () => {
         const [sm, globals] = data.Lt2
-        expect(test(sm, globals)).toBe(false)
+        assert.strictEqual(test(sm, globals), false)
     })
 
     it("fails with the same numbers", () => {
         const [sm, globals] = data.Lt3
-        expect(test(sm, globals)).toBe(false)
+        assert.strictEqual(test(sm, globals), false)
     })
 })

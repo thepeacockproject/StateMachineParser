@@ -1,4 +1,5 @@
 const { test } = require("../src/index")
+const assert = require("assert")
 
 const data = {
     Inarray1: [
@@ -36,11 +37,11 @@ const data = {
 describe("$inarray", () => {
     it("can find a string in a context array", () => {
         const [sm, globals] = data.Inarray1
-        expect(test(sm, globals)).toBe(true)
+        assert.strictEqual(test(sm, globals), true)
     })
 
     it("returns false if the item isn't present", () => {
         const [sm, globals] = data.Inarray2
-        expect(test(sm, globals)).toBe(false)
+        assert.strictEqual(test(sm, globals), false)
     })
 })

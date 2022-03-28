@@ -1,4 +1,5 @@
 const { test } = require("../src/index")
+const assert = require("assert")
 
 const data = {
     Equality1: [
@@ -55,34 +56,34 @@ const data = {
 
 it("1 $eq 1", () => {
     const [sm, globals] = data.Equality1
-    expect(test(sm, globals)).toBe(true)
+    assert.strictEqual(test(sm, globals), true)
 })
 
 it("$eq with strings", () => {
     const [sm, globals] = data.Equality2
-    expect(test(sm, globals)).toBe(true)
+    assert.strictEqual(test(sm, globals), true)
 })
 
 it("$eq with globals", () => {
     const [sm, globals] = data.Equality3
-    expect(test(sm, globals)).toBe(true)
+    assert.strictEqual(test(sm, globals), true)
 })
 
 describe("inequality", () => {
     it("1 neq 2", () => {
         const [sm, globals] = data.Inequality1
-        expect(test(sm, globals)).toBe(false)
+        assert.strictEqual(test(sm, globals), false)
     })
 })
 
 describe("nested $eq", () => {
     it("can understand nested $eq", () => {
         const [sm, globals] = data.NestedEq1
-        expect(test(sm, globals)).toBe(true)
+        assert.strictEqual(test(sm, globals), true)
     })
 
     it("can understand nested !$eq", () => {
         const [sm, globals] = data.NestedNeq1
-        expect(test(sm, globals)).toBe(false)
+        assert.strictEqual(test(sm, globals), false)
     })
 })

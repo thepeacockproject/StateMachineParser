@@ -1,4 +1,5 @@
 const { test } = require("../src/index")
+const assert = require("assert")
 
 const data = {
     And1: [
@@ -64,18 +65,18 @@ const data = {
 
 it("understands $and with equality", () => {
     const [sm, globals] = data.And1
-    expect(test(sm, globals)).toBe(true)
+    assert.strictEqual(test(sm, globals), true)
 })
 
 it("$and fails when a condition is not met", () => {
     const [sm, globals] = data.And2
-    expect(test(sm, globals)).toBe(false)
+    assert.strictEqual(test(sm, globals), false)
 })
 
 it("$and works with less and more than 2 conditions", () => {
     const [sm, globals] = data.And3
-    expect(test(sm, globals)).toBe(true)
+    assert.strictEqual(test(sm, globals), true)
 
     const [sm2, globals2] = data.And4
-    expect(test(sm2, globals2)).toBe(true)
+    assert.strictEqual(test(sm2, globals2), true)
 })

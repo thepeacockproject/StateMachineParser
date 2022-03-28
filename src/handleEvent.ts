@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { test } from "./index.js"
+import { test } from "./index"
 
 /**
  * Options that are passed to {@link handleEvent}.

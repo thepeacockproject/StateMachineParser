@@ -1,4 +1,5 @@
 const { test } = require("../src/index")
+const assert = require("assert")
 
 const data = {
     Not1: [
@@ -11,5 +12,5 @@ const data = {
 
 it("$not true is false", () => {
     const [sm, globals] = data.Not1
-    expect(test(sm, globals)).toBe(false)
+    assert.strictEqual(test(sm, globals), false)
 })

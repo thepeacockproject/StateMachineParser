@@ -14,10 +14,18 @@
  *    limitations under the License.
  */
 
-import { set } from "./lodash-set.js"
+import { set } from "./lodashSet"
 import arrayEqual from "array-equal"
-import { createArrayHandler } from "./array-handling.js"
-import { handleEvent as handleEvent1 } from "./handleEvent.js"
+import { createArrayHandler } from "./arrayHandling"
+import { handleEvent } from "./handleEvent"
+import {
+    TimerManager,
+    TIMER_COMPLETE,
+    TIMER_CANCELLED,
+    TIMER_RUNNING,
+    TimerStatus,
+    Timer,
+} from "./timers"
 
 function findNamedChild(
     reference: string,
@@ -43,7 +51,7 @@ function findNamedChild(
     }
 
     if (reference.includes(".")) {
-        // the thing has a dot in it, which means that its accessing a global
+        // the thing has a dot in it, which means that it's accessing a global
         const parts = reference.split(".")
 
         for (let part of parts) {
@@ -56,16 +64,21 @@ function findNamedChild(
     return reference // it's just a string
 }
 
-export interface Options {
+export interface Options<TimerClass extends Timer = Timer> {
+    /**
+     * The findNamedChild function that should be used for resolution of variables.
+     */
+    findNamedChild: FindNamedChildFunc
+
     /**
      * The path to the current value in the current object, for interactive debugger stepping.
      */
     _path?: string
 
     /**
-     * The findNamedChild function that should be used for resolution of variables.
+     * The timer manager instance. If not defined, timers will never be started, and will always return false.
      */
-    findNamedChild: FindNamedChildFunc
+    timerManager?: TimerManager
 }
 
 export function test(
@@ -242,8 +255,35 @@ function realTest(
         }
 
         if (input.hasOwnProperty("$after")) {
-            // TODO we should implement proper timers
-            return true
+            if (!options.timerManager) {
+                return false
+            }
+
+            let timer = options.timerManager.getTimer(`${options._path}.$after`)
+
+            if (!timer) {
+                // add timer details
+                timer = options.timerManager.createTimer(
+                    `${options._path}.$after`,
+                    <number>realTest(input.$after, variables, {
+                        ...options,
+                        _path: `${options._path}.$after`,
+                    })
+                )
+            }
+
+            if (
+                timer.state === TIMER_CANCELLED ||
+                timer.state === TIMER_RUNNING
+            ) {
+                return false
+            }
+
+            if (timer.state === TIMER_COMPLETE) {
+                return true
+            }
+
+            throw new Error("Invalid timer state!")
         }
     }
 
@@ -391,5 +431,12 @@ export function handleActions(
     return variables
 }
 
-// bridge to avoid tsc generating dummy code
-export const handleEvent = handleEvent1
+export {
+    handleEvent,
+    TIMER_COMPLETE,
+    TIMER_CANCELLED,
+    TIMER_RUNNING,
+    Timer,
+    TimerManager,
+}
+export type { TimerStatus }
