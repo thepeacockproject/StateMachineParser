@@ -65,7 +65,7 @@ function findNamedChild(
     return reference // it's just a string
 }
 
-export interface Options<TimerClass extends Timer = Timer> {
+export interface Options {
     /**
      * The findNamedChild function that should be used for resolution of variables.
      */
