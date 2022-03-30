@@ -298,8 +298,9 @@ function toString(value): string {
     return value === null ? "" : baseToString(value)
 }
 
-function set(object: any, path: string, value: any) {
+/**
+ * @internal
+ */
+export function set(object: any, path: string, value: any) {
     return object === null ? object : baseSet(object, path, value)
 }
-
-export { set }

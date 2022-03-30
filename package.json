@@ -4,7 +4,7 @@
     "description": "IOI state machine conditional parser.",
     "main": "build/cjs/index.js",
     "module": "build/esm/index.js",
-    "types": "build/cjs/index.d.ts",
+    "types": "build/index.d.ts",
     "homepage": "https://thepeacockproject.org",
     "engines": {
         "node": ">=14"
@@ -17,7 +17,8 @@
         "README.md",
         "build/cjs/*",
         "build/esm/*",
-        "LICENSE"
+        "LICENSE",
+        "src"
     ],
     "keywords": [
         "ioi",
@@ -48,15 +49,11 @@
     "scripts": {
         "prettier": "prettier --write \"**/*.{ts,md,json,js,cjs}\"",
         "build": "tsc && tsc -p tsconfig-esm.json",
-        "test": "mocha --require ts-node/register --extension js,ts,cjs,mjs,mts,cts tests"
+        "test": "mocha --require ts-node/register --extension js,ts,cjs,mjs tests"
     },
     "prettier": {
         "semi": false,
         "tabWidth": 4
-    },
-    "dependencies": {
-        "array-equal": "^1.0.0",
-        "tslib": "^2.3.1"
     },
     "publishConfig": {
         "access": "public"

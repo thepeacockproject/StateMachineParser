@@ -4,6 +4,7 @@
         "outDir": "build/cjs",
         "module": "CommonJS",
         "rootDir": "src",
-        "target": "ES2019"
+        "target": "ES2019",
+        "composite": false
     }
 }

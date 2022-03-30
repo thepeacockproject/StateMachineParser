@@ -4,17 +4,17 @@
         "target": "ES2019",
         "module": "es2020",
         "composite": true,
-        "sourceMap": true,
         "declaration": true,
         "declarationMap": true,
-        "importHelpers": true,
-        "noEmitHelpers": true,
+        "declarationDir": "build",
+        "sourceMap": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
         "isolatedModules": true,
         "outDir": "build/esm",
         "rootDir": "src",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "stripInternal": true
     },
     "include": ["src"]
 }

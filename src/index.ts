@@ -15,8 +15,7 @@
  */
 
 import { set } from "./lodashSet"
-import arrayEqual from "array-equal"
-import { createArrayHandler } from "./arrayHandling"
+import { arraysAreEqual, createArrayHandler } from "./arrayHandling"
 import { handleEvent } from "./handleEvent"
 import {
     TimerManager,
@@ -147,7 +146,7 @@ function realTest(
                 })
 
             if (Array.isArray(input.$eq[0] || input.$eq[1])) {
-                return arrayEqual(
+                return arraysAreEqual(
                     input.$eq[0].map(predicate),
                     input.$eq[1].map(predicate)
                 )
