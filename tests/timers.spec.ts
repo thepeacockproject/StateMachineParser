@@ -1,4 +1,10 @@
-import { test, TimerManager, TIMER_RUNNING, TIMER_CANCELLED, Timer } from "../src"
+import {
+    test,
+    TimerManager,
+    TIMER_RUNNING,
+    TIMER_CANCELLED,
+    Timer,
+} from "../src"
 import assert from "assert"
 
 const data = {
@@ -6,8 +12,8 @@ const data = {
         {
             $after: 5,
         },
-        {}
-    ]
+        {},
+    ],
 }
 
 describe("timer managers", () => {
@@ -22,7 +28,7 @@ describe("timer managers", () => {
                 this.timers.set(path, t)
                 return t
             }
-        })
+        })()
 
         assert.strictEqual(timerManager.timers.size, 0)
 
@@ -30,7 +36,10 @@ describe("timer managers", () => {
 
         assert.strictEqual(timerManager.timers.size, 1)
 
-        assert.strictEqual(timerManager.timers.values().next().value.state, TIMER_RUNNING)
+        assert.strictEqual(
+            timerManager.timers.values().next().value.state,
+            TIMER_RUNNING
+        )
     })
 
     it("can cancel timers", (done) => {
@@ -42,7 +51,7 @@ describe("timer managers", () => {
                 this.timers.set(path, t)
                 return t
             }
-        })
+        })()
 
         assert.strictEqual(timerManager.timers.size, 0)
 

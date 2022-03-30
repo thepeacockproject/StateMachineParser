@@ -40,7 +40,11 @@ export class Timer {
      * @param newState The new state value.
      */
     set state(newState: TimerStatus) {
-        if (newState !== TIMER_CANCELLED && newState !== TIMER_RUNNING && newState !== TIMER_COMPLETE) {
+        if (
+            newState !== TIMER_CANCELLED &&
+            newState !== TIMER_RUNNING &&
+            newState !== TIMER_COMPLETE
+        ) {
             throw new TypeError(`Invalid timer state: ${newState}!`)
         }
 

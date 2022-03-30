@@ -46,10 +46,18 @@ yarn && yarn build
 ## Usage
 
 ```js
-const { check } = require("@peacockproject/statemachine-parser")
+const { test } = require("@peacockproject/statemachine-parser")
 
-const result = check(
-    { $eq: [true, true] }, // the state machine condition
-    { Value: {} } // the globals object, which is essentially the input values.
+const condition = {
+    $eq: ["$Value.Greeting", "Hi!"],
+}
+
+const result = test(
+    condition, // the state machine condition
+    {
+        Value: {
+            Greeting: "Hi!",
+        },
+    } // the variables object, which is essentially the input values.
 )
 ```

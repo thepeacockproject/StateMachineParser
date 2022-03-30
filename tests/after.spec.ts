@@ -12,8 +12,8 @@ const data = {
         {
             $after: 5,
         },
-        {}
-    ]
+        {},
+    ],
 }
 
 it("returns false with no timer manager specified", () => {
@@ -38,9 +38,12 @@ it("doesn't return true until a 5 second timer is up", function testTimers5(done
         return done()
     }
 
-    assert.strictEqual(test(sm, globals, {
-        timerManager: tm,
-    }), false)
+    assert.strictEqual(
+        test(sm, globals, {
+            timerManager: tm,
+        }),
+        false
+    )
 
     setTimeout(() => {
         assert.strictEqual(test(sm, globals, { timerManager: tm }), false)
