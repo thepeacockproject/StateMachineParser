@@ -1,5 +1,5 @@
-const { test } = require("../src/index")
-const assert = require("assert")
+import { test } from "../src"
+import assert from "assert"
 
 describe("essential validation", () => {
     it("doesn't accept null or undefined globals", () => {

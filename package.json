@@ -15,9 +15,9 @@
     },
     "files": [
         "README.md",
-        "build",
-        "LICENSE",
-        "src"
+        "build/cjs/*",
+        "build/esm/*",
+        "LICENSE"
     ],
     "keywords": [
         "ioi",
@@ -48,7 +48,7 @@
     "scripts": {
         "prettier": "prettier --write \"**/*.{ts,md,json,js,cjs}\"",
         "build": "tsc && tsc -p tsconfig-esm.json",
-        "test": "mocha --require ts-node/register tests"
+        "test": "mocha --require ts-node/register --extension js,ts,cjs,mjs,mts,cts tests"
     },
     "prettier": {
         "semi": false,

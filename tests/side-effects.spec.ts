@@ -1,5 +1,5 @@
-const { handleActions } = require("../src/index")
-const assert = require("assert")
+import { handleActions } from "../src"
+import assert from "assert"
 
 const data = {
     Set1: [

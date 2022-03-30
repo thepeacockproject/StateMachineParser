@@ -24,6 +24,7 @@ import {
     TIMER_CANCELLED,
     TIMER_RUNNING,
     TimerStatus,
+    TimerCallback,
     Timer,
 } from "./timers"
 
@@ -84,7 +85,7 @@ export interface Options<TimerClass extends Timer = Timer> {
 export function test(
     input: any,
     variables: Record<string, unknown>,
-    options?: Options
+    options?: Partial<Options>
 ): any {
     if (input === null || input === undefined) {
         throw new Error("State machine is null or undefined")
@@ -439,4 +440,4 @@ export {
     Timer,
     TimerManager,
 }
-export type { TimerStatus }
+export type { TimerStatus, TimerCallback }

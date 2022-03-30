@@ -1,5 +1,5 @@
-const { test } = require("../src/index")
-const assert = require("assert")
+import { test } from "../src"
+import assert from "assert"
 
 const data = {
     Equality1: [
