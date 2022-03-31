@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { test } from "./index"
+import { test, TimerManager } from "./index"
 
 /**
  * Options that are passed to {@link handleEvent}.
@@ -22,6 +22,7 @@ import { test } from "./index"
 export interface HandleEventOptions {
     eventName: string
     currentState?: string
+    timerManager?: TimerManager
 }
 
 /**
@@ -63,6 +64,7 @@ interface StateMachineLike<Context, Constants = undefined> {
     States: {
         [stateName: string]: {
             [eventName: string]: InStateEventHandler | InStateEventHandler[]
+            $timer?: InStateEventHandler | InStateEventHandler[]
         }
     }
 }
@@ -87,7 +89,8 @@ export function handleEvent<Context = unknown>(
 
     if (
         !definition.States?.[currentState] ||
-        !definition.States?.[currentState]?.[eventName]
+        (!definition.States?.[currentState]?.[eventName] &&
+            !definition.States?.[currentState]?.$timer)
     ) {
         // we are here because either:
         // - we have no handler for the current state
@@ -97,6 +100,9 @@ export function handleEvent<Context = unknown>(
             state: currentState,
         }
     }
+
+    const hasTimerState =
+        !!definition.States[currentState]?.$timer && !!options?.timerManager
 
     // ensure no circular references are present, and that this won't update the param by accident
     let newContext = JSON.parse(JSON.stringify(context))
@@ -176,30 +182,41 @@ export function handleEvent<Context = unknown>(
         }
     }
 
-    const eventHandlers = definition.States[currentState][eventName]
+    let eventHandlers = definition.States[currentState][eventName]
 
-    if (Array.isArray(eventHandlers)) {
-        // this may get messy
+    if (!Array.isArray(eventHandlers)) {
+        // if we don't have a handler for the current event, but we do for the timer, it produces [undefined]
+        eventHandlers = [eventHandlers].filter(Boolean)
+    }
 
-        for (const handler of eventHandlers) {
-            const out = doEventHandler(handler)
+    if (hasTimerState) {
+        const timerState = definition.States[currentState].$timer
 
-            newContext = out.context
+        type EHArray = InStateEventHandler[]
 
-            if (out.state !== currentState) {
-                // we swapped states while in a handler, so our work here is done
-                return {
-                    context: newContext,
-                    state: out.state,
-                }
-            }
-        }
-
-        return {
-            state: currentState,
-            context: newContext,
+        if (Array.isArray(timerState)) {
+            ;(eventHandlers as EHArray).push(...timerState)
+        } else {
+            ;(eventHandlers as EHArray).push(timerState)
         }
     }
 
-    return doEventHandler(eventHandlers)
+    for (const handler of eventHandlers) {
+        const out = doEventHandler(handler)
+
+        newContext = out.context
+
+        if (out.state !== currentState) {
+            // we swapped states while in a handler, so our work here is done
+            return {
+                context: newContext,
+                state: out.state,
+            }
+        }
+    }
+
+    return {
+        state: currentState,
+        context: newContext,
+    }
 }

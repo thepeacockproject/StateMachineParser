@@ -302,10 +302,10 @@ export type RealTestFunc = typeof realTest
  */
 export type FindNamedChildFunc = typeof findNamedChild
 
-export function handleActions(
+export function handleActions<Context>(
     input: any,
-    variables: { [key: string]: any }
-): { [key: string]: any } {
+    variables: Context
+): Context {
     if (input === null || input === undefined || typeof input !== "object") {
         return variables
     }
