@@ -15,7 +15,7 @@
  */
 
 import { set } from "./lodashSet"
-import { arraysAreEqual, createArrayHandler } from "./arrayHandling"
+import { arraysAreEqual, handleArrayLogic } from "./arrayHandling"
 import { handleEvent } from "./handleEvent"
 import {
     TimerManager,
@@ -81,11 +81,11 @@ export interface Options {
     timerManager?: TimerManager
 }
 
-export function test(
+export function test<Variables = Record<string, unknown>>(
     input: any,
-    variables: Record<string, unknown>,
+    variables: Variables,
     options?: Partial<Options>
-): any {
+): boolean | any {
     if (input === null || input === undefined) {
         throw new Error("State machine is null or undefined")
     }
@@ -105,13 +105,11 @@ export function test(
     })
 }
 
-const arrayHandler = createArrayHandler(realTest)
-
-function realTest(
+function realTest<Variables, Return = Variables | boolean>(
     input: any,
-    variables: Record<string, unknown>,
+    variables: Variables,
     options: Options
-): any {
+): Variables | boolean {
     if (
         typeof input === "number" ||
         typeof input === "boolean" ||
@@ -128,6 +126,7 @@ function realTest(
     }
 
     if (Array.isArray(input)) {
+        // @ts-expect-error Type mismatch thing.
         return input.map((val, index) =>
             realTest(val, variables, {
                 ...options,
@@ -243,15 +242,21 @@ function realTest(
         }
 
         if (input.hasOwnProperty("$inarray")) {
-            return arrayHandler(input, variables, "$inarray", options)
+            return handleArrayLogic(
+                realTest,
+                input,
+                variables,
+                "$inarray",
+                options
+            )
         }
 
         if (input.hasOwnProperty("$any")) {
-            return arrayHandler(input, variables, "$any", options)
+            return handleArrayLogic(realTest, input, variables, "$any", options)
         }
 
         if (input.hasOwnProperty("$all")) {
-            return arrayHandler(input, variables, "$all", options)
+            return handleArrayLogic(realTest, input, variables, "$all", options)
         }
 
         if (input.hasOwnProperty("$after")) {
@@ -265,6 +270,7 @@ function realTest(
                 // add timer details
                 timer = options.timerManager.createTimer(
                     `${options._path}.$after`,
+                    // @ts-expect-error Yes it's a number.
                     <number>realTest(input.$after, variables, {
                         ...options,
                         _path: `${options._path}.$after`,
