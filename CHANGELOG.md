@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.0
+
+-   Basically rewrote the whole thing to be faster and smaller, and have fewer issues.
+-   Handling side effect state machines and conditional state machines are now separate functions.
+-   Many other improvements, such as properly shipped ES modules, less file duplication, and more.
+
 ## v2.1.0
 
 -   `$pushunique` and `$push` nodes now use the same implementation.
