@@ -15,12 +15,14 @@
  */
 
 import { test, TimerManager } from "./index"
+import { sha1 } from "./utils"
 
 /**
  * Options that are passed to {@link handleEvent}.
  */
 export interface HandleEventOptions {
     eventName: string
+    completedImmediateStates?: string[]
     currentState?: string
     timerManager?: TimerManager
 }
@@ -32,6 +34,7 @@ export interface HandleEventOptions {
 export interface HandleEventReturn<Context> {
     state: string
     context: Context
+    completedImmediateStates: string[]
 }
 
 interface InStateEventHandler {
@@ -65,6 +68,7 @@ interface StateMachineLike<Context, Constants = undefined> {
         [stateName: string]: {
             [eventName: string]: InStateEventHandler | InStateEventHandler[]
             $timer?: InStateEventHandler | InStateEventHandler[]
+            ["-"]?: InStateEventHandler | InStateEventHandler[]
         }
     }
 }
@@ -87,10 +91,14 @@ export function handleEvent<Context = unknown>(
 ): HandleEventReturn<Partial<Context>> {
     const { eventName, currentState = "Start" } = options
 
+    const completedImmediateStates = options?.completedImmediateStates ?? []
+
+    // (current state object - reduces code duplication)
+    const csObject = definition.States?.[currentState]
+
     if (
-        !definition.States?.[currentState] ||
-        (!definition.States?.[currentState]?.[eventName] &&
-            !definition.States?.[currentState]?.$timer)
+        !csObject ||
+        (!csObject?.[eventName] && !csObject?.["-"] && !csObject?.$timer)
     ) {
         // we are here because either:
         // - we have no handler for the current state
@@ -98,11 +106,13 @@ export function handleEvent<Context = unknown>(
         return {
             context: definition.Context,
             state: currentState,
+            completedImmediateStates,
         }
     }
 
-    const hasTimerState =
-        !!definition.States[currentState]?.$timer && !!options?.timerManager
+    const hasTimerState = !!csObject.$timer && !!options?.timerManager
+
+    const hasImmediateState = !!csObject["-"]
 
     // ensure no circular references are present, and that this won't update the param by accident
     let newContext = JSON.parse(JSON.stringify(context))
@@ -151,6 +161,7 @@ export function handleEvent<Context = unknown>(
             }
 
             for (const actionSet of Actions as unknown[]) {
+                // TODO: this no longer works after v3, and needs to be changed to use the handleActions API
                 for (const action of Object.keys(actionSet)) {
                     newContext = test(handler.Condition, {
                         Value: event,
@@ -182,22 +193,46 @@ export function handleEvent<Context = unknown>(
         }
     }
 
-    let eventHandlers = definition.States[currentState][eventName]
+    let eventHandlers = csObject[eventName]
 
     if (!Array.isArray(eventHandlers)) {
         // if we don't have a handler for the current event, but we do for the timer, it produces [undefined]
         eventHandlers = [eventHandlers].filter(Boolean)
     }
 
-    if (hasTimerState) {
-        const timerState = definition.States[currentState].$timer
+    type EHArray = InStateEventHandler[]
 
-        type EHArray = InStateEventHandler[]
+    if (hasTimerState) {
+        const timerState = csObject.$timer
 
         if (Array.isArray(timerState)) {
             ;(eventHandlers as EHArray).push(...timerState)
         } else {
             ;(eventHandlers as EHArray).push(timerState)
+        }
+    }
+
+    if (hasImmediateState) {
+        const immediateState = csObject["-"]
+
+        if (Array.isArray(immediateState)) {
+            for (const state of immediateState) {
+                const hash = sha1(JSON.stringify(state ?? {}))
+
+                if (!completedImmediateStates.includes(hash)) {
+                    ;(eventHandlers as EHArray).push(state)
+
+                    completedImmediateStates.push(hash)
+                }
+            }
+        } else {
+            const hash = sha1(JSON.stringify(immediateState ?? {}))
+
+            if (!completedImmediateStates.includes(hash)) {
+                ;(eventHandlers as EHArray).push(immediateState)
+
+                completedImmediateStates.push(hash)
+            }
         }
     }
 
@@ -211,6 +246,7 @@ export function handleEvent<Context = unknown>(
             return {
                 context: newContext,
                 state: out.state,
+                completedImmediateStates,
             }
         }
     }
@@ -218,5 +254,6 @@ export function handleEvent<Context = unknown>(
     return {
         state: currentState,
         context: newContext,
+        completedImmediateStates,
     }
 }
