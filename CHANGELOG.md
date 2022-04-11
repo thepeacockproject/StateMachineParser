@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.1.0
+
+-   Handle immediately executing event handlers.
+-   Enable enhanced tree shaking.
+
 ## v3.0.0
 
 -   Basically rewrote the whole thing to be faster and smaller, and have fewer issues.
