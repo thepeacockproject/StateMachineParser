@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.2.1
+
+-   Fixed the actions not being executed correctly in `handleEvent`.
+-   Fixed some outstanding issues with timers.
+
 ## v3.2.0
 
 -   Remove `lodash`'s `set` implementation in favor of a smaller one.
