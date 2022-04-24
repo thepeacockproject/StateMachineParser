@@ -87,11 +87,11 @@ export function test<Variables = Record<string, unknown>>(
     options?: Partial<Options>
 ): boolean | any {
     if (input === null || input === undefined) {
-        throw new Error("State machine is null or undefined")
+        throw new Error("State machine is falsey!")
     }
 
     if (variables === null || variables === undefined) {
-        throw new Error("Variables are null or undefined")
+        throw new Error("Context is falsey!")
     }
 
     if (options?._path) {
@@ -312,7 +312,7 @@ export function handleActions<Context>(
     input: any,
     variables: Context
 ): Context {
-    if (input === null || input === undefined || typeof input !== "object") {
+    if (!input || typeof input !== "object") {
         return variables
     }
 

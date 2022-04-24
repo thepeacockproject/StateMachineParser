@@ -1,5 +1,6 @@
 import { test } from "../src"
 import assert from "assert"
+import { describe } from "mocha"
 
 const data = {
     Or1: [
@@ -38,17 +39,19 @@ const data = {
     ],
 }
 
-it("can do $or with booleans", () => {
-    const [sm, globals] = data.Or1
-    assert.strictEqual(test(sm, globals), true)
-})
+describe("$or", () => {
+    it("can do $or with booleans", () => {
+        const [sm, vars] = data.Or1
+        assert.strictEqual(test(sm, vars), true)
+    })
 
-it("can do $or with equality", () => {
-    const [sm, globals] = data.Or2
-    assert.strictEqual(test(sm, globals), true)
-})
+    it("can do $or with equality", () => {
+        const [sm, vars] = data.Or2
+        assert.strictEqual(test(sm, vars), true)
+    })
 
-it("fails when neither condition is true", () => {
-    const [sm, globals] = data.Or3
-    assert.strictEqual(test(sm, globals), false)
+    it("fails when neither condition is true", () => {
+        const [sm, vars] = data.Or3
+        assert.strictEqual(test(sm, vars), false)
+    })
 })

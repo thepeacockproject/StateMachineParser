@@ -67,34 +67,34 @@ const data = {
 
 describe("$gt", () => {
     it("understands $gt with equality", () => {
-        const [sm, globals] = data.Gt1
-        assert.strictEqual(test(sm, globals), true)
+        const [sm, vars] = data.Gt1
+        assert.strictEqual(test(sm, vars), true)
     })
 
     it("does the math correctly", () => {
-        const [sm, globals] = data.Gt2
-        assert.strictEqual(test(sm, globals), false)
+        const [sm, vars] = data.Gt2
+        assert.strictEqual(test(sm, vars), false)
     })
 
     it("fails with the same numbers", () => {
-        const [sm, globals] = data.Gt3
-        assert.strictEqual(test(sm, globals), false)
+        const [sm, vars] = data.Gt3
+        assert.strictEqual(test(sm, vars), false)
     })
 })
 
 describe("$lt", () => {
     it("understands $lt with equality", () => {
-        const [sm, globals] = data.Lt1
-        assert.strictEqual(test(sm, globals), true)
+        const [sm, vars] = data.Lt1
+        assert.strictEqual(test(sm, vars), true)
     })
 
     it("does the math correctly", () => {
-        const [sm, globals] = data.Lt2
-        assert.strictEqual(test(sm, globals), false)
+        const [sm, vars] = data.Lt2
+        assert.strictEqual(test(sm, vars), false)
     })
 
     it("fails with the same numbers", () => {
-        const [sm, globals] = data.Lt3
-        assert.strictEqual(test(sm, globals), false)
+        const [sm, vars] = data.Lt3
+        assert.strictEqual(test(sm, vars), false)
     })
 })

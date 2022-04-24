@@ -14,17 +14,31 @@ const data = {
         },
         {},
     ],
+    After1: [
+        {
+            $after: 8,
+        },
+        {},
+    ],
+    After2: [
+        {
+            $after: 5,
+        },
+        {},
+    ],
 }
 
-describe("timer managers", () => {
-    it("registers and properly creates timers", function registersAndCreatesTimersTest(done) {
-        this.timeout(6_000)
+describe("timer managers", function timerManagers() {
+    this.timeout(6_000)
 
-        const [sm, globals] = data.Timer1
+    it("registers and properly creates timers", (done) => {
+        const [sm, vars] = data.Timer1
 
         const timerManager = new (class extends TimerManager {
             override createTimer(path: string, length: number): Timer {
-                const t = new Timer(length, () => done())
+                const t = new Timer(length, () => {
+                    done()
+                })
                 this.timers.set(path, t)
                 return t
             }
@@ -32,7 +46,7 @@ describe("timer managers", () => {
 
         assert.strictEqual(timerManager.timers.size, 0)
 
-        test(sm, globals, { timerManager })
+        test(sm, vars, { timerManager })
 
         assert.strictEqual(timerManager.timers.size, 1)
 
@@ -42,12 +56,14 @@ describe("timer managers", () => {
         )
     })
 
-    it("can cancel timers", (done) => {
-        const [sm, globals] = data.Timer1
+    it("can cancel timers", (testDone) => {
+        const [sm, vars] = data.Timer1
 
         const timerManager = new (class extends TimerManager {
             override createTimer(path: string, length: number): Timer {
-                const t = new Timer(length, () => done())
+                const t = new Timer(length, () => {
+                    testDone()
+                })
                 this.timers.set(path, t)
                 return t
             }
@@ -55,7 +71,7 @@ describe("timer managers", () => {
 
         assert.strictEqual(timerManager.timers.size, 0)
 
-        test(sm, globals, { timerManager })
+        test(sm, vars, { timerManager })
 
         assert.strictEqual(timerManager.timers.size, 1)
 
@@ -66,5 +82,12 @@ describe("timer managers", () => {
         firstTimer.cancel()
 
         assert.strictEqual(firstTimer.state, TIMER_CANCELLED)
+    })
+})
+
+describe("$after", () => {
+    it("returns false with no timer manager specified", () => {
+        const [sm, vars] = data.After1
+        assert.strictEqual(test(sm, vars), false)
     })
 })

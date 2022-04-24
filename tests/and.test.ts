@@ -63,20 +63,22 @@ const data = {
     ],
 }
 
-it("understands $and with equality", () => {
-    const [sm, globals] = data.And1
-    assert.strictEqual(test(sm, globals), true)
-})
+describe("$and", () => {
+    it("understands $and with equality", () => {
+        const [sm, vars] = data.And1
+        assert.strictEqual(test(sm, vars), true)
+    })
 
-it("$and fails when a condition is not met", () => {
-    const [sm, globals] = data.And2
-    assert.strictEqual(test(sm, globals), false)
-})
+    it("$and fails when a condition is not met", () => {
+        const [sm, vars] = data.And2
+        assert.strictEqual(test(sm, vars), false)
+    })
 
-it("$and works with less and more than 2 conditions", () => {
-    const [sm, globals] = data.And3
-    assert.strictEqual(test(sm, globals), true)
+    it("$and works with less and more than 2 conditions", () => {
+        const [sm, vars] = data.And3
+        assert.strictEqual(test(sm, vars), true)
 
-    const [sm2, globals2] = data.And4
-    assert.strictEqual(test(sm2, globals2), true)
+        const [sm2, vars2] = data.And4
+        assert.strictEqual(test(sm2, vars2), true)
+    })
 })

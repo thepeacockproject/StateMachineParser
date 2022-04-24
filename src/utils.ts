@@ -36,7 +36,11 @@ export function set(obj, keys: string | string[], val): void {
     while (i < len) {
         key = keys[i++]
 
-        if (key === "__proto__" || key === "constructor" || key === "prototype") {
+        if (
+            key === "__proto__" ||
+            key === "constructor" ||
+            key === "prototype"
+        ) {
             break
         }
 
@@ -50,8 +54,8 @@ export function set(obj, keys: string | string[], val): void {
             typeof (currKey = curr[key]) === typeof keys
                 ? currKey
                 : keys[i] * 0 !== 0 || !!~("" + keys[i]).indexOf(".")
-                    ? {}
-                    : []
+                ? {}
+                : []
     }
 }
 
@@ -65,9 +69,9 @@ export function sha1(b: string) {
     let i,
         W = [],
         A,
-        B,
-        C,
-        D,
+        B: number,
+        C: number,
+        D: number,
         h: number[] = [(A = 0x67452301), (B = 0xefcdab89), ~A, ~B, 0xc3d2e1f0],
         words: number[] = [],
         s = decodeURI(encodeURI(b)) + "\x80",

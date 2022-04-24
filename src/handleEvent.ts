@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { test, TimerManager } from "./index"
+import { handleActions, test, TimerManager } from "./index"
 import { sha1 } from "./utils"
 
 /**
@@ -53,6 +53,10 @@ interface StateMachineLike<Context, Constants = undefined> {
      * The globals.
      */
     Context?: Context
+    /**
+     * Context listeners.
+     */
+    ContextListeners?: unknown
     /**
      * The constants, which is used by certain state machines like sniper scoring.
      */
@@ -161,12 +165,11 @@ export function handleEvent<Context = unknown, Event = unknown>(
             }
 
             for (const actionSet of Actions as unknown[]) {
-                // TODO: this no longer works after v3, and needs to be changed to use the handleActions API
                 for (const action of Object.keys(actionSet)) {
-                    newContext = test(handler.Condition, {
+                    newContext = handleActions(handler.Condition, {
                         Value: event,
                         ...newContext,
-                    }).globals
+                    })
                 }
             }
 

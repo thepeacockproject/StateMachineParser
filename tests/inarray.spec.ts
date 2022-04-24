@@ -36,12 +36,12 @@ const data = {
 
 describe("$inarray", () => {
     it("can find a string in a context array", () => {
-        const [sm, globals] = data.Inarray1
-        assert.strictEqual(test(sm, globals), true)
+        const [sm, vars] = data.Inarray1
+        assert.strictEqual(test(sm, vars), true)
     })
 
     it("returns false if the item isn't present", () => {
-        const [sm, globals] = data.Inarray2
-        assert.strictEqual(test(sm, globals), false)
+        const [sm, vars] = data.Inarray2
+        assert.strictEqual(test(sm, vars), false)
     })
 })

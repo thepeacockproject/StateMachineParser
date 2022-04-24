@@ -41,6 +41,7 @@ export type TimerCallback = (status: TimerStatus) => void
 
 export class Timer {
     private _state: TimerStatus
+    private readonly _timer: NodeJS.Timer
 
     /**
      * The current status of a timer.
@@ -76,23 +77,16 @@ export class Timer {
     constructor(length: number, private readonly callback?: TimerCallback) {
         this.state = TIMER_RUNNING
 
-        new Promise((resolve) => {
-            setTimeout(resolve, length * 1000)
-        })
-            .then(() => {
-                if (this.state === TIMER_CANCELLED) {
-                    callback?.(this.state)
-                    return
-                }
+        this._timer = setInterval(() => {
+            if (this.state === TIMER_CANCELLED) {
+                // this should not be possible, but just in case
+                return
+            }
 
-                this.state = TIMER_COMPLETE
-                this.callback?.(this.state)
-            })
-            .catch(() => {
-                // how did we get here? this should not be possible
-                this.state = TIMER_CANCELLED
-                this.callback?.(this.state)
-            })
+            this.state = TIMER_COMPLETE
+            clearInterval(this._timer)
+            this.callback?.(this.state)
+        }, length * 1000)
     }
 
     /**
@@ -104,6 +98,7 @@ export class Timer {
             return
         }
 
+        clearInterval(this._timer)
         this.state = TIMER_CANCELLED
         this.callback?.(this.state)
     }

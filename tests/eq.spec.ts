@@ -1,5 +1,6 @@
 import { test } from "../src"
 import assert from "assert"
+import { describe } from "mocha"
 
 const data = {
     Equality1: [
@@ -54,36 +55,38 @@ const data = {
     ],
 }
 
-it("1 $eq 1", () => {
-    const [sm, globals] = data.Equality1
-    assert.strictEqual(test(sm, globals), true)
-})
-
-it("$eq with strings", () => {
-    const [sm, globals] = data.Equality2
-    assert.strictEqual(test(sm, globals), true)
-})
-
-it("$eq with globals", () => {
-    const [sm, globals] = data.Equality3
-    assert.strictEqual(test(sm, globals), true)
-})
-
-describe("inequality", () => {
-    it("1 neq 2", () => {
-        const [sm, globals] = data.Inequality1
-        assert.strictEqual(test(sm, globals), false)
-    })
-})
-
-describe("nested $eq", () => {
-    it("can understand nested $eq", () => {
-        const [sm, globals] = data.NestedEq1
-        assert.strictEqual(test(sm, globals), true)
+describe("$eq", () => {
+    it("1 $eq 1", () => {
+        const [sm, vars] = data.Equality1
+        assert.strictEqual(test(sm, vars), true)
     })
 
-    it("can understand nested !$eq", () => {
-        const [sm, globals] = data.NestedNeq1
-        assert.strictEqual(test(sm, globals), false)
+    it("$eq with strings", () => {
+        const [sm, vars] = data.Equality2
+        assert.strictEqual(test(sm, vars), true)
+    })
+
+    it("$eq with variables", () => {
+        const [sm, vars] = data.Equality3
+        assert.strictEqual(test(sm, vars), true)
+    })
+
+    context("inequality", () => {
+        it("1 neq 2", () => {
+            const [sm, vars] = data.Inequality1
+            assert.strictEqual(test(sm, vars), false)
+        })
+    })
+
+    context("nested $eq", () => {
+        it("can understand nested $eq", () => {
+            const [sm, vars] = data.NestedEq1
+            assert.strictEqual(test(sm, vars), true)
+        })
+
+        it("can understand nested !$eq", () => {
+            const [sm, vars] = data.NestedNeq1
+            assert.strictEqual(test(sm, vars), false)
+        })
     })
 })
