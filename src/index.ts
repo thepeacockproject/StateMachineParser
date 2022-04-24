@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { set } from "./lodashSet"
+import { set } from "./utils"
 import { arraysAreEqual, handleArrayLogic } from "./arrayHandling"
 import { handleEvent } from "./handleEvent"
 import {
@@ -99,8 +99,8 @@ export function test<Variables = Record<string, unknown>>(
     }
 
     return realTest(input, variables, {
-        findNamedChild: options?.findNamedChild ?? findNamedChild,
-        ...(options ?? {}),
+        findNamedChild: options?.findNamedChild || findNamedChild,
+        ...(options || {}),
         _path: "ROOTOBJ",
     })
 }

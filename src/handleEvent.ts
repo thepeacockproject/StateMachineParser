@@ -83,15 +83,15 @@ interface StateMachineLike<Context, Constants = undefined> {
  * @param options Various other settings and details needed for the implementation.
  * @returns The state machine and related data after performing the operation.
  */
-export function handleEvent<Context = unknown>(
+export function handleEvent<Context = unknown, Event = unknown>(
     definition: StateMachineLike<Partial<Context>>,
     context: Partial<Context>,
-    event: unknown,
+    event: Event,
     options: HandleEventOptions
 ): HandleEventReturn<Partial<Context>> {
     const { eventName, currentState = "Start" } = options
 
-    const completedImmediateStates = options?.completedImmediateStates ?? []
+    const completedImmediateStates = options.completedImmediateStates || []
 
     // (current state object - reduces code duplication)
     const csObject = definition.States?.[currentState]
@@ -135,20 +135,20 @@ export function handleEvent<Context = unknown>(
         // do we need to perform a transition?
         const shouldPerformTransition = !!handler.Transition
 
-        const constantKeys = Object.keys(definition.Constants ?? {})
+        const constantKeys = Object.keys(definition.Constants || {})
 
         let conditionResult = true
 
         if (shouldCheckConditions) {
             conditionResult = test(handler.Condition, {
                 Value: event,
-                ...(context ?? {}),
-                ...(definition.Constants ?? {}),
+                ...(context || {}),
+                ...(definition.Constants || {}),
             })
         }
 
         if (conditionResult && shouldPerformActions) {
-            let Actions = handler.Actions ?? []
+            let Actions = handler.Actions || []
 
             if (!Array.isArray(Actions)) {
                 Actions = [Actions]
@@ -217,7 +217,7 @@ export function handleEvent<Context = unknown>(
 
         if (Array.isArray(immediateState)) {
             for (const state of immediateState) {
-                const hash = sha1(JSON.stringify(state ?? {}))
+                const hash = sha1(JSON.stringify(state || {}))
 
                 if (!completedImmediateStates.includes(hash)) {
                     ;(eventHandlers as EHArray).push(state)
@@ -226,7 +226,7 @@ export function handleEvent<Context = unknown>(
                 }
             }
         } else {
-            const hash = sha1(JSON.stringify(immediateState ?? {}))
+            const hash = sha1(JSON.stringify(immediateState || {}))
 
             if (!completedImmediateStates.includes(hash)) {
                 ;(eventHandlers as EHArray).push(immediateState)

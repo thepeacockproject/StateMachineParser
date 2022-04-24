@@ -17,6 +17,45 @@
 // @ts-nocheck
 
 /**
+ * Dependency 'dset'.
+ * @license MIT
+ * @see https://github.com/lukeed/dset/blob/master/src/index.js
+ * @internal
+ */
+export function set(obj, keys: string | string[], val): void {
+    if (typeof keys === "string") {
+        keys = keys.split(".")
+    }
+
+    let i = 0,
+        len = keys.length,
+        curr = obj,
+        currKey,
+        key
+
+    while (i < len) {
+        key = keys[i++]
+
+        if (key === "__proto__" || key === "constructor" || key === "prototype") {
+            break
+        }
+
+        if (i === len) {
+            curr = curr[key] = val
+            continue
+        }
+
+        // noinspection PointlessArithmeticExpressionJS
+        curr = curr[key] =
+            typeof (currKey = curr[key]) === typeof keys
+                ? currKey
+                : keys[i] * 0 !== 0 || !!~("" + keys[i]).indexOf(".")
+                    ? {}
+                    : []
+    }
+}
+
+/**
  * SHA1 from tiny-hashes.
  * @license MIT
  * @see https://github.com/jbt/tiny-hashes/blob/master/sha1/sha1.js

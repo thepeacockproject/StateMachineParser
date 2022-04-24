@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.2.0
+
+-   Remove `lodash`'s `set` implementation in favor of a smaller one.
+-   Better handling in `handleEvent` for falsy values.
+
 ## v3.1.0
 
 -   Handle immediately executing event handlers.
