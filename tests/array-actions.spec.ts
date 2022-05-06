@@ -4,28 +4,33 @@ import assert from "assert"
 const data = {
     Push1: [
         {
-            $push: ["$Animals", "snake"]
+            $push: ["$Animals", "snake"],
         },
         {
-            Animals: ["dog", "cat", "bird"]
+            Animals: ["dog", "cat", "bird"],
         },
     ],
     PushUnique1: [
         {
-            $pushunique: ["$People", "Viktor Novikov"]
+            $pushunique: ["$People", "Viktor Novikov"],
         },
         {
-            People: ["Dalia Margolis", "Silvio Caruso", "Francesca De Santis"]
+            People: ["Dalia Margolis", "Silvio Caruso", "Francesca De Santis"],
         },
     ],
     PushUnique2: [
         {
-            $pushunique: ["$People", "Dalia Margolis"]
+            $pushunique: ["$People", "Dalia Margolis"],
         },
         {
-            People: ["Viktor Novikov", "Dalia Margolis", "Silvio Caruso", "Francesca De Santis"]
+            People: [
+                "Viktor Novikov",
+                "Dalia Margolis",
+                "Silvio Caruso",
+                "Francesca De Santis",
+            ],
         },
-    ]
+    ],
 }
 
 describe("$push", () => {
