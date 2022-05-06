@@ -166,10 +166,15 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
             for (const actionSet of Actions as unknown[]) {
                 for (const action of Object.keys(actionSet)) {
-                    newContext = handleActions(handler.Condition, {
-                        Value: event,
-                        ...newContext,
-                    })
+                    newContext = handleActions(
+                        {
+                            [action]: actionSet[action],
+                        },
+                        {
+                            Value: event,
+                            ...newContext,
+                        }
+                    )
                 }
             }
 
@@ -205,6 +210,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
     type EHArray = InStateEventHandler[]
 
+    //#region timers and immediate states
+
     if (hasTimerState) {
         const timerState = csObject.$timer
 
@@ -238,6 +245,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
             }
         }
     }
+
+    //#endregion
 
     for (const handler of eventHandlers) {
         const out = doEventHandler(handler)

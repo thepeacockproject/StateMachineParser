@@ -1,0 +1,82 @@
+{
+    "basicConditionalTransition": {
+        "Definition": {
+            "Context": {
+                "Target": "94854024-3a11-4acc-bdbd-5e91879455b9"
+            },
+            "States": {
+                "Start": {
+                    "Pacify": {
+                        "Condition": {
+                            "$eq": ["$Value.RepositoryId", "$Target"]
+                        },
+                        "Transition": "Success"
+                    }
+                }
+            }
+        },
+        "Inputs": [
+            {
+                "Name": "ContractStarted",
+                "Value": null
+            },
+            {
+                "Name": "Pacify",
+                "Value": {
+                    "RepositoryId": "94854024-3a11-4acc-bdbd-5e91879455b9"
+                }
+            }
+        ]
+    },
+    "conditionsActionsTransition": {
+        "Definition": {
+            "Context": {
+                "Number": 0,
+                "Outfit": "caa37b77-90e2-4118-813b-b8dcf0ce0a6c"
+            },
+            "States": {
+                "Start": {
+                    "Disguised": [
+                        {
+                            "Condition": {
+                                "$eq": ["$Value.RepositoryId", "$Outfit"]
+                            },
+                            "Actions": [
+                                {
+                                    "$set": ["$Number", 5]
+                                }
+                            ]
+                        }
+                    ],
+                    "AmbientChanged": {
+                        "Condition": {
+                            "$eq": ["$Number", 5]
+                        },
+                        "Transition": "NumberIsFive"
+                    }
+                }
+            }
+        },
+        "Inputs": [
+            {
+                "Name": "ContractStarted",
+                "Value": null
+            },
+            {
+                "Name": "Disguised",
+                "Value": {
+                    "RepositoryId": "caa37b77-90e2-4118-813b-b8dcf0ce0a6c"
+                }
+            },
+            {
+                "_comment": "why not",
+                "Name": "AlexaUnderMoose",
+                "Value": {}
+            },
+            {
+                "Name": "AmbientChanged",
+                "Value": {}
+            }
+        ]
+    }
+}

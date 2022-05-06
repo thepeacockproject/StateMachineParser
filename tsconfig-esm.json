@@ -14,7 +14,8 @@
         "outDir": "build/esm",
         "rootDir": "src",
         "skipLibCheck": true,
-        "stripInternal": true
+        "stripInternal": true,
+        "resolveJsonModule": true
     },
     "include": ["src"]
 }
