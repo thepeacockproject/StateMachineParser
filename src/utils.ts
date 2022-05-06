@@ -36,6 +36,7 @@ export function set(obj, keys: string | string[], val): void {
     while (i < len) {
         key = keys[i++]
 
+        // prevent prototype pollution
         if (
             key === "__proto__" ||
             key === "constructor" ||

@@ -7,27 +7,27 @@ const data = {
             $all: {
                 in: "$Trues",
                 "?": {
-                    $eq: ["$.#", true]
-                }
-            }
+                    $eq: ["$.#", true],
+                },
+            },
         },
         {
-            Trues: [true, true]
-        }
+            Trues: [true, true],
+        },
     ],
     All2: [
         {
             $all: {
                 in: "$NotAllTrues",
                 "?": {
-                    $eq: ["$.#", true]
-                }
-            }
+                    $eq: ["$.#", true],
+                },
+            },
         },
         {
-            NotAllTrues: [true, false]
-        }
-    ]
+            NotAllTrues: [true, false],
+        },
+    ],
 }
 
 describe("$all", () => {

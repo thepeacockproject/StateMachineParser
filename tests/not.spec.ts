@@ -11,11 +11,11 @@ const data = {
     Not2: [
         {
             $not: {
-                $not: true
-            }
+                $not: true,
+            },
         },
-        {}
-    ]
+        {},
+    ],
 }
 
 describe("$not", () => {
