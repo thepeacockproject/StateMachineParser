@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.3.0
+
+-   Moved the build setup to esbuild.
+-   Proper ES modules are now published that can be loaded by Node.js and the browser.
+-   Added code coverage.
+-   Handle nested array nodes.
+-   Fixed a crash that could be caused by handling actions in `handleEvent`.
+-   Added some new tests.
+
 ## v3.2.1
 
 -   Fixed the actions not being executed correctly in `handleEvent`.
