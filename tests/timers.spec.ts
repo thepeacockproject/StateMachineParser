@@ -83,6 +83,14 @@ describe("timer managers", function timerManagers() {
 
         assert.strictEqual(firstTimer.state, TIMER_CANCELLED)
     })
+
+    it("won't allow the status of a timer to be a non-approved value", () => {
+        assert.throws(() => {
+            const timer = new Timer(0.5, () => null)
+            // @ts-expect-error We are intentionally testing this.
+            timer.state = "YOLO"
+        })
+    })
 })
 
 describe("$after", () => {
