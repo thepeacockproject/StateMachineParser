@@ -16,6 +16,8 @@
 
 import type { Options, RealTestFunc } from "./index"
 
+const fillHashtags = (count: number): string => "#".repeat(count)
+
 /**
  * Function that creates an array-like test node parser.
  * It's split into a separate file for the sake of organization, and uses the proxy function to avoid circular dependencies.
@@ -37,6 +39,7 @@ export function handleArrayLogic<Variables>(
     // find the array
     const array = realTest(input[op]["in"], variables, {
         ...options,
+        _currentLoopDepth: (options._currentLoopDepth || 0) + 1,
         _path: `${options._path}.${op}.in`,
     }) as unknown as unknown[]
 
@@ -45,10 +48,14 @@ export function handleArrayLogic<Variables>(
     for (const item of array) {
         const test = realTest(itemConditions, variables, {
             ...options,
+            _currentLoopDepth: (options._currentLoopDepth || 0) + 1,
             findNamedChild(reference, variables) {
+                // NOTE: if we have a multi-layered loop, this should one-by-one fall back until the targeted loop is hit
+                const hashtags = fillHashtags((options._currentLoopDepth || 0) + 1)
+
                 // a little future-proofing, as sometimes the $ is there, and other times it isn't.
                 // we strip it out somewhere, but it shouldn't matter too much.
-                if (reference === "$.#" || reference === ".#") {
+                if (reference === `$.${hashtags}` || reference === `.${hashtags}`) {
                     return item
                 }
 

@@ -70,6 +70,8 @@ export interface Options {
      */
     findNamedChild: FindNamedChildFunc
 
+    _currentLoopDepth?: number
+
     /**
      * The path to the current value in the current object, for interactive debugger stepping.
      */
@@ -102,6 +104,7 @@ export function test<Variables = Record<string, unknown>>(
         findNamedChild: options?.findNamedChild || findNamedChild,
         ...(options || {}),
         _path: "ROOTOBJ",
+        _currentLoopDepth: 0,
     })
 }
 
