@@ -51,11 +51,16 @@ export function handleArrayLogic<Variables>(
             _currentLoopDepth: (options._currentLoopDepth || 0) + 1,
             findNamedChild(reference, variables) {
                 // NOTE: if we have a multi-layered loop, this should one-by-one fall back until the targeted loop is hit
-                const hashtags = fillHashtags((options._currentLoopDepth || 0) + 1)
+                const hashtags = fillHashtags(
+                    (options._currentLoopDepth || 0) + 1
+                )
 
                 // a little future-proofing, as sometimes the $ is there, and other times it isn't.
                 // we strip it out somewhere, but it shouldn't matter too much.
-                if (reference === `$.${hashtags}` || reference === `.${hashtags}`) {
+                if (
+                    reference === `$.${hashtags}` ||
+                    reference === `.${hashtags}`
+                ) {
                     return item
                 }
 

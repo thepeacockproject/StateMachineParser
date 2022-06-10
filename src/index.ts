@@ -26,6 +26,9 @@ import {
     TimerCallback,
     Timer,
 } from "./timers"
+import debug from "debug"
+
+const trace = debug("smparser:trace")
 
 function findNamedChild(
     reference: string,
@@ -108,11 +111,20 @@ export function test<Variables = Record<string, unknown>>(
     })
 }
 
+function testWithPath(input: any, variables, options: Options, name: string) {
+    return realTest(input, variables, {
+        ...options,
+        _path: `${options._path}.${name}`,
+    })
+}
+
 function realTest<Variables, Return = Variables | boolean>(
     input: any,
     variables: Variables,
     options: Options
 ): Variables | boolean {
+    trace(`Visiting ${options._path}`)
+
     if (
         typeof input === "number" ||
         typeof input === "boolean" ||
@@ -142,10 +154,7 @@ function realTest<Variables, Return = Variables | boolean>(
         if (input.hasOwnProperty("$eq")) {
             // transform any strings inside these arrays into their intended context values
             const predicate = (val, index) =>
-                realTest(val, variables, {
-                    ...options,
-                    _path: `${options._path}.$eq[${index}]`,
-                })
+                testWithPath(val, variables, options, `$eq[${index}]`)
 
             if (Array.isArray(input.$eq[0] || input.$eq[1])) {
                 return arraysAreEqual(
@@ -156,91 +165,52 @@ function realTest<Variables, Return = Variables | boolean>(
 
             return (
                 // we test twice because we need to make sure that the value is fixed if it's a variable
-                realTest(input.$eq[0], variables, {
-                    ...options,
-                    _path: `${options._path}.$eq[0]`,
-                }) ===
-                realTest(input.$eq[1], variables, {
-                    ...options,
-                    _path: `${options._path}.$eq[1]`,
-                })
+                testWithPath(input.$eq[0], variables, options, "$eq[0]") ===
+                testWithPath(input.$eq[1], variables, options, "$eq[1]")
             )
         }
 
         if (input.hasOwnProperty("$not")) {
-            return !realTest(input.$not, variables, {
-                ...options,
-                _path: `${options._path}.$not`,
-            })
+            return !testWithPath(input.$not, variables, options, "$not")
         }
 
         if (input.hasOwnProperty("$and")) {
             return input.$and.every((val, index) =>
-                realTest(val, variables, {
-                    ...options,
-                    _path: `${options._path}.$and[${index}]`,
-                })
+                testWithPath(val, variables, options, `$and[${index}]`)
             )
         }
 
         if (input.hasOwnProperty("$or")) {
             return input.$or.some((val, index) =>
-                realTest(val, variables, {
-                    ...options,
-                    _path: `${options._path}.$or[${index}]`,
-                })
+                testWithPath(val, variables, options, `$or[${index}]`)
             )
         }
 
         if (input.hasOwnProperty("$gt")) {
             return (
-                realTest(input.$gt[0], variables, {
-                    ...options,
-                    _path: `${options._path}.$gt[0]`,
-                }) >
-                realTest(input.$gt[1], variables, {
-                    ...options,
-                    _path: `${options._path}.$gt[1]`,
-                })
+                testWithPath(input.$gt[0], variables, options, "$gt[0]") >
+                testWithPath(input.$gt[1], variables, options, "$gt[1]")
             )
         }
 
         if (input.hasOwnProperty("$gte")) {
             return (
-                realTest(input.$gte[0], variables, {
-                    ...options,
-                    _path: `${options._path}.$gte[0]`,
-                }) >=
-                realTest(input.$gte[1], variables, {
-                    ...options,
-                    _path: `${options._path}.$gte[1]`,
-                })
+                testWithPath(input.$gte[0], variables, options, "$gte[0]") >=
+                testWithPath(input.$gte[1], variables, options, "$gte[1]")
             )
         }
 
         if (input.hasOwnProperty("$lt")) {
             return (
-                realTest(input.$lt[0], variables, {
-                    ...options,
-                    _path: `${options._path}.$lt[0]`,
-                }) <
-                realTest(input.$lt[1], variables, {
-                    ...options,
-                    _path: `${options._path}.$lt[1]`,
-                })
+                testWithPath(input.$lt[0], variables, options, "$lt[0]") <
+                testWithPath(input.$lt[1], variables, options, "$lt[1]")
             )
         }
 
         if (input.hasOwnProperty("$lte")) {
             return (
-                realTest(input.$lte[0], variables, {
-                    ...options,
-                    _path: `${options._path}.$lte[0]`,
-                }) <=
-                realTest(input.$lte[1], variables, {
-                    ...options,
-                    _path: `${options._path}.$lte[1]`,
-                })
+                testWithPath(input.$lte[0], variables, options, "$lte[0]") <=
+                testWithPath(input.$lte[1], variables, options, "$lte[1]")
             )
         }
 

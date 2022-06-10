@@ -39,16 +39,17 @@
         "require": "./build/index-cjs.js"
     },
     "devDependencies": {
+        "@types/debug": "^4.1.7",
         "@types/mocha": "^9.1.1",
-        "@types/node": "^17.0.35",
-        "call-spy": "^3.0.0",
+        "@types/node": "^17.0.41",
+        "debug": "^4.3.4",
         "esbuild": "^0.14.41",
         "esbuild-register": "^3.3.2",
         "get-package-type": "^0.1.0",
         "mocha": "^10.0.0",
         "nyc": "^15.1.0",
         "prettier": "^2.6.2",
-        "typescript": "^4.7.2"
+        "typescript": "^4.7.3"
     },
     "scripts": {
         "prettier": "prettier --write \"**/*.{ts,md,json,js,cjs}\"",
