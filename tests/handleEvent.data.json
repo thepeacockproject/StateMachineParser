@@ -78,5 +78,19 @@
                 "Value": {}
             }
         ]
+    },
+    "immediateState": {
+        "Definition": {
+            "Context": {
+                "Targets": []
+            },
+            "States": {
+                "Start": {
+                    "-": {
+                        "Transition": "Success"
+                    }
+                }
+            }
+        }
     }
 }

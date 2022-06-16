@@ -1,5 +1,5 @@
-/**
- *    Copyright 2022 The Peacock Project
+/*
+ *    Copyright (c) 2022 The Peacock Project
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { set } from "./utils"
+import { PROTOTYPE_POLLUTION_KEYS, set } from "./utils"
 import { arraysAreEqual, handleArrayLogic } from "./arrayHandling"
 import { handleEvent } from "./handleEvent"
 import {
@@ -28,14 +28,29 @@ import {
 } from "./timers"
 import debug from "debug"
 
-const trace = debug("smparser:trace")
-
+/**
+ * Evaluates a reference to a property as a string into the actual value.
+ * For instance, `myObj.property.hi` would be the same as
+ * `myObj["property"]["hi"]` in actual JavaScript.
+ *
+ * @param reference The reference to the target as a string.
+ * @param variables The object that may contain the target.
+ * @returns The value if found, or the reference if it wasn't /
+ * something went wrong.
+ */
 function findNamedChild(
     reference: string,
     variables: Record<string, any>
 ): any {
     if (typeof reference !== "string") {
         return reference
+    }
+
+    // no prototype pollution please
+    for (const pollutant of PROTOTYPE_POLLUTION_KEYS) {
+        if (reference.includes(pollutant)) {
+            return reference
+        }
     }
 
     if (reference.includes("#")) {
@@ -69,19 +84,26 @@ function findNamedChild(
 
 export interface Options {
     /**
-     * The findNamedChild function that should be used for resolution of variables.
+     * The findNamedChild function that should be used for resolution of
+     * variables.
      */
     findNamedChild: FindNamedChildFunc
 
+    /**
+     * How many nested loop nodes we are currently in - used to determine what
+     * the value of the current iterator should point to.
+     */
     _currentLoopDepth?: number
 
     /**
-     * The path to the current value in the current object, for interactive debugger stepping.
+     * The path to the current value in the current object, for interactive
+     * debugger stepping and tracing.
      */
     _path?: string
 
     /**
-     * The timer manager instance. If not defined, timers will never be started, and will always return false.
+     * The timer manager instance. If not defined, timers will never be started,
+     * and will always return false.
      */
     timerManager?: TimerManager
 }
@@ -100,7 +122,7 @@ export function test<Variables = Record<string, unknown>>(
     }
 
     if (options?._path) {
-        throw new Error("Hey, I make the paths, not you!!")
+        throw new Error("Paths can only be specified internally, not by API consumers.")
     }
 
     return realTest(input, variables, {
@@ -111,6 +133,11 @@ export function test<Variables = Record<string, unknown>>(
     })
 }
 
+/**
+ * Tiny wrapper function that calls {@link realTest} with a path specified.
+ * The benefit of using this is that it's a single, inline call, instead of 4
+ * lines per call.
+ */
 function testWithPath(input: any, variables, options: Options, name: string) {
     return realTest(input, variables, {
         ...options,
@@ -123,6 +150,8 @@ function realTest<Variables, Return = Variables | boolean>(
     variables: Variables,
     options: Options
 ): Variables | boolean {
+    const trace = debug("smparser:trace")
+
     trace(`Visiting ${options._path}`)
 
     if (
@@ -143,10 +172,7 @@ function realTest<Variables, Return = Variables | boolean>(
     if (Array.isArray(input)) {
         // @ts-expect-error Type mismatch thing.
         return input.map((val, index) =>
-            realTest(val, variables, {
-                ...options,
-                _path: `${options._path}[${index}]`,
-            })
+            testWithPath(val, variables, options, `[${index}]`)
         )
     }
 

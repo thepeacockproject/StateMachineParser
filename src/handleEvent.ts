@@ -1,5 +1,5 @@
-/**
- *    Copyright 2022 The Peacock Project
+/*
+ *    Copyright (c) 2022 The Peacock Project
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 
 import { handleActions, test, TimerManager } from "./index"
-import { sha1 } from "./utils"
+import debug from "debug"
 
 /**
  * Options that are passed to {@link handleEvent}.
  */
 export interface HandleEventOptions {
     eventName: string
-    completedImmediateStates?: string[]
     currentState?: string
     timerManager?: TimerManager
 }
@@ -34,7 +33,6 @@ export interface HandleEventOptions {
 export interface HandleEventReturn<Context> {
     state: string
     context: Context
-    completedImmediateStates: string[]
 }
 
 interface InStateEventHandler {
@@ -93,30 +91,27 @@ export function handleEvent<Context = unknown, Event = unknown>(
     event: Event,
     options: HandleEventOptions
 ): HandleEventReturn<Partial<Context>> {
+    const trace = debug("smparser:handleEvent")
     const { eventName, currentState = "Start" } = options
 
-    const completedImmediateStates = options.completedImmediateStates || []
-
     // (current state object - reduces code duplication)
-    const csObject = definition.States?.[currentState]
+    let csObject = definition.States?.[currentState]
 
     if (
         !csObject ||
-        (!csObject?.[eventName] && !csObject?.["-"] && !csObject?.$timer)
+        (!csObject?.[eventName] && !csObject?.$timer)
     ) {
+        trace(`SM in state ${currentState} disregarding ${eventName}`)
         // we are here because either:
         // - we have no handler for the current state
         // - in this particular state, the state machine doesn't care about the current event
         return {
             context: definition.Context,
             state: currentState,
-            completedImmediateStates,
         }
     }
 
     const hasTimerState = !!csObject.$timer && !!options?.timerManager
-
-    const hasImmediateState = !!csObject["-"]
 
     // ensure no circular references are present, and that this won't update the param by accident
     let newContext = JSON.parse(JSON.stringify(context))
@@ -193,6 +188,13 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
         if (conditionResult && shouldPerformTransition) {
             state = handler.Transition
+
+            trace(`${currentState} is performing a transition to ${state} - running it's "-" event`)
+
+            return handleEvent(definition, newContext, {}, {
+                eventName: "-",
+                currentState: state,
+            })
         }
 
         return {
@@ -222,30 +224,6 @@ export function handleEvent<Context = unknown, Event = unknown>(
         }
     }
 
-    if (hasImmediateState) {
-        const immediateState = csObject["-"]
-
-        if (Array.isArray(immediateState)) {
-            for (const state of immediateState) {
-                const hash = sha1(JSON.stringify(state || {}))
-
-                if (!completedImmediateStates.includes(hash)) {
-                    ;(eventHandlers as EHArray).push(state)
-
-                    completedImmediateStates.push(hash)
-                }
-            }
-        } else {
-            const hash = sha1(JSON.stringify(immediateState || {}))
-
-            if (!completedImmediateStates.includes(hash)) {
-                ;(eventHandlers as EHArray).push(immediateState)
-
-                completedImmediateStates.push(hash)
-            }
-        }
-    }
-
     //#endregion
 
     for (const handler of eventHandlers) {
@@ -258,7 +236,6 @@ export function handleEvent<Context = unknown, Event = unknown>(
             return {
                 context: newContext,
                 state: out.state,
-                completedImmediateStates,
             }
         }
     }
@@ -266,6 +243,5 @@ export function handleEvent<Context = unknown, Event = unknown>(
     return {
         state: currentState,
         context: newContext,
-        completedImmediateStates,
     }
 }

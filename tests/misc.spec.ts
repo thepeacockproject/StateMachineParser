@@ -1,4 +1,20 @@
-import { set, sha1 } from "../src/utils"
+/*
+ *    Copyright (c) 2022 The Peacock Project
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+import { set } from "../src/utils"
 import assert from "assert"
 
 // the main purpose of this is just to improve code coverage
@@ -12,35 +28,12 @@ describe("utils", () => {
                 return "polluted"
             })
 
-            // @ts-expect-error I know.
             assert.strictEqual(
+                // @ts-expect-error I know.
                 Object.prototype.func,
                 undefined,
                 "prototype pollution succeeded"
             )
         })
-    })
-
-    describe("sha1", () => {
-        assert.strictEqual(
-            sha1(""),
-            "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-            "sha1 calc of empty string is wrong"
-        )
-        assert.strictEqual(
-            sha1("hello-world"),
-            "fbb969117edfa916b86dfb67fd11decf1e336df0",
-            "sha1 calc of 'hello-world' is wrong"
-        )
-        assert.strictEqual(
-            sha1("abcdef"),
-            "1f8ac10f23c5b5bc1167bda84b833e5c057a77d2",
-            "sha1 calc of 'abcdef' is wrong"
-        )
-        assert.strictEqual(
-            sha1("128734598"),
-            "6c7ffcb2e7e8bef9e956b7998c48cf4d9d53d831",
-            "sha1 calc of '128734598' is wrong"
-        )
     })
 })
