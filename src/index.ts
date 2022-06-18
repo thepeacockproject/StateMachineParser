@@ -23,7 +23,6 @@ import {
     TIMER_CANCELLED,
     TIMER_RUNNING,
     TimerStatus,
-    TimerCallback,
     Timer,
 } from "./timers"
 import debug from "debug"
@@ -93,19 +92,25 @@ export interface Options {
      * How many nested loop nodes we are currently in - used to determine what
      * the value of the current iterator should point to.
      */
-    _currentLoopDepth?: number
+    _currentLoopDepth: number
 
     /**
      * The path to the current value in the current object, for interactive
      * debugger stepping and tracing.
      */
-    _path?: string
+    _path: string
 
     /**
      * The timer manager instance. If not defined, timers will never be started,
      * and will always return false.
      */
     timerManager?: TimerManager
+
+    /**
+     * If applicable, the timestamp that the event occurred at. If not defined,
+     * it will fall back to the time the method is invoked.
+     */
+    eventTimestamp: number
 }
 
 export function test<Variables = Record<string, unknown>>(
@@ -125,11 +130,16 @@ export function test<Variables = Record<string, unknown>>(
         throw new Error("Paths can only be specified internally, not by API consumers.")
     }
 
+    if (options?._currentLoopDepth) {
+        throw new Error("Current loop depth cannot be specified by API consumers.")
+    }
+
     return realTest(input, variables, {
         findNamedChild: options?.findNamedChild || findNamedChild,
         ...(options || {}),
         _path: "ROOTOBJ",
         _currentLoopDepth: 0,
+        eventTimestamp: options?.eventTimestamp || Date.now(),
     })
 }
 
@@ -269,26 +279,23 @@ function realTest<Variables, Return = Variables | boolean>(
                 // add timer details
                 timer = options.timerManager.createTimer(
                     `${options._path}.$after`,
-                    // @ts-expect-error Yes it's a number.
-                    <number>realTest(input.$after, variables, {
-                        ...options,
-                        _path: `${options._path}.$after`,
-                    })
+                    <number>testWithPath(input.$after, variables, options, "$after"),
+                    options.eventTimestamp
                 )
             }
 
             if (
-                timer.state === TIMER_CANCELLED ||
-                timer.state === TIMER_RUNNING
+                timer.status === TIMER_CANCELLED ||
+                timer.status === TIMER_RUNNING
             ) {
                 return false
             }
 
-            if (timer.state === TIMER_COMPLETE) {
+            if (timer.status === TIMER_COMPLETE) {
                 return true
             }
 
-            throw new Error("Invalid timer state!")
+            throw new Error("Invalid timer status!")
         }
     }
 
@@ -441,7 +448,6 @@ export {
     TIMER_COMPLETE,
     TIMER_CANCELLED,
     TIMER_RUNNING,
-    Timer,
     TimerManager,
 }
-export type { TimerStatus, TimerCallback }
+export type { TimerStatus, Timer }

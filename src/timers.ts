@@ -14,94 +14,26 @@
  *    limitations under the License.
  */
 
-/**
- * A unique identifier indicating that a timer has successfully finished.
- */
+/** A unique identifier indicating that a timer has successfully finished. */
 export const TIMER_COMPLETE = Symbol.for("StateMachineTimerComplete")
-/**
- * A unique identifier indicating that a timer has been cancelled before it was able to finish.
- */
+/** A unique identifier indicating that a timer has been cancelled before it was able to finish. */
 export const TIMER_CANCELLED = Symbol.for("StateMachineTimerCancelled")
-/**
- * A unique identifier indicating that a timer is currently running.
- */
+/** A unique identifier indicating that a timer is currently running. */
 export const TIMER_RUNNING = Symbol.for("StateMachineTimerRunning")
-/**
- * The status of a timer. Can be running, cancelled, or completed.
- */
+/** The status of a timer. */
 export type TimerStatus =
     | typeof TIMER_COMPLETE
     | typeof TIMER_CANCELLED
     | typeof TIMER_RUNNING
 
-/**
- * The callback function that can be given to a timer.
- */
-export type TimerCallback = (status: TimerStatus) => void
-
-export class Timer {
-    private _state: TimerStatus
-    private readonly _timer: NodeJS.Timer
-
-    /**
-     * The current status of a timer.
-     */
-    get state(): TimerStatus {
-        return this._state
-    }
-
-    /**
-     * Set the current status of a timer.
-     *
-     * @throws {TypeError} If the newState value is not an acceptable type.
-     * @param newState The new state value.
-     */
-    set state(newState: TimerStatus) {
-        if (
-            newState !== TIMER_CANCELLED &&
-            newState !== TIMER_RUNNING &&
-            newState !== TIMER_COMPLETE
-        ) {
-            throw new TypeError(`Invalid timer state: ${newState}!`)
-        }
-
-        this._state = newState
-    }
-
-    /**
-     * A class representing a timer.
-     *
-     * @param length The length in seconds of the timer.
-     * @param callback The callback function to run when the state is finalized.
-     */
-    constructor(length: number, private readonly callback?: TimerCallback) {
-        this.state = TIMER_RUNNING
-
-        this._timer = setInterval(() => {
-            if (this.state === TIMER_CANCELLED) {
-                // this should not be possible, but just in case
-                return
-            }
-
-            this.state = TIMER_COMPLETE
-            clearInterval(this._timer)
-            this.callback?.(this.state)
-        }, length * 1000)
-    }
-
-    /**
-     * Cancel execution of a timer early.
-     */
-    cancel(): void {
-        if (this.state !== TIMER_RUNNING) {
-            // ignore this call if the timer isn't running
-            return
-        }
-
-        clearInterval(this._timer)
-        this.state = TIMER_CANCELLED
-        this.callback?.(this.state)
-    }
+/** A timer. */
+export interface Timer {
+    /** The start timestamp. */
+    start: number
+    /** The end timestamp. */
+    end: number
+    /** The status. */
+    status: TimerStatus
 }
 
 /**
@@ -112,10 +44,9 @@ export class TimerManager {
      * Note: please avoid accessing this directly.
      *
      * @see getTimer
-     * @see setTimer
      * @see createTimer
      */
-    timers: Map<string, Timer>
+    protected timers: Map<string, Timer>
 
     constructor() {
         this.timers = new Map<string, Timer>()
@@ -142,15 +73,26 @@ export class TimerManager {
     }
 
     /**
+     * Get a list of all the timer paths registered with this timer manager.
+     */
+    get allRegisteredTimerPaths(): string[] {
+        return Array.from(this.timers.keys())
+    }
+
+    /**
      * Create a timer. Mainly meant for consumers who want to use a custom timer class.
      *
      * @param path The timer's JSON path.
      * @param length The timer's length in seconds.
-     * @param callback Optional callback.
+     * @param startTimestamp The timer's starting timestamp.
      * @returns The timer.
      */
-    createTimer(path: string, length: number, callback?: TimerCallback): Timer {
-        const t = new Timer(length, callback)
+    createTimer(path: string, length: number, startTimestamp: number): Timer {
+        const t: Timer = {
+            start: startTimestamp,
+            end: startTimestamp + (length * 1000),
+            status: TIMER_RUNNING,
+        }
         this.timers.set(path, t)
         return t
     }

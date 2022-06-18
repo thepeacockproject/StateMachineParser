@@ -22,6 +22,7 @@ import debug from "debug"
  */
 export interface HandleEventOptions {
     eventName: string
+    eventTimestamp?: number
     currentState?: string
     timerManager?: TimerManager
 }
@@ -161,6 +162,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
             for (const actionSet of Actions as unknown[]) {
                 for (const action of Object.keys(actionSet)) {
+                    trace(`performing action ${action}`)
+
                     newContext = handleActions(
                         {
                             [action]: actionSet[action],
