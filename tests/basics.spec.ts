@@ -39,7 +39,8 @@ describe("essential validation", () => {
 
     it("doesn't accept a path value in the outward-facing test function", () => {
         assert.throws(() => test({}, {}, { _path: "value" }), {
-            message: "Paths can only be specified internally, not by API consumers.",
+            message:
+                "Paths can only be specified internally, not by API consumers.",
         })
     })
 })

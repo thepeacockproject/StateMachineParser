@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.0.0
+
+-   Added tracing functionality to assist with finding bugs.
+-   Support `$remove` action.
+-   Synchronized copyright headers.
+-   `handleEvent` now automatically handles the immediately invoked event upon transitions.
+
 ## v3.3.0
 
 -   Moved the build setup to esbuild.

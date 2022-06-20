@@ -97,10 +97,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     // (current state object - reduces code duplication)
     let csObject = definition.States?.[currentState]
 
-    if (
-        !csObject ||
-        (!csObject?.[eventName] && !csObject?.$timer)
-    ) {
+    if (!csObject || (!csObject?.[eventName] && !csObject?.$timer)) {
         trace(`SM in state ${currentState} disregarding ${eventName}`)
         // we are here because either:
         // - we have no handler for the current state
@@ -189,12 +186,19 @@ export function handleEvent<Context = unknown, Event = unknown>(
         if (conditionResult && shouldPerformTransition) {
             state = handler.Transition
 
-            trace(`${currentState} is performing a transition to ${state} - running it's "-" event`)
+            trace(
+                `${currentState} is performing a transition to ${state} - running its "-" event`
+            )
 
-            return handleEvent(definition, newContext, {}, {
-                eventName: "-",
-                currentState: state,
-            })
+            return handleEvent(
+                definition,
+                newContext,
+                {},
+                {
+                    eventName: "-",
+                    currentState: state,
+                }
+            )
         }
 
         return {
@@ -212,8 +216,6 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
     type EHArray = InStateEventHandler[]
 
-    //#region timers and immediate states
-
     if (hasTimerState) {
         const timerState = csObject.$timer
 
@@ -223,8 +225,6 @@ export function handleEvent<Context = unknown, Event = unknown>(
             ;(eventHandlers as EHArray).push(timerState)
         }
     }
-
-    //#endregion
 
     for (const handler of eventHandlers) {
         const out = doEventHandler(handler)

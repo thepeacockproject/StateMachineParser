@@ -16,7 +16,11 @@
 
 // @ts-nocheck
 
-export const PROTOTYPE_POLLUTION_KEYS = ["__proto__", "constructor", "prototype"]
+export const PROTOTYPE_POLLUTION_KEYS = [
+    "__proto__",
+    "constructor",
+    "prototype",
+]
 
 /**
  * Dependency 'dset'.

@@ -23,9 +23,9 @@ const data = {
             $remove: ["$FavoriteFoods", "pickles"],
         },
         {
-            FavoriteFoods: ["apples", "oranges", "pickles"]
+            FavoriteFoods: ["apples", "oranges", "pickles"],
         },
-    ]
+    ],
 }
 
 describe("$remove", () => {
@@ -36,7 +36,7 @@ describe("$remove", () => {
 
         assert.strictEqual(
             JSON.stringify(r.FavoriteFoods),
-            JSON.stringify(["apples", "oranges"]),
+            JSON.stringify(["apples", "oranges"])
         )
     })
 })

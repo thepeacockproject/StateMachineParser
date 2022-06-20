@@ -122,7 +122,9 @@ export function test<Variables = Record<string, unknown>>(
     }
 
     if (options?._path) {
-        throw new Error("Paths can only be specified internally, not by API consumers.")
+        throw new Error(
+            "Paths can only be specified internally, not by API consumers."
+        )
     }
 
     return realTest(input, variables, {
