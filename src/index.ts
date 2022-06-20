@@ -315,6 +315,8 @@ export function handleActions<Context>(
         return variables
     }
 
+    // TODO: Refactor this into a switch statement using the object keys instead of hasOwn.
+
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
             const variableValue = findNamedChild(input[op], variables)
@@ -431,6 +433,25 @@ export function handleActions<Context>(
 
     if (input.hasOwnProperty("$pushunique")) {
         push(true)
+    }
+
+    if (input.hasOwnProperty("$remove")) {
+        let reference = input.$remove[0]
+
+        if (reference.startsWith("$")) {
+            reference = reference.substring(1)
+        }
+
+        const value = findNamedChild(input.$remove[1], variables)
+
+        // clone the thing
+        let array: unknown[] = JSON.parse(
+            JSON.stringify(findNamedChild(reference, variables))
+        )
+
+        array = array.filter((item) => item !== value)
+
+        set(variables, reference, array)
     }
 
     return variables
