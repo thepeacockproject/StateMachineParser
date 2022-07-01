@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { set } from "../src/utils"
+import { findNamedChild, set } from "../src/utils"
 import assert from "assert"
 
 // the main purpose of this is just to improve code coverage
@@ -34,6 +34,20 @@ describe("utils", () => {
                 undefined,
                 "prototype pollution succeeded"
             )
+        })
+    })
+
+    describe("findNamedChild", () => {
+        it("has the Count property on arrays", () => {
+            const input = {
+                Items: ["apple", "banana", "orange", "pear"],
+            }
+
+            assert.strictEqual(findNamedChild("$Items.Count", input), 4)
+        })
+
+        it("returns the input if it is a loop", () => {
+            assert.strictEqual(findNamedChild("$.#", {}), "$.#")
         })
     })
 })

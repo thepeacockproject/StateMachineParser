@@ -67,7 +67,7 @@ const data = {
                     $eq: [false, false],
                 },
                 {
-                    $eq: [[], []],
+                    $eq: ["fgdgfdgdfg", "fgdgfdgdfg"],
                 },
             ],
         },

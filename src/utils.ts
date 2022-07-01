@@ -61,3 +61,69 @@ export function set(obj, keys: string | string[], val): void {
                 : []
     }
 }
+
+/**
+ * Evaluates a reference to a property as a string into the actual value.
+ * For instance, `myObj.property.hi` would be the same as
+ * `myObj["property"]["hi"]` in actual JavaScript.
+ *
+ * @param reference The reference to the target as a string.
+ * @param variables The object that may contain the target.
+ * @returns The value if found, or the reference if it wasn't /
+ * something went wrong.
+ */
+export function findNamedChild(
+    reference: string,
+    variables: Record<string, any>
+): any {
+    if (typeof reference !== "string") {
+        return reference
+    }
+
+    // no prototype pollution please
+    for (const pollutant of PROTOTYPE_POLLUTION_KEYS) {
+        if (reference.includes(pollutant)) {
+            return reference
+        }
+    }
+
+    if (reference.includes("#")) {
+        return reference
+    }
+
+    if (reference.startsWith("$")) {
+        reference = reference.substring(1)
+    }
+
+    let obj = variables
+
+    // if we have a global matching the exact name of the reference, this is probably what we want
+    if (Object.prototype.hasOwnProperty.call(obj, reference)) {
+        return obj[reference]
+    }
+
+    if (reference.includes(".")) {
+        // the thing has a dot in it, which means that it's accessing a global
+        const parts = reference.split(".")
+
+        for (let part of parts) {
+            // Arrays have a custom property, `Count`, which is equal to their length
+            if (part === "Count" && Array.isArray(obj)) {
+                obj = (obj as unknown[]).length
+
+                continue
+            }
+
+            obj = obj?.[part]
+        }
+
+        return obj
+    }
+
+    return reference // it's just a string
+}
+
+/**
+ * @internal
+ */
+export type FindNamedChildFunc = typeof findNamedChild

@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-import { PROTOTYPE_POLLUTION_KEYS, set } from "./utils"
-import { arraysAreEqual, handleArrayLogic } from "./arrayHandling"
+import { findNamedChild, FindNamedChildFunc, set } from "./utils"
+import { handleArrayLogic } from "./arrayHandling"
 import { handleEvent } from "./handleEvent"
 import {
     TimerManager,
@@ -27,60 +27,6 @@ import {
     Timer,
 } from "./timers"
 import debug from "debug"
-
-/**
- * Evaluates a reference to a property as a string into the actual value.
- * For instance, `myObj.property.hi` would be the same as
- * `myObj["property"]["hi"]` in actual JavaScript.
- *
- * @param reference The reference to the target as a string.
- * @param variables The object that may contain the target.
- * @returns The value if found, or the reference if it wasn't /
- * something went wrong.
- */
-function findNamedChild(
-    reference: string,
-    variables: Record<string, any>
-): any {
-    if (typeof reference !== "string") {
-        return reference
-    }
-
-    // no prototype pollution please
-    for (const pollutant of PROTOTYPE_POLLUTION_KEYS) {
-        if (reference.includes(pollutant)) {
-            return reference
-        }
-    }
-
-    if (reference.includes("#")) {
-        return reference
-    }
-
-    if (reference.startsWith("$")) {
-        reference = reference.substring(1)
-    }
-
-    let obj = variables
-
-    // if we have a global matching the exact name of the reference, this is probably what we want
-    if (Object.prototype.hasOwnProperty.call(obj, reference)) {
-        return obj[reference]
-    }
-
-    if (reference.includes(".")) {
-        // the thing has a dot in it, which means that it's accessing a global
-        const parts = reference.split(".")
-
-        for (let part of parts) {
-            obj = obj?.[part]
-        }
-
-        return obj
-    }
-
-    return reference // it's just a string
-}
 
 export interface Options {
     /**
@@ -181,14 +127,9 @@ function realTest<Variables, Return = Variables | boolean>(
     if (typeof input === "object") {
         if (input.hasOwnProperty("$eq")) {
             // transform any strings inside these arrays into their intended context values
-            const predicate = (val, index) =>
-                testWithPath(val, variables, options, `$eq[${index}]`)
-
             if (Array.isArray(input.$eq[0] || input.$eq[1])) {
-                return arraysAreEqual(
-                    input.$eq[0].map(predicate),
-                    input.$eq[1].map(predicate)
-                )
+                trace("attempted to compare arrays (can't!)")
+                return false
             }
 
             return (
@@ -303,11 +244,6 @@ function realTest<Variables, Return = Variables | boolean>(
  * @internal
  */
 export type RealTestFunc = typeof realTest
-
-/**
- * @internal
- */
-export type FindNamedChildFunc = typeof findNamedChild
 
 export function handleActions<Context>(
     input: any,
