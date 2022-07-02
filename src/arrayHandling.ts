@@ -81,4 +81,3 @@ export function handleArrayLogic<Variables>(
     // otherwise, only some (or possibly none) worked
     return op === "$all"
 }
-
