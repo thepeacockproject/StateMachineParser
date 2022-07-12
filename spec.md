@@ -14,7 +14,7 @@ This node accepts an array of 2 items, which will be checked for equality.
 
 This node returns true if the 2 items are equal to each other.
 
-> Implementation Note: We have made sure that JavaScript arrays with identical contents will equal each other.
+> Implementation Note: Arrays will not equal each other (starting in v4.1.0).
 
 Example:
 
@@ -109,7 +109,7 @@ Example:
 
 This node is indented for delaying a state machine's evaluation by a number of seconds.
 
-> Implementation Note: We always return true, instead of actually timing anything.
+> Implementation Note: This node is very loosely implemented, and will be rewritten in the near future.
 
 ### `$inarray`
 
@@ -128,5 +128,15 @@ Documentation not yet done here. Feel free to open a PR!
 Documentation not yet done here. Feel free to open a PR!
 
 ### `$set`
+
+Documentation not yet done here. Feel free to open a PR!
+
+### `$push`
+
+Documentation not yet done here. Feel free to open a PR!
+
+### `$pushunique`
+
+> **Warning**: This node is the only one that is both a condition and an action.
 
 Documentation not yet done here. Feel free to open a PR!

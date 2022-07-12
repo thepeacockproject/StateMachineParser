@@ -14,13 +14,19 @@
  *    limitations under the License.
  */
 
-// @ts-nocheck
-
 export const PROTOTYPE_POLLUTION_KEYS = [
     "__proto__",
     "constructor",
     "prototype",
 ]
+
+/**
+ * When we are getting or setting a named child, we don't want:
+ * - A leading $
+ * - A leading $.
+ * - Any ( or )
+ */
+const DEAD_CHARS_REGEX = /^\.|^\$|^\$\..*|\(.*|\)$/g
 
 /**
  * Dependency 'dset'.
@@ -30,6 +36,7 @@ export const PROTOTYPE_POLLUTION_KEYS = [
  */
 export function set(obj, keys: string | string[], val): void {
     if (typeof keys === "string") {
+        keys = keys.replace(DEAD_CHARS_REGEX, "")
         keys = keys.split(".")
     }
 
@@ -56,6 +63,7 @@ export function set(obj, keys: string | string[], val): void {
         curr = curr[key] =
             typeof (currKey = curr[key]) === typeof keys
                 ? currKey
+                // @ts-expect-error Very interesting type stuff going on here.
                 : keys[i] * 0 !== 0 || !!~("" + keys[i]).indexOf(".")
                 ? {}
                 : []
@@ -74,7 +82,7 @@ export function set(obj, keys: string | string[], val): void {
  */
 export function findNamedChild(
     reference: string,
-    variables: Record<string, any>
+    variables: any
 ): any {
     if (typeof reference !== "string") {
         return reference
@@ -91,9 +99,7 @@ export function findNamedChild(
         return reference
     }
 
-    if (reference.startsWith("$")) {
-        reference = reference.substring(1)
-    }
+    reference = reference.replace(DEAD_CHARS_REGEX, "")
 
     let obj = variables
 

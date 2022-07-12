@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import type { Options, RealTestFunc } from "./index"
+import type { TestOptions, RealTestFunc } from "./index"
 
 const fillHashtags = (count: number): string => "#".repeat(count)
 
@@ -34,7 +34,7 @@ export function handleArrayLogic<Variables>(
     input: any,
     variables: Variables,
     op: string,
-    options: Options
+    options: TestOptions
 ): boolean {
     // find the array
     const array = realTest(input[op]["in"], variables, {

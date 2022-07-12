@@ -16,6 +16,7 @@
 
 import { handleActions, test, TimerManager } from "./index"
 import debug from "debug"
+import { findNamedChild, set } from "./utils"
 
 /**
  * Options that are passed to {@link handleEvent}.
@@ -46,7 +47,7 @@ interface InStateEventHandler {
  * A state machine, in a minimal form.
  * Context and Constants are generic, so they can be typed by library consumers.
  */
-interface StateMachineLike<Context, Constants = undefined> {
+interface StateMachineLike<Context, Constants = object | undefined> {
     /**
      * The globals.
      */
@@ -140,6 +141,21 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 Value: event,
                 ...(context || {}),
                 ...(definition.Constants || {}),
+            }, {
+                pushUniqueAction(reference, item) {
+                    const referenceArray = findNamedChild(reference, newContext)
+                    item = findNamedChild(item, newContext)
+
+                    if (referenceArray?.includes(item)) {
+                        return false
+                    }
+
+                    referenceArray.push(item)
+
+                    set(newContext, reference, referenceArray)
+
+                    return true
+                }
             })
         }
 

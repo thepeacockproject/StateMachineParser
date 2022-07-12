@@ -28,7 +28,7 @@ import {
 } from "./timers"
 import debug from "debug"
 
-export interface Options {
+export interface TestOptions {
     /**
      * The findNamedChild function that should be used for resolution of
      * variables.
@@ -52,18 +52,28 @@ export interface Options {
      * and will always return false.
      */
     timerManager?: TimerManager
+
+    /**
+     * The function called when a push-unique instruction occurs in a test case.
+     * Consumer-specified for backwards compatibility.
+     *
+     * @param reference A pointer to the array.
+     * @param value The value to try to push.
+     * @returns True if the value was pushed, false if it was not.
+     */
+    pushUniqueAction?: (reference: string, value: any) => boolean
 }
 
-export function test<Variables = Record<string, unknown>>(
+export function test<Context = Record<string, unknown>>(
     input: any,
-    variables: Variables,
-    options?: Partial<Options>
+    context: Context,
+    options?: Partial<TestOptions>
 ): boolean | any {
     if (input === null || input === undefined) {
         throw new Error("State machine is falsey!")
     }
 
-    if (variables === null || variables === undefined) {
+    if (context === null || context === undefined) {
         throw new Error("Context is falsey!")
     }
 
@@ -73,7 +83,7 @@ export function test<Variables = Record<string, unknown>>(
         )
     }
 
-    return realTest(input, variables, {
+    return realTest(input, context, {
         findNamedChild: options?.findNamedChild || findNamedChild,
         ...(options || {}),
         _path: "ROOTOBJ",
@@ -86,8 +96,8 @@ export function test<Variables = Record<string, unknown>>(
  * The benefit of using this is that it's a single, inline call, instead of 4
  * lines per call.
  */
-function testWithPath(input: any, variables, options: Options, name: string) {
-    return realTest(input, variables, {
+function testWithPath(input: any, context, options: TestOptions, name: string) {
+    return realTest(input, context, {
         ...options,
         _path: `${options._path}.${name}`,
     })
@@ -96,7 +106,7 @@ function testWithPath(input: any, variables, options: Options, name: string) {
 function realTest<Variables, Return = Variables | boolean>(
     input: any,
     variables: Variables,
-    options: Options
+    options: TestOptions
 ): Variables | boolean {
     const trace = debug("smparser:trace")
 
@@ -112,9 +122,7 @@ function realTest<Variables, Return = Variables | boolean>(
     }
 
     if (typeof input === "string") {
-        const realKeyName = input.startsWith("$") ? input.slice(1) : input
-
-        return options.findNamedChild(realKeyName, variables)
+        return options.findNamedChild(input, variables)
     }
 
     if (Array.isArray(input)) {
@@ -125,7 +133,9 @@ function realTest<Variables, Return = Variables | boolean>(
     }
 
     if (typeof input === "object") {
-        if (input.hasOwnProperty("$eq")) {
+        const has = (key: string) => Object.prototype.hasOwnProperty.call(input, key)
+
+        if (has("$eq")) {
             // transform any strings inside these arrays into their intended context values
             if (Array.isArray(input.$eq[0] || input.$eq[1])) {
                 trace("attempted to compare arrays (can't!)")
@@ -139,51 +149,51 @@ function realTest<Variables, Return = Variables | boolean>(
             )
         }
 
-        if (input.hasOwnProperty("$not")) {
+        if (has("$not")) {
             return !testWithPath(input.$not, variables, options, "$not")
         }
 
-        if (input.hasOwnProperty("$and")) {
+        if (has("$and")) {
             return input.$and.every((val, index) =>
                 testWithPath(val, variables, options, `$and[${index}]`)
             )
         }
 
-        if (input.hasOwnProperty("$or")) {
+        if (has("$or")) {
             return input.$or.some((val, index) =>
                 testWithPath(val, variables, options, `$or[${index}]`)
             )
         }
 
-        if (input.hasOwnProperty("$gt")) {
+        if (has("$gt")) {
             return (
                 testWithPath(input.$gt[0], variables, options, "$gt[0]") >
                 testWithPath(input.$gt[1], variables, options, "$gt[1]")
             )
         }
 
-        if (input.hasOwnProperty("$gte")) {
+        if (has("$gte")) {
             return (
                 testWithPath(input.$gte[0], variables, options, "$gte[0]") >=
                 testWithPath(input.$gte[1], variables, options, "$gte[1]")
             )
         }
 
-        if (input.hasOwnProperty("$lt")) {
+        if (has("$lt")) {
             return (
                 testWithPath(input.$lt[0], variables, options, "$lt[0]") <
                 testWithPath(input.$lt[1], variables, options, "$lt[1]")
             )
         }
 
-        if (input.hasOwnProperty("$lte")) {
+        if (has("$lte")) {
             return (
                 testWithPath(input.$lte[0], variables, options, "$lte[0]") <=
                 testWithPath(input.$lte[1], variables, options, "$lte[1]")
             )
         }
 
-        if (input.hasOwnProperty("$inarray")) {
+        if (has("$inarray")) {
             return handleArrayLogic(
                 realTest,
                 input,
@@ -193,15 +203,15 @@ function realTest<Variables, Return = Variables | boolean>(
             )
         }
 
-        if (input.hasOwnProperty("$any")) {
+        if (has("$any")) {
             return handleArrayLogic(realTest, input, variables, "$any", options)
         }
 
-        if (input.hasOwnProperty("$all")) {
+        if (has("$all")) {
             return handleArrayLogic(realTest, input, variables, "$all", options)
         }
 
-        if (input.hasOwnProperty("$after")) {
+        if (has("$after")) {
             if (!options.timerManager) {
                 return false
             }
@@ -233,6 +243,13 @@ function realTest<Variables, Return = Variables | boolean>(
 
             throw new Error("Invalid timer state!")
         }
+
+        if (has("$pushunique")) {
+            return options.pushUniqueAction?.(
+                input.$pushunique[0],
+                testWithPath(input.$pushunique[1], variables, options, "$pushunique[1]")
+            )
+        }
     }
 
     console.warn("Unhandled test", input)
@@ -253,6 +270,8 @@ export function handleActions<Context>(
         return variables
     }
 
+    const has = (key: string) => Object.prototype.hasOwnProperty.call(input, key)
+
     // TODO: Refactor this into a switch statement using the object keys instead of hasOwn.
 
     const addOrDec = (op: string) => {
@@ -261,10 +280,6 @@ export function handleActions<Context>(
 
             let reference = input[op]
 
-            if (reference.startsWith("$")) {
-                reference = reference.substring(1)
-            }
-
             set(
                 variables,
                 reference,
@@ -272,10 +287,6 @@ export function handleActions<Context>(
             )
         } else {
             let reference = input[op][0]
-
-            if (reference.startsWith("$")) {
-                reference = reference.substring(1)
-            }
 
             const variableValue = findNamedChild(reference, variables)
             const incrementBy = findNamedChild(input[op][1], variables)
@@ -293,10 +304,6 @@ export function handleActions<Context>(
     const mulOrDiv = (op: string) => {
         let reference = input[op][2]
 
-        if (reference.startsWith("$")) {
-            reference = reference.substring(1)
-        }
-
         const variableValue1 = findNamedChild(input[op][0], variables)
         const variableValue2 = findNamedChild(input[op][1], variables)
 
@@ -309,28 +316,24 @@ export function handleActions<Context>(
         )
     }
 
-    if (input.hasOwnProperty("$inc")) {
+    if (has("$inc")) {
         addOrDec("$inc")
     }
 
-    if (input.hasOwnProperty("$dec")) {
+    if (has("$dec")) {
         addOrDec("$dec")
     }
 
-    if (input.hasOwnProperty("$mul")) {
+    if (has("$mul")) {
         mulOrDiv("$mul")
     }
 
-    if (input.hasOwnProperty("$div")) {
+    if (has("$div")) {
         mulOrDiv("$div")
     }
 
-    if (input.hasOwnProperty("$set")) {
+    if (has("$set")) {
         let reference = input.$set[0]
-
-        if (reference.startsWith("$")) {
-            reference = reference.substring(1)
-        }
 
         const value = findNamedChild(input.$set[1], variables)
 
@@ -365,15 +368,15 @@ export function handleActions<Context>(
         set(variables, reference, array)
     }
 
-    if (input.hasOwnProperty("$push")) {
+    if (has("$push")) {
         push(false)
     }
 
-    if (input.hasOwnProperty("$pushunique")) {
+    if (has("$pushunique")) {
         push(true)
     }
 
-    if (input.hasOwnProperty("$remove")) {
+    if (has("$remove")) {
         let reference = input.$remove[0]
 
         if (reference.startsWith("$")) {
