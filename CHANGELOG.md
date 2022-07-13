@@ -1,5 +1,10 @@
 # Changelog
 
+## v4.2.0
+
+-   `$pushunique` can now be used as a condition.
+-   `(`, `)`, and leading `$` (and `$.`) are now automatically removed from strings if resolved.
+
 ## v4.1.0
 
 -   Added `Count` property to arrays.
