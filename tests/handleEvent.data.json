@@ -92,5 +92,64 @@
                 }
             }
         }
+    },
+    "testWithConstants": {
+        "Definition": {
+            "Context": {},
+            "Constants": {
+                "SomeRepoId": "24793fa7-7d74-4b8a-aad7-60871d2f925d"
+            },
+            "States": {
+                "Start": {
+                    "Event": {
+                        "Condition": {
+                            "$eq": ["$Value.RepositoryId", "SomeRepoId"]
+                        },
+                        "Transition": "Success"
+                    }
+                }
+            }
+        },
+        "Input": {
+            "Name": "Event",
+            "Value": {
+                "RepositoryId": "24793fa7-7d74-4b8a-aad7-60871d2f925d"
+            }
+        }
+    },
+    "pushUniqueAsCondition": {
+        "Definition": {
+            "Context": {
+                "Targets": [],
+                "Target": "abc123",
+                "Pacified": []
+            },
+            "States": {
+                "Start": {
+                    "Pacify": {
+                        "Condition": {
+                            "$pushunique": ["Pacified", "$Value.RepositoryId"]
+                        },
+                        "Transition": "OnePacified"
+                    }
+                },
+                "OnePacified": {
+                    "Pacify": {
+                        "Condition": {
+                            "$not": {
+                                "$pushunique": ["Pacified", "$Value.RepositoryId"]
+                            }
+                        },
+                        "Transition": "Success"
+                    }
+                }
+            }
+        },
+        "Input": {
+            "Name": "Pacify",
+            "Value": {
+                "RepositoryId": "abc123"
+            }
+        }
     }
 }

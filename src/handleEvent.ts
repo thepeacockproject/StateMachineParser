@@ -145,14 +145,19 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 pushUniqueAction(reference, item) {
                     const referenceArray = findNamedChild(reference, newContext)
                     item = findNamedChild(item, newContext)
+                    trace(`Running pushUniqueAction on ${reference} with ${item}`)
 
-                    if (referenceArray?.includes(item)) {
+                    if (!referenceArray) {
+                        throw new Error(`Could not find ${reference} in context`)
+                    }
+
+                    if (referenceArray.includes(item)) {
                         return false
                     }
 
                     referenceArray.push(item)
 
-                    set(newContext, reference, referenceArray)
+                    set(context, reference, referenceArray)
 
                     return true
                 }

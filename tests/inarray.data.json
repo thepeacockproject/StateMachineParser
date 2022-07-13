@@ -1,0 +1,62 @@
+{
+    "Inarray1": [
+        {
+            "$inarray": {
+                "in": "$Value.Objs",
+                "?": {
+                    "$eq": ["$.#", "quiet"]
+                }
+            }
+        },
+        {
+            "Value": {
+                "Objs": ["the", "world", "is", "quiet", "here"]
+            }
+        }
+    ],
+    "Inarray2": [
+        {
+            "$inarray": {
+                "in": "$Value.Objs",
+                "?": {
+                    "$eq": ["$.#", "clarinet"]
+                }
+            }
+        },
+        {
+            "Value": {
+                "Objs": ["flute", "saxophone", "trumpet", "bass guitar", "drums"]
+            }
+        }
+    ],
+    "Any1": [
+        {
+            "$any": {
+                "in": "$Value.Objs",
+                "?": {
+                    "$eq": ["$.#", "quiet"]
+                }
+            }
+        },
+        {
+            "Value": {
+                "Objs": ["the", "world", "is", "quiet", "here"]
+            }
+        }
+    ],
+    "Any2": [
+        {
+            "$any": {
+                "in": "$Value.Objs",
+                "?": {
+                    "$eq": ["$.#", "clarinet"]
+                }
+            }
+        },
+        {
+            "Value": {
+                "Objs": ["flute", "saxophone", "trumpet", "bass guitar", "drums"]
+            }
+        }
+    ]
+}

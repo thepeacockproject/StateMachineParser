@@ -93,4 +93,43 @@ describe("handleEvent api", () => {
 
         assert.strictEqual(result.state, "Success", "Transition did not happen")
     })
+
+    it("works with constants", () => {
+        const { Definition, Input } = suites.testWithConstants
+
+        let state = "Start"
+
+        const result = handleEvent(Definition, Definition.Context, Input.Value, {
+            currentState: state,
+            eventName: Input.Name,
+        })
+
+        assert.strictEqual(result.state, "Success", "Transition did not happen")
+    })
+
+    it("supports pushunique", () => {
+        const { Definition, Input } = suites.pushUniqueAsCondition
+        let context: Required<typeof Definition.Context> = Definition.Context
+        let currentState = "Start"
+
+        let result = handleEvent(Definition, context, Input.Value, {
+            currentState,
+            eventName: Input.Name,
+        })
+
+        context = <any>result.context
+        currentState = result.state
+
+        assert.strictEqual(currentState, "OnePacified", "Transition did not happen")
+        assert.strictEqual(context.Pacified.length, 1, "Pacified array was not pushed")
+
+        // once more, we should now be in the OnePacified state
+        result = handleEvent(Definition, context, Input.Value, {
+            currentState,
+            eventName: Input.Name,
+        })
+
+        assert.strictEqual(context.Pacified.length, 1, "Unique check failed")
+        assert.strictEqual(result.state, "Success", "Second transition did not happen")
+    })
 })
