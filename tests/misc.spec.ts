@@ -49,5 +49,13 @@ describe("utils", () => {
         it("returns the input if it is a loop", () => {
             assert.strictEqual(findNamedChild("$.#", {}), "$.#")
         })
+
+        it("returns the reference if prototype pollution is attempted", () => {
+            const data = Object.create({})
+
+            const ref = "data.prototype.constructor"
+
+            assert.strictEqual(findNamedChild(ref, data), ref, "prototype fetched")
+        })
     })
 })
