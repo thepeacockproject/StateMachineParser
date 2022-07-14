@@ -2,7 +2,24 @@
 
 This is a list of the possible nodes that can appear in a state machine, and what they do, from the research we have done so far.
 
-## Generic Nodes
+## Table of Contents
+
+- [Conditional Nodes](#conditional-nodes)
+    - [`$eq`](#eq)
+    - [`$and`](#and)
+    - [`$or`](#or)
+    - [`$not`](#not)
+    - [`$after`](#after)
+    - [`$inarray` and `$any`](#inarray-any)
+    - [`$contains`](#contains)
+- [Action Nodes](#action-nodes)
+    - [`$inc` and `$dec`](#inc-dec)
+    - [`$mul` and `$div`](#mul-div)
+    - [`$push`](#push)
+- [Common Nodes](#common-nodes)
+    - [`$pushunique`](#pushunique)
+
+## Conditional Nodes
 
 These nodes all return boolean values, which represent if the checks inside these nodes pass or fail.
 
@@ -111,11 +128,15 @@ This node is indented for delaying a state machine's evaluation by a number of s
 
 > Implementation Note: This node is very loosely implemented, and will be rewritten in the near future.
 
-### `$inarray`
+### `$inarray`, `$any`
 
 Documentation not yet done here. Feel free to open a PR!
 
-## Side Effect Nodes
+### `$contains`
+
+Documentation not yet done here. Feel free to open a PR!
+
+## Action Nodes
 
 Side effect nodes are nodes that are only supposed to be used inside `Actions` definitions, as they have side effects (e.g. modifying the globals).
 
@@ -134,6 +155,10 @@ Documentation not yet done here. Feel free to open a PR!
 ### `$push`
 
 Documentation not yet done here. Feel free to open a PR!
+
+## Common Nodes
+
+These nodes can be used as both conditions and actions.
 
 ### `$pushunique`
 

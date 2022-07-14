@@ -172,10 +172,10 @@ function realTest<Variables, Return = Variables | boolean>(
             )
         }
 
-        if (has("$gte")) {
+        if (has("$ge")) {
             return (
-                testWithPath(input.$gte[0], variables, options, "$gte[0]") >=
-                testWithPath(input.$gte[1], variables, options, "$gte[1]")
+                testWithPath(input.$ge[0], variables, options, "$ge[0]") >=
+                testWithPath(input.$ge[1], variables, options, "$ge[1]")
             )
         }
 
@@ -188,8 +188,8 @@ function realTest<Variables, Return = Variables | boolean>(
 
         if (has("$lte")) {
             return (
-                testWithPath(input.$lte[0], variables, options, "$lte[0]") <=
-                testWithPath(input.$lte[1], variables, options, "$lte[1]")
+                testWithPath(input.$le[0], variables, options, "$le[0]") <=
+                testWithPath(input.$le[1], variables, options, "$le[1]")
             )
         }
 
@@ -222,11 +222,7 @@ function realTest<Variables, Return = Variables | boolean>(
                 // add timer details
                 timer = options.timerManager.createTimer(
                     `${options._path}.$after`,
-                    // @ts-expect-error Yes it's a number.
-                    <number>realTest(input.$after, variables, {
-                        ...options,
-                        _path: `${options._path}.$after`,
-                    })
+                    <number>testWithPath(input.$after, variables, options, "$after")
                 )
             }
 
@@ -262,12 +258,28 @@ function realTest<Variables, Return = Variables | boolean>(
  */
 export type RealTestFunc = typeof realTest
 
+/**
+ * Handles a group of action nodes (a.k.a. side-effect nodes).
+ * Actions will modify the context, which will then be returned.
+ *
+ * @param input The actions to take.
+ * @param context The context.
+ * @returns The modified context.
+ * @example
+ *  let context = { Number: 8 }
+ *  const actions = {
+ *      // increment the value of Number by 1
+ *      $inc: "$Number",
+ *  }
+ *  context = handleActions(actions, context)
+ *  // context will now be { Number: 9 }
+ */
 export function handleActions<Context>(
     input: any,
-    variables: Context
+    context: Context
 ): Context {
     if (!input || typeof input !== "object") {
-        return variables
+        return context
     }
 
     const has = (key: string) => Object.prototype.hasOwnProperty.call(input, key)
@@ -276,23 +288,23 @@ export function handleActions<Context>(
 
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
-            const variableValue = findNamedChild(input[op], variables)
+            const variableValue = findNamedChild(input[op], context)
 
             let reference = input[op]
 
             set(
-                variables,
+                context,
                 reference,
                 op === "$inc" ? variableValue + 1 : variableValue - 1
             )
         } else {
             let reference = input[op][0]
 
-            const variableValue = findNamedChild(reference, variables)
-            const incrementBy = findNamedChild(input[op][1], variables)
+            const variableValue = findNamedChild(reference, context)
+            const incrementBy = findNamedChild(input[op][1], context)
 
             set(
-                variables,
+                context,
                 reference,
                 op === "$inc"
                     ? variableValue + incrementBy
@@ -304,11 +316,11 @@ export function handleActions<Context>(
     const mulOrDiv = (op: string) => {
         let reference = input[op][2]
 
-        const variableValue1 = findNamedChild(input[op][0], variables)
-        const variableValue2 = findNamedChild(input[op][1], variables)
+        const variableValue1 = findNamedChild(input[op][0], context)
+        const variableValue2 = findNamedChild(input[op][1], context)
 
         set(
-            variables,
+            context,
             reference,
             op === "$mul"
                 ? variableValue1 * variableValue2
@@ -335,9 +347,9 @@ export function handleActions<Context>(
     if (has("$set")) {
         let reference = input.$set[0]
 
-        const value = findNamedChild(input.$set[1], variables)
+        const value = findNamedChild(input.$set[1], context)
 
-        set(variables, reference, value)
+        set(context, reference, value)
     }
 
     const push = (unique: boolean): void => {
@@ -348,11 +360,11 @@ export function handleActions<Context>(
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input[op][1], variables)
+        const value = findNamedChild(input[op][1], context)
 
         // clone the thing
         const array = JSON.parse(
-            JSON.stringify(findNamedChild(reference, variables))
+            JSON.stringify(findNamedChild(reference, context))
         )
 
         if (unique) {
@@ -365,7 +377,7 @@ export function handleActions<Context>(
             array.push(value)
         }
 
-        set(variables, reference, array)
+        set(context, reference, array)
     }
 
     if (has("$push")) {
@@ -383,19 +395,19 @@ export function handleActions<Context>(
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input.$remove[1], variables)
+        const value = findNamedChild(input.$remove[1], context)
 
         // clone the thing
         let array: unknown[] = JSON.parse(
-            JSON.stringify(findNamedChild(reference, variables))
+            JSON.stringify(findNamedChild(reference, context))
         )
 
         array = array.filter((item) => item !== value)
 
-        set(variables, reference, array)
+        set(context, reference, array)
     }
 
-    return variables
+    return context
 }
 
 export {
