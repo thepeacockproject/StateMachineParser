@@ -12,7 +12,8 @@
     },
     "directories": {
         "test": "tests",
-        "lib": "build"
+        "lib": "build",
+        "doc": "docs"
     },
     "files": [
         "README.md",

@@ -43,4 +43,25 @@ describe("essential validation", () => {
                 "Paths can only be specified internally, not by API consumers.",
         })
     })
+
+    it("maps an array of strings to their proper values in test", () => {
+        const input = ["$.Hello", "Greetings", "$Bonjour"]
+        const context = {
+            Hello: "Hi!",
+            Bonjour: "Hello in French!",
+        }
+        const expected = JSON.stringify([
+            "Hi!",
+            "Greetings",
+            "Hello in French!",
+        ])
+
+        const result = test(input, context)
+
+        assert.strictEqual(
+            JSON.stringify(result),
+            expected,
+            "arrays did not match"
+        )
+    })
 })

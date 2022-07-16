@@ -4,20 +4,21 @@ This is a list of the possible nodes that can appear in a state machine, and wha
 
 ## Table of Contents
 
-- [Conditional Nodes](#conditional-nodes)
-    - [`$eq`](#eq)
-    - [`$and`](#and)
-    - [`$or`](#or)
-    - [`$not`](#not)
-    - [`$after`](#after)
-    - [`$inarray` and `$any`](#inarray-any)
-    - [`$contains`](#contains)
-- [Action Nodes](#action-nodes)
-    - [`$inc` and `$dec`](#inc-dec)
-    - [`$mul` and `$div`](#mul-div)
-    - [`$push`](#push)
-- [Common Nodes](#common-nodes)
-    - [`$pushunique`](#pushunique)
+-   [Conditional Nodes](#conditional-nodes)
+    -   [`$eq`](#eq)
+    -   [`$and`](#and)
+    -   [`$or`](#or)
+    -   [`$not`](#not)
+    -   [`$after`](#after)
+    -   [`$inarray` and `$any`](#inarray-any)
+    -   [`$all`](#all)
+    -   [`$contains`](#contains)
+-   [Action Nodes](#action-nodes)
+    -   [`$inc` and `$dec`](#inc-dec)
+    -   [`$mul` and `$div`](#mul-div)
+    -   [`$push`](#push)
+-   [Common Nodes](#common-nodes)
+    -   [`$pushunique`](#pushunique)
 
 ## Conditional Nodes
 
@@ -132,6 +133,10 @@ This node is indented for delaying a state machine's evaluation by a number of s
 
 Documentation not yet done here. Feel free to open a PR!
 
+### `$all`
+
+Documentation not yet done here. Feel free to open a PR!
+
 ### `$contains`
 
 Documentation not yet done here. Feel free to open a PR!
@@ -150,7 +155,19 @@ Documentation not yet done here. Feel free to open a PR!
 
 ### `$set`
 
-Documentation not yet done here. Feel free to open a PR!
+This node sets the value of a context object to another value.
+
+The node itself is given an array as a parameter.
+The array may only have 2 items, the first being the reference to the context object to set the value of, and the second being the new value.
+
+Example:
+
+```json5
+{
+    // sets the value of `CoolestCharacter` to "Rocco"
+    $set: ["$CoolestCharacter", "Rocco"]
+}
+```
 
 ### `$push`
 
