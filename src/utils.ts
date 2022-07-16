@@ -14,11 +14,7 @@
  *    limitations under the License.
  */
 
-const PROTOTYPE_POLLUTION_KEYS = [
-    "__proto__",
-    "constructor",
-    "prototype",
-]
+const PROTOTYPE_POLLUTION_KEYS = ["__proto__", "constructor", "prototype"]
 
 /**
  * When we are getting or setting a named child, we don't want:
@@ -77,8 +73,8 @@ export function set(obj: any, keys: string | string[], val: any): void {
         curr = curr[key] =
             typeof (currKey = curr[key]) === typeof keys
                 ? currKey
-                // @ts-expect-error Very interesting type stuff going on here.
-                : keys[i] * 0 !== 0 || !!~("" + keys[i]).indexOf(".")
+                : // @ts-expect-error Very interesting type stuff going on here.
+                keys[i] * 0 !== 0 || !!~("" + keys[i]).indexOf(".")
                 ? {}
                 : []
     }
@@ -94,10 +90,7 @@ export function set(obj: any, keys: string | string[], val: any): void {
  * @returns The value if found, or the reference if it wasn't /
  * something went wrong.
  */
-export function findNamedChild(
-    reference: string,
-    variables: any
-): any {
+export function findNamedChild(reference: string, variables: any): any {
     if (typeof reference !== "string") {
         return reference
     }

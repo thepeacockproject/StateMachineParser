@@ -55,7 +55,11 @@ describe("utils", () => {
 
             const ref = "data.prototype.constructor"
 
-            assert.strictEqual(findNamedChild(ref, data), ref, "prototype fetched")
+            assert.strictEqual(
+                findNamedChild(ref, data),
+                ref,
+                "prototype fetched"
+            )
         })
     })
 })

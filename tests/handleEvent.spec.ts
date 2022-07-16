@@ -99,10 +99,15 @@ describe("handleEvent api", () => {
 
         let state = "Start"
 
-        const result = handleEvent(Definition, Definition.Context, Input.Value, {
-            currentState: state,
-            eventName: Input.Name,
-        })
+        const result = handleEvent(
+            Definition,
+            Definition.Context,
+            Input.Value,
+            {
+                currentState: state,
+                eventName: Input.Name,
+            }
+        )
 
         assert.strictEqual(result.state, "Success", "Transition did not happen")
     })
@@ -120,8 +125,16 @@ describe("handleEvent api", () => {
         context = <any>result.context
         currentState = result.state
 
-        assert.strictEqual(currentState, "OnePacified", "Transition did not happen")
-        assert.strictEqual(context.Pacified.length, 1, "Pacified array was not pushed")
+        assert.strictEqual(
+            currentState,
+            "OnePacified",
+            "Transition did not happen"
+        )
+        assert.strictEqual(
+            context.Pacified.length,
+            1,
+            "Pacified array was not pushed"
+        )
 
         // once more, we should now be in the OnePacified state
         result = handleEvent(Definition, context, Input.Value, {
@@ -130,6 +143,10 @@ describe("handleEvent api", () => {
         })
 
         assert.strictEqual(context.Pacified.length, 1, "Unique check failed")
-        assert.strictEqual(result.state, "Success", "Second transition did not happen")
+        assert.strictEqual(
+            result.state,
+            "Success",
+            "Second transition did not happen"
+        )
     })
 })

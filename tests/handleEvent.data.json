@@ -137,7 +137,10 @@
                     "Pacify": {
                         "Condition": {
                             "$not": {
-                                "$pushunique": ["Pacified", "$Value.RepositoryId"]
+                                "$pushunique": [
+                                    "Pacified",
+                                    "$Value.RepositoryId"
+                                ]
                             }
                         },
                         "Transition": "Success"

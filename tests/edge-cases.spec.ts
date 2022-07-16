@@ -26,11 +26,7 @@ describe("edge cases", () => {
 
             const result = findNamedChild("($.JNames).Count", ctx)
 
-            assert.strictEqual(
-                result,
-                3,
-                "expected value not present"
-            )
+            assert.strictEqual(result, 3, "expected value not present")
         })
 
         it("can tolerate strange but valid references (set)", () => {

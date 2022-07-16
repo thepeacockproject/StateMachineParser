@@ -133,7 +133,8 @@ function realTest<Variables, Return = Variables | boolean>(
     }
 
     if (typeof input === "object") {
-        const has = (key: string) => Object.prototype.hasOwnProperty.call(input, key)
+        const has = (key: string) =>
+            Object.prototype.hasOwnProperty.call(input, key)
 
         if (has("$eq")) {
             // transform any strings inside these arrays into their intended context values
@@ -222,7 +223,9 @@ function realTest<Variables, Return = Variables | boolean>(
                 // add timer details
                 timer = options.timerManager.createTimer(
                     `${options._path}.$after`,
-                    <number>testWithPath(input.$after, variables, options, "$after")
+                    <number>(
+                        testWithPath(input.$after, variables, options, "$after")
+                    )
                 )
             }
 
@@ -243,7 +246,12 @@ function realTest<Variables, Return = Variables | boolean>(
         if (has("$pushunique")) {
             return options.pushUniqueAction?.(
                 input.$pushunique[0],
-                testWithPath(input.$pushunique[1], variables, options, "$pushunique[1]")
+                testWithPath(
+                    input.$pushunique[1],
+                    variables,
+                    options,
+                    "$pushunique[1]"
+                )
             )
         }
     }
@@ -274,15 +282,13 @@ export type RealTestFunc = typeof realTest
  *  context = handleActions(actions, context)
  *  // context will now be { Number: 9 }
  */
-export function handleActions<Context>(
-    input: any,
-    context: Context
-): Context {
+export function handleActions<Context>(input: any, context: Context): Context {
     if (!input || typeof input !== "object") {
         return context
     }
 
-    const has = (key: string) => Object.prototype.hasOwnProperty.call(input, key)
+    const has = (key: string) =>
+        Object.prototype.hasOwnProperty.call(input, key)
 
     // TODO: Refactor this into a switch statement using the object keys instead of hasOwn.
 

@@ -137,31 +137,42 @@ export function handleEvent<Context = unknown, Event = unknown>(
         let conditionResult = true
 
         if (shouldCheckConditions) {
-            conditionResult = test(handler.Condition, {
-                Value: event,
-                ...(context || {}),
-                ...(definition.Constants || {}),
-            }, {
-                pushUniqueAction(reference, item) {
-                    const referenceArray = findNamedChild(reference, newContext)
-                    item = findNamedChild(item, newContext)
-                    trace(`Running pushUniqueAction on ${reference} with ${item}`)
+            conditionResult = test(
+                handler.Condition,
+                {
+                    Value: event,
+                    ...(context || {}),
+                    ...(definition.Constants || {}),
+                },
+                {
+                    pushUniqueAction(reference, item) {
+                        const referenceArray = findNamedChild(
+                            reference,
+                            newContext
+                        )
+                        item = findNamedChild(item, newContext)
+                        trace(
+                            `Running pushUniqueAction on ${reference} with ${item}`
+                        )
 
-                    if (!referenceArray) {
-                        throw new Error(`Could not find ${reference} in context`)
-                    }
+                        if (!referenceArray) {
+                            throw new Error(
+                                `Could not find ${reference} in context`
+                            )
+                        }
 
-                    if (referenceArray.includes(item)) {
-                        return false
-                    }
+                        if (referenceArray.includes(item)) {
+                            return false
+                        }
 
-                    referenceArray.push(item)
+                        referenceArray.push(item)
 
-                    set(context, reference, referenceArray)
+                        set(context, reference, referenceArray)
 
-                    return true
+                        return true
+                    },
                 }
-            })
+            )
         }
 
         if (conditionResult && shouldPerformActions) {

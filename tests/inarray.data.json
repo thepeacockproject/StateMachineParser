@@ -25,7 +25,13 @@
         },
         {
             "Value": {
-                "Objs": ["flute", "saxophone", "trumpet", "bass guitar", "drums"]
+                "Objs": [
+                    "flute",
+                    "saxophone",
+                    "trumpet",
+                    "bass guitar",
+                    "drums"
+                ]
             }
         }
     ],
@@ -55,7 +61,13 @@
         },
         {
             "Value": {
-                "Objs": ["flute", "saxophone", "trumpet", "bass guitar", "drums"]
+                "Objs": [
+                    "flute",
+                    "saxophone",
+                    "trumpet",
+                    "bass guitar",
+                    "drums"
+                ]
             }
         }
     ]
