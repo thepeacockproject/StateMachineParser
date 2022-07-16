@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-export const PROTOTYPE_POLLUTION_KEYS = [
+const PROTOTYPE_POLLUTION_KEYS = [
     "__proto__",
     "constructor",
     "prototype",
@@ -26,7 +26,21 @@ export const PROTOTYPE_POLLUTION_KEYS = [
  * - A leading $.
  * - Any ( or )
  */
-const DEAD_CHARS_REGEX = /^\.|^\$|^\$\..*|\(.*|\)$/g
+function replaceBadCharacters(input: string): string {
+    while (input.includes("(") || input.includes(")")) {
+        input = input.replace("(", "").replace(")", "")
+    }
+
+    if (input.startsWith("$.")) {
+        return input.substring(2)
+    }
+
+    if (input.startsWith("$")) {
+        return input.substring(1)
+    }
+
+    return input
+}
 
 /**
  * Dependency 'dset'.
@@ -34,9 +48,9 @@ const DEAD_CHARS_REGEX = /^\.|^\$|^\$\..*|\(.*|\)$/g
  * @see https://github.com/lukeed/dset/blob/master/src/index.js
  * @internal
  */
-export function set(obj, keys: string | string[], val): void {
+export function set(obj: any, keys: string | string[], val: any): void {
     if (typeof keys === "string") {
-        keys = keys.replace(DEAD_CHARS_REGEX, "")
+        keys = replaceBadCharacters(keys)
         keys = keys.split(".")
     }
 
@@ -99,7 +113,7 @@ export function findNamedChild(
         return reference
     }
 
-    reference = reference.replace(DEAD_CHARS_REGEX, "")
+    reference = replaceBadCharacters(reference)
 
     let obj = variables
 
