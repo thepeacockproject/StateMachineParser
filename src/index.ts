@@ -254,6 +254,17 @@ function realTest<Variables, Return = Variables | boolean>(
                 )
             )
         }
+
+        if (has("$contains")) {
+            const first = testWithPath(input.$contains[0], variables, options, "$contains[0]")
+            const second = testWithPath(input.$contains[1], variables, options, "$contains[1]")
+
+            if (typeof first === "string") {
+                return first.includes(second)
+            }
+
+            return false
+        }
     }
 
     console.warn("Unhandled test", input)
