@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.3.0
+
+-   Fixed inconsistent getting and setting behavior as a result of the last patch.
+-   Added new documentation, and improved existing documentation.
+-   Renamed `$gte` and `$lte` to `$ge` and `$le` to be consistent with the usage of the game.
+
 ## v4.2.0
 
 -   `$pushunique` can now be used as a condition.
