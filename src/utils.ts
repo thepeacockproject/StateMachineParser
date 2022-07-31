@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+import { DeepCloneFunction } from "./types"
+
 const PROTOTYPE_POLLUTION_KEYS = ["__proto__", "constructor", "prototype"]
 
 /**
@@ -134,4 +136,11 @@ export function findNamedChild(reference: string, variables: any): any {
     }
 
     return reference // it's just a string
+}
+
+/**
+ * @internal
+ */
+export const defaultDeepClone: DeepCloneFunction<any> = (t: any) => {
+    return JSON.parse(JSON.stringify(t))
 }

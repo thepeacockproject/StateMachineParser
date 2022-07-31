@@ -329,7 +329,6 @@ __metadata:
     "@types/debug": ^4.1.7
     "@types/mocha": ^9.1.1
     "@types/node": ^18.0.3
-    debug: ^4.3.4
     esbuild: ^0.14.49
     esbuild-register: ^3.3.3
     get-package-type: ^0.1.0
@@ -817,7 +816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4.3.4, debug@npm:^4.1.1, debug@npm:^4.3.4":
+"debug@npm:4.3.4, debug@npm:^4.1.1":
   version: 4.3.4
   resolution: "debug@npm:4.3.4"
   dependencies:

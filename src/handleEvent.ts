@@ -15,9 +15,13 @@
  */
 
 import { handleActions, test } from "./index"
-import debug from "debug"
 import { findNamedChild, set } from "./utils"
-import { HandleEventOptions, HandleEventReturn, InStateEventHandler, StateMachineLike } from "./types"
+import {
+    HandleEventOptions,
+    HandleEventReturn,
+    InStateEventHandler,
+    StateMachineLike,
+} from "./types"
 
 /**
  * This function simulates an event happening, as if in game.
@@ -35,14 +39,18 @@ export function handleEvent<Context = unknown, Event = unknown>(
     event: Event,
     options: HandleEventOptions
 ): HandleEventReturn<Partial<Context>> {
-    const trace = debug("smparser:handleEvent")
+    const log = options.logger || (() => {})
+
     const { eventName, currentState = "Start" } = options
 
     // (current state object - reduces code duplication)
     let csObject = definition.States?.[currentState]
 
     if (!csObject || (!csObject?.[eventName] && !csObject?.$timer)) {
-        trace(`SM in state ${currentState} disregarding ${eventName}`)
+        log(
+            "disregard-event",
+            `SM in state ${currentState} disregarding ${eventName}`
+        )
         // we are here because either:
         // - we have no handler for the current state
         // - in this particular state, the state machine doesn't care about the current event
@@ -52,7 +60,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
         }
     }
 
-    const hasTimerState = !!csObject.$timer && !!options?.timerManager
+    const hasTimerState = !!csObject.$timer
 
     // ensure no circular references are present, and that this won't update the param by accident
     let newContext = JSON.parse(JSON.stringify(context))
@@ -94,7 +102,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             newContext
                         )
                         item = findNamedChild(item, newContext)
-                        trace(
+                        log(
+                            "action",
                             `Running pushUniqueAction on ${reference} with ${item}`
                         )
 
@@ -161,7 +170,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
         if (conditionResult && shouldPerformTransition) {
             state = handler.Transition
 
-            trace(
+            log(
+                "transition",
                 `${currentState} is performing a transition to ${state} - running its "-" event`
             )
 

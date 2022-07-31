@@ -14,16 +14,36 @@
  *    limitations under the License.
  */
 
-import { TIMER_CANCELLED, TIMER_COMPLETE, TIMER_RUNNING, TimerManager } from "./timers"
 import { findNamedChild } from "./utils"
+
+/**
+ * A function that logs a message.
+ */
+export type LogFunction = (category: string, message: string) => void
+
+/**
+ * A function that takes an object and creates a deep clone of it.
+ */
+export type DeepCloneFunction<Value> = (value: Value) => Value
 
 /**
  * Options that are passed to {@link handleEvent}.
  */
 export interface HandleEventOptions {
+    /**
+     * The event's name.
+     */
     eventName: string
+
+    /**
+     * The current state of the state machine.
+     */
     currentState?: string
-    timerManager?: TimerManager
+
+    /**
+     * The logging implementation.
+     */
+    logger?: LogFunction
 }
 
 /**
@@ -79,19 +99,6 @@ export interface StateMachineLike<Context, Constants = any | undefined> {
 }
 
 /**
- * The status of a timer. Can be running, cancelled, or completed.
- */
-export type TimerStatus =
-    | typeof TIMER_COMPLETE
-    | typeof TIMER_CANCELLED
-    | typeof TIMER_RUNNING
-
-/**
- * The callback function that can be given to a timer.
- */
-export type TimerCallback = (status: TimerStatus) => void
-
-/**
  * @internal
  */
 export type FindNamedChildFunc = typeof findNamedChild
@@ -107,19 +114,24 @@ export interface TestOptions {
      * How many nested loop nodes we are currently in - used to determine what
      * the value of the current iterator should point to.
      */
-    _currentLoopDepth?: number
+    _currentLoopDepth: number
 
     /**
      * The path to the current value in the current object, for interactive
      * debugger stepping and tracing.
      */
-    _path?: string
+    _path: string
 
     /**
-     * The timer manager instance. If not defined, timers will never be started,
-     * and will always return false.
+     * If applicable, the timestamp that the event occurred at. If not defined,
+     * it will fall back to the time the method is invoked.
      */
-    timerManager?: TimerManager
+    eventTimestamp: number
+
+    /**
+     * The logging implementation.
+     */
+    logger: LogFunction
 
     /**
      * The function called when a push-unique instruction occurs in a test case.
@@ -130,4 +142,14 @@ export interface TestOptions {
      * @returns True if the value was pushed, false if it was not.
      */
     pushUniqueAction?: (reference: string, value: any) => boolean
+}
+
+export interface HandleActionsOptions {
+    /**
+     * The implementation of deep value cloning. You may wish to pass in a more
+     * performant implementation, such as Lodash's cloneDeep function.
+     * By default, this will just call `JSON.parse(JSON.stringify(value))`,
+     * because it reduces bundle size.
+     */
+    deepClone?: DeepCloneFunction<any>
 }

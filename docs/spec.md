@@ -165,7 +165,7 @@ Example:
 ```json5
 {
     // sets the value of `CoolestCharacter` to "Rocco"
-    $set: ["$CoolestCharacter", "Rocco"]
+    $set: ["$CoolestCharacter", "Rocco"],
 }
 ```
 

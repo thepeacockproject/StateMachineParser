@@ -15,11 +15,9 @@
  */
 
 import { handleEvent } from "./handleEvent"
-import { TimerManager, Timer, TIMER_CANCELLED, TIMER_COMPLETE, TIMER_RUNNING } from "./timers"
-import { TestOptions } from "./types"
-import { findNamedChild, set } from "./utils"
+import { HandleActionsOptions, TestOptions } from "./types"
+import { defaultDeepClone, findNamedChild, set } from "./utils"
 import { handleArrayLogic } from "./arrayHandling"
-import debug from "debug"
 
 export function test<Context = Record<string, unknown>>(
     input: any,
@@ -40,11 +38,15 @@ export function test<Context = Record<string, unknown>>(
         )
     }
 
+    const opts = options || {}
+
     return realTest(input, context, {
-        findNamedChild: options?.findNamedChild || findNamedChild,
-        ...(options || {}),
+        findNamedChild: opts.findNamedChild || findNamedChild,
+        ...opts,
         _path: "ROOTOBJ",
         _currentLoopDepth: 0,
+        logger: opts.logger || (() => {}),
+        eventTimestamp: opts.eventTimestamp || Date.now(),
     })
 }
 
@@ -65,9 +67,9 @@ function realTest<Variables, Return = Variables | boolean>(
     variables: Variables,
     options: TestOptions
 ): Variables | boolean {
-    const trace = debug("smparser:trace")
+    const log = options.logger
 
-    trace(`Visiting ${options._path}`)
+    log("visit", `Visiting ${options._path}`)
 
     if (
         typeof input === "number" ||
@@ -96,7 +98,7 @@ function realTest<Variables, Return = Variables | boolean>(
         if (has("$eq")) {
             // transform any strings inside these arrays into their intended context values
             if (Array.isArray(input.$eq[0] || input.$eq[1])) {
-                trace("attempted to compare arrays (can't!)")
+                log("validation", "attempted to compare arrays (can't!)")
                 return false
             }
 
@@ -170,33 +172,6 @@ function realTest<Variables, Return = Variables | boolean>(
         }
 
         if (has("$after")) {
-            if (!options.timerManager) {
-                return false
-            }
-
-            let timer = options.timerManager.getTimer(`${options._path}.$after`)
-
-            if (!timer) {
-                // add timer details
-                timer = options.timerManager.createTimer(
-                    `${options._path}.$after`,
-                    <number>(
-                        testWithPath(input.$after, variables, options, "$after")
-                    )
-                )
-            }
-
-            if (
-                timer.state === TIMER_CANCELLED ||
-                timer.state === TIMER_RUNNING
-            ) {
-                return false
-            }
-
-            if (timer.state === TIMER_COMPLETE) {
-                return true
-            }
-
             throw new Error("Invalid timer state!")
         }
 
@@ -213,8 +188,18 @@ function realTest<Variables, Return = Variables | boolean>(
         }
 
         if (has("$contains")) {
-            const first = testWithPath(input.$contains[0], variables, options, "$contains[0]")
-            const second = testWithPath(input.$contains[1], variables, options, "$contains[1]")
+            const first = testWithPath(
+                input.$contains[0],
+                variables,
+                options,
+                "$contains[0]"
+            )
+            const second = testWithPath(
+                input.$contains[1],
+                variables,
+                options,
+                "$contains[1]"
+            )
 
             if (typeof first === "string") {
                 return first.includes(second)
@@ -240,6 +225,7 @@ export type RealTestFunc = typeof realTest
  *
  * @param input The actions to take.
  * @param context The context.
+ * @param options The options.
  * @returns The modified context.
  * @example
  *  let context = { Number: 8 }
@@ -250,7 +236,15 @@ export type RealTestFunc = typeof realTest
  *  context = handleActions(actions, context)
  *  // context will now be { Number: 9 }
  */
-export function handleActions<Context>(input: any, context: Context): Context {
+export function handleActions<Context>(
+    input: any,
+    context: Context,
+    options?: HandleActionsOptions
+): Context {
+    const opts: HandleActionsOptions = options || {}
+
+    opts.deepClone ??= defaultDeepClone
+
     if (!input || typeof input !== "object") {
         return context
     }
@@ -337,9 +331,7 @@ export function handleActions<Context>(input: any, context: Context): Context {
         const value = findNamedChild(input[op][1], context)
 
         // clone the thing
-        const array = JSON.parse(
-            JSON.stringify(findNamedChild(reference, context))
-        )
+        const array = opts.deepClone!(findNamedChild(reference, context))
 
         if (unique) {
             if (array.indexOf(value) === -1) {
@@ -372,9 +364,7 @@ export function handleActions<Context>(input: any, context: Context): Context {
         const value = findNamedChild(input.$remove[1], context)
 
         // clone the thing
-        let array: unknown[] = JSON.parse(
-            JSON.stringify(findNamedChild(reference, context))
-        )
+        let array: unknown[] = opts.deepClone!(findNamedChild(reference, context))
 
         array = array.filter((item) => item !== value)
 
@@ -384,12 +374,5 @@ export function handleActions<Context>(input: any, context: Context): Context {
     return context
 }
 
-export {
-    handleEvent,
-    TIMER_COMPLETE,
-    TIMER_CANCELLED,
-    TIMER_RUNNING,
-    Timer,
-    TimerManager,
-}
+export { handleEvent }
 export * from "./types"
