@@ -69,12 +69,12 @@ export function test<Context = Record<string, unknown>>(
     context: Context,
     options?: Partial<TestOptions>
 ): boolean | any {
-    if (input === null || input === undefined) {
-        throw new Error("State machine is falsey!")
+    if (!input) {
+        throw new Error("State machine is falsy!")
     }
 
-    if (context === null || context === undefined) {
-        throw new Error("Context is falsey!")
+    if (!context) {
+        throw new Error("Context is falsy!")
     }
 
     if (options?._path) {
