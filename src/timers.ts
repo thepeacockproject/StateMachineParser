@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+import type { TimerCallback, TimerStatus } from "./types"
+
 /**
  * A unique identifier indicating that a timer has successfully finished.
  */
@@ -26,18 +28,6 @@ export const TIMER_CANCELLED = Symbol.for("StateMachineTimerCancelled")
  * A unique identifier indicating that a timer is currently running.
  */
 export const TIMER_RUNNING = Symbol.for("StateMachineTimerRunning")
-/**
- * The status of a timer. Can be running, cancelled, or completed.
- */
-export type TimerStatus =
-    | typeof TIMER_COMPLETE
-    | typeof TIMER_CANCELLED
-    | typeof TIMER_RUNNING
-
-/**
- * The callback function that can be given to a timer.
- */
-export type TimerCallback = (status: TimerStatus) => void
 
 export class Timer {
     private _state: TimerStatus

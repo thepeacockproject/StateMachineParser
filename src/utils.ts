@@ -135,8 +135,3 @@ export function findNamedChild(reference: string, variables: any): any {
 
     return reference // it's just a string
 }
-
-/**
- * @internal
- */
-export type FindNamedChildFunc = typeof findNamedChild

@@ -14,67 +14,10 @@
  *    limitations under the License.
  */
 
-import { handleActions, test, TimerManager } from "./index"
+import { handleActions, test } from "./index"
 import debug from "debug"
 import { findNamedChild, set } from "./utils"
-
-/**
- * Options that are passed to {@link handleEvent}.
- */
-export interface HandleEventOptions {
-    eventName: string
-    currentState?: string
-    timerManager?: TimerManager
-}
-
-/**
- * Data returned from {@link handleEvent}.
- * Context is a generic, so it can be typed by library consumers.
- */
-export interface HandleEventReturn<Context> {
-    state: string
-    context: Context
-}
-
-interface InStateEventHandler {
-    Condition?: unknown | unknown[]
-    Actions?: unknown | unknown[]
-    Transition?: string
-    [additionalActions: string]: unknown
-}
-
-/**
- * A state machine, in a minimal form.
- * Context and Constants are generic, so they can be typed by library consumers.
- */
-interface StateMachineLike<Context, Constants = object | undefined> {
-    /**
-     * The globals.
-     */
-    Context?: Context
-    /**
-     * Context listeners.
-     */
-    ContextListeners?: unknown
-    /**
-     * The constants, which is used by certain state machines like sniper scoring.
-     */
-    Constants?: Constants
-    /**
-     * We may need this in the future.
-     */
-    Scope?: string
-    /**
-     * Mapping of state name to mapping of event name to handler.
-     */
-    States: {
-        [stateName: string]: {
-            [eventName: string]: InStateEventHandler | InStateEventHandler[]
-            $timer?: InStateEventHandler | InStateEventHandler[]
-            ["-"]?: InStateEventHandler | InStateEventHandler[]
-        }
-    }
-}
+import { HandleEventOptions, HandleEventReturn, InStateEventHandler, StateMachineLike } from "./types"
 
 /**
  * This function simulates an event happening, as if in game.

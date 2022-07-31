@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import type { TestOptions, RealTestFunc } from "./index"
+import type { RealTestFunc, TestOptions } from "./index"
 
 const fillHashtags = (count: number): string => "#".repeat(count)
 

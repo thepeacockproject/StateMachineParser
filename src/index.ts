@@ -14,55 +14,12 @@
  *    limitations under the License.
  */
 
-import { findNamedChild, FindNamedChildFunc, set } from "./utils"
-import { handleArrayLogic } from "./arrayHandling"
 import { handleEvent } from "./handleEvent"
-import {
-    TimerManager,
-    TIMER_COMPLETE,
-    TIMER_CANCELLED,
-    TIMER_RUNNING,
-    TimerStatus,
-    TimerCallback,
-    Timer,
-} from "./timers"
+import { TimerManager, Timer, TIMER_CANCELLED, TIMER_COMPLETE, TIMER_RUNNING } from "./timers"
+import { TestOptions } from "./types"
+import { findNamedChild, set } from "./utils"
+import { handleArrayLogic } from "./arrayHandling"
 import debug from "debug"
-
-export interface TestOptions {
-    /**
-     * The findNamedChild function that should be used for resolution of
-     * variables.
-     */
-    findNamedChild: FindNamedChildFunc
-
-    /**
-     * How many nested loop nodes we are currently in - used to determine what
-     * the value of the current iterator should point to.
-     */
-    _currentLoopDepth?: number
-
-    /**
-     * The path to the current value in the current object, for interactive
-     * debugger stepping and tracing.
-     */
-    _path?: string
-
-    /**
-     * The timer manager instance. If not defined, timers will never be started,
-     * and will always return false.
-     */
-    timerManager?: TimerManager
-
-    /**
-     * The function called when a push-unique instruction occurs in a test case.
-     * Consumer-specified for backwards compatibility.
-     *
-     * @param reference A pointer to the array.
-     * @param value The value to try to push.
-     * @returns True if the value was pushed, false if it was not.
-     */
-    pushUniqueAction?: (reference: string, value: any) => boolean
-}
 
 export function test<Context = Record<string, unknown>>(
     input: any,
@@ -435,4 +392,4 @@ export {
     Timer,
     TimerManager,
 }
-export type { TimerStatus, TimerCallback }
+export * from "./types"
