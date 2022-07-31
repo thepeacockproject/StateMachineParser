@@ -40,7 +40,6 @@
         "require": "./build/index-cjs.js"
     },
     "devDependencies": {
-        "@types/debug": "^4.1.7",
         "@types/mocha": "^9.1.1",
         "@types/node": "^18.0.3",
         "esbuild": "^0.14.49",
