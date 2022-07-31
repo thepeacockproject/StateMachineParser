@@ -19,6 +19,18 @@ import { HandleActionsOptions, TestOptions } from "./types"
 import { defaultDeepClone, findNamedChild, set } from "./utils"
 import { handleArrayLogic } from "./arrayHandling"
 
+/**
+ * Recursively evaluate a value or object.
+ * If something that isn't a state machine object is passed in, it will be
+ * translated where possible (e.g. strings will be attempted to be evaluated
+ * into the values they correspond to inside the context object). If the value
+ * can't be evaluated, the input will be returned.
+ *
+ * @param input The state machine or value.
+ * @param context The context object.
+ * @param options The options.
+ * @returns The result of the evaluation.
+ */
 export function test<Context = Record<string, unknown>>(
     input: any,
     context: Context,
@@ -32,18 +44,12 @@ export function test<Context = Record<string, unknown>>(
         throw new Error("Context is falsy!")
     }
 
-    if (options?._path) {
-        throw new Error(
-            "Paths can only be specified internally, not by API consumers."
-        )
-    }
-
     const opts = options || {}
 
     return realTest(input, context, {
         findNamedChild: opts.findNamedChild || findNamedChild,
         ...opts,
-        _path: "ROOTOBJ",
+        _path: opts._path || "ROOTOBJ",
         _currentLoopDepth: 0,
         logger: opts.logger || (() => {}),
         eventTimestamp: opts.eventTimestamp || Date.now(),
