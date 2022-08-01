@@ -26,10 +26,45 @@ export type LogFunction = (category: string, message: string) => void
  */
 export type DeepCloneFunction<Value> = (value: Value) => Value
 
+interface LoggingProvider {
+    /**
+     * The logging implementation.
+     */
+    logger: LogFunction
+}
+
+interface DeepCloneProvider {
+    /**
+     * The implementation of deep value cloning. You may wish to pass in a more
+     * performant implementation, such as Lodash's cloneDeep function.
+     * By default, this will just call `JSON.parse(JSON.stringify(value))`,
+     * because it reduces bundle size.
+     */
+    deepClone: DeepCloneFunction<any>
+}
+
+/**
+ * The context for a running timer.
+ */
+export type Timer = {
+    /**
+     * The Unix timestamp at which this timer started.
+     */
+    startTime: number
+    /**
+     * The Unix timestamp at which this timer is scheduled to end.
+     */
+    endTime: number
+    /**
+     * The path to this timer.
+     */
+    path: string
+}
+
 /**
  * Options that are passed to {@link handleEvent}.
  */
-export interface HandleEventOptions {
+export interface HandleEventOptions extends Partial<LoggingProvider>, Partial<DeepCloneProvider> {
     /**
      * The event's name.
      */
@@ -41,9 +76,9 @@ export interface HandleEventOptions {
     currentState?: string
 
     /**
-     * The logging implementation.
+     * All the timers that are currently active.
      */
-    logger?: LogFunction
+    timers?: Timer[]
 }
 
 /**
@@ -103,7 +138,7 @@ export interface StateMachineLike<Context, Constants = any | undefined> {
  */
 export type FindNamedChildFunc = typeof findNamedChild
 
-export interface TestOptions {
+export interface TestOptions extends LoggingProvider {
     /**
      * The findNamedChild function that should be used for resolution of
      * variables.
@@ -129,9 +164,9 @@ export interface TestOptions {
     eventTimestamp: number
 
     /**
-     * The logging implementation.
+     * All the timers that are currently active.
      */
-    logger: LogFunction
+    timers?: Timer[]
 
     /**
      * The function called when a push-unique instruction occurs in a test case.
@@ -144,12 +179,4 @@ export interface TestOptions {
     pushUniqueAction?: (reference: string, value: any) => boolean
 }
 
-export interface HandleActionsOptions {
-    /**
-     * The implementation of deep value cloning. You may wish to pass in a more
-     * performant implementation, such as Lodash's cloneDeep function.
-     * By default, this will just call `JSON.parse(JSON.stringify(value))`,
-     * because it reduces bundle size.
-     */
-    deepClone?: DeepCloneFunction<any>
-}
+export interface HandleActionsOptions extends Partial<DeepCloneProvider> {}

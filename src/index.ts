@@ -178,7 +178,32 @@ function realTest<Variables, Return = Variables | boolean>(
         }
 
         if (has("$after")) {
-            throw new Error("Invalid timer state!")
+            const path = `${options._path}.$after`
+
+            if (!options.timers) {
+                return false
+            }
+
+            let timer = options.timers.find((timer) => timer.path === path)
+
+            if (!timer) {
+                const seconds = <number>(
+                    testWithPath(input.$after, variables, options, "$after")
+                )
+
+                timer = {
+                    startTime: options.eventTimestamp,
+                    endTime: options.eventTimestamp + (1000 * seconds),
+                    path,
+                }
+
+                options.timers.push(timer)
+            }
+
+            log("eventStamp", String(options.eventTimestamp))
+            log("endTime", String(timer.endTime))
+
+            return options.eventTimestamp >= timer.endTime
         }
 
         if (has("$pushunique")) {

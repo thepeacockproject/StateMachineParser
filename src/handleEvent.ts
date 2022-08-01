@@ -15,7 +15,7 @@
  */
 
 import { handleActions, test } from "./index"
-import { findNamedChild, set } from "./utils"
+import { defaultDeepClone, findNamedChild, set } from "./utils"
 import {
     HandleEventOptions,
     HandleEventReturn,
@@ -40,6 +40,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     options: HandleEventOptions
 ): HandleEventReturn<Partial<Context>> {
     const log = options.logger || (() => {})
+    const deepClone = options.deepClone || defaultDeepClone
 
     const { eventName, currentState = "Start" } = options
 
@@ -63,7 +64,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     const hasTimerState = !!csObject.$timer
 
     // ensure no circular references are present, and that this won't update the param by accident
-    let newContext = JSON.parse(JSON.stringify(context))
+    let newContext = deepClone(context)
 
     const doEventHandler = (handler: InStateEventHandler) => {
         // do we need to check conditions?
@@ -123,6 +124,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
                         return true
                     },
+                    logger: log,
+                    timers: options.timers,
                 }
             )
         }
@@ -149,6 +152,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
                         {
                             Value: event,
                             ...newContext,
+                        },
+                        {
+                            deepClone,
                         }
                     )
                 }
@@ -182,6 +188,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 {
                     eventName: "-",
                     currentState: state,
+                    logger: log,
+                    timers: options.timers,
                 }
             )
         }
