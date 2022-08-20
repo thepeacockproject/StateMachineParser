@@ -40,7 +40,6 @@ export function handleEvent<Context = unknown, Event = unknown>(
     options: HandleEventOptions
 ): HandleEventReturn<Partial<Context>> {
     const log = options.logger || (() => {})
-    const deepClone = options.deepClone || defaultDeepClone
 
     const { eventName, currentState = "Start" } = options
 
@@ -64,7 +63,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     const hasTimerState = !!csObject.$timer
 
     // ensure no circular references are present, and that this won't update the param by accident
-    let newContext = deepClone(context)
+    let newContext = defaultDeepClone(context)
 
     const doEventHandler = (handler: InStateEventHandler) => {
         // do we need to check conditions?
@@ -153,15 +152,15 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             Value: event,
                             ...newContext,
                         },
-                        {
-                            deepClone,
-                        }
+                        {}
                     )
                 }
             }
 
             // drop this specific event's value
+            // @ts-expect-error
             if (newContext.Value) {
+                // @ts-expect-error
                 delete newContext.Value
             }
 

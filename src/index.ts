@@ -193,7 +193,7 @@ function realTest<Variables, Return = Variables | boolean>(
 
                 timer = {
                     startTime: options.eventTimestamp,
-                    endTime: options.eventTimestamp + (1000 * seconds),
+                    endTime: options.eventTimestamp + 1000 * seconds,
                     path,
                 }
 
@@ -240,7 +240,7 @@ function realTest<Variables, Return = Variables | boolean>(
         }
     }
 
-    console.warn("Unhandled test", input)
+    log("unhandled", `Unhandled test: '${input}'`)
 
     return false
 }
@@ -272,10 +272,6 @@ export function handleActions<Context>(
     context: Context,
     options?: HandleActionsOptions
 ): Context {
-    const opts: HandleActionsOptions = options || {}
-
-    opts.deepClone ??= defaultDeepClone
-
     if (!input || typeof input !== "object") {
         return context
     }
@@ -362,7 +358,7 @@ export function handleActions<Context>(
         const value = findNamedChild(input[op][1], context)
 
         // clone the thing
-        const array = opts.deepClone!(findNamedChild(reference, context))
+        const array = defaultDeepClone(findNamedChild(reference, context))
 
         if (unique) {
             if (array.indexOf(value) === -1) {
@@ -395,7 +391,9 @@ export function handleActions<Context>(
         const value = findNamedChild(input.$remove[1], context)
 
         // clone the thing
-        let array: unknown[] = opts.deepClone!(findNamedChild(reference, context))
+        let array: unknown[] = defaultDeepClone(
+            findNamedChild(reference, context)
+        )
 
         array = array.filter((item) => item !== value)
 

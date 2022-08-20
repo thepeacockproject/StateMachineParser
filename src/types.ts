@@ -21,26 +21,11 @@ import { findNamedChild } from "./utils"
  */
 export type LogFunction = (category: string, message: string) => void
 
-/**
- * A function that takes an object and creates a deep clone of it.
- */
-export type DeepCloneFunction<Value> = (value: Value) => Value
-
 interface LoggingProvider {
     /**
      * The logging implementation.
      */
     logger: LogFunction
-}
-
-interface DeepCloneProvider {
-    /**
-     * The implementation of deep value cloning. You may wish to pass in a more
-     * performant implementation, such as Lodash's cloneDeep function.
-     * By default, this will just call `JSON.parse(JSON.stringify(value))`,
-     * because it reduces bundle size.
-     */
-    deepClone: DeepCloneFunction<any>
 }
 
 /**
@@ -64,7 +49,7 @@ export type Timer = {
 /**
  * Options that are passed to {@link handleEvent}.
  */
-export interface HandleEventOptions extends Partial<LoggingProvider>, Partial<DeepCloneProvider> {
+export interface HandleEventOptions extends Partial<LoggingProvider> {
     /**
      * The event's name.
      */
@@ -179,4 +164,7 @@ export interface TestOptions extends LoggingProvider {
     pushUniqueAction?: (reference: string, value: any) => boolean
 }
 
-export interface HandleActionsOptions extends Partial<DeepCloneProvider> {}
+/**
+ * Options for {@link handleEvent}. (Future-proofing!)
+ */
+export interface HandleActionsOptions {}
