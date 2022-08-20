@@ -20,16 +20,16 @@ import assert from "assert"
 const data = {
     After1: [
         {
-            $after: 5
+            $after: 5,
         },
-        {}
+        {},
     ],
     After2: [
         {
-            $after: 8
+            $after: 8,
         },
-        {}
-    ]
+        {},
+    ],
 }
 
 /** Sat Jan 01 2022 00:00:00 GMT-0500 (Eastern Standard Time) */
@@ -45,8 +45,16 @@ describe("$after", () => {
 
     function validateAfter1(timers: Timer[]) {
         assert.strictEqual(timers.length, 1, "incorrect timer count")
-        assert.strictEqual(timers[0].startTime, START_2022, "start time not correct")
-        assert.strictEqual(timers[0].endTime, START_2022_5, "end time not correct")
+        assert.strictEqual(
+            timers[0].startTime,
+            START_2022,
+            "start time not correct"
+        )
+        assert.strictEqual(
+            timers[0].endTime,
+            START_2022_5,
+            "end time not correct"
+        )
     }
 
     it("supports basic timers", () => {
@@ -62,7 +70,8 @@ describe("$after", () => {
 
         // now, let's try again, pretending 5 seconds have passed
         const result2 = test(sm, vars, {
-            timers, eventTimestamp: START_2022_5
+            timers,
+            eventTimestamp: START_2022_5,
         })
 
         validateAfter1(timers)
