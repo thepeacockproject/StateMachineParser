@@ -34,15 +34,15 @@
     },
     "author": "The Peacock Project <admin@thepeacockproject.org> (https://thepeacockproject.org)",
     "license": "Apache-2.0",
-    "packageManager": "yarn@3.2.1",
+    "packageManager": "yarn@3.2.2",
     "exports": {
         "import": "./build/index.js",
         "require": "./build/index-cjs.js"
     },
     "devDependencies": {
         "@types/mocha": "^9.1.1",
-        "@types/node": "^18.0.3",
-        "esbuild": "^0.14.49",
+        "@types/node": "^18.7.8",
+        "esbuild": "^0.15.5",
         "esbuild-register": "^3.3.3",
         "get-package-type": "^0.1.0",
         "mocha": "^10.0.0",
