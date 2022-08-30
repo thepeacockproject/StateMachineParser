@@ -51,3 +51,37 @@ describe("$lt", () => {
         assert.strictEqual(test(sm, vars), false)
     })
 })
+
+describe("$ge", () => {
+    it("does the math correctly", () => {
+        const [sm, vars] = data.Ge1
+        assert.strictEqual(test(sm, vars), true)
+    })
+
+    it("does the math correctly (false)", () => {
+        const [sm, vars] = data.Ge2
+        assert.strictEqual(test(sm, vars), false)
+    })
+
+    it("works with the same numbers", () => {
+        const [sm, vars] = data.Ge3
+        assert.strictEqual(test(sm, vars), true)
+    })
+})
+
+describe("$le", () => {
+    it("does the math correctly", () => {
+        const [sm, vars] = data.Le1
+        assert.strictEqual(test(sm, vars), true)
+    })
+
+    it("does the math correctly (false)", () => {
+        const [sm, vars] = data.Le2
+        assert.strictEqual(test(sm, vars), false)
+    })
+
+    it("works with the same numbers", () => {
+        const [sm, vars] = data.Le3
+        assert.strictEqual(test(sm, vars), true)
+    })
+})

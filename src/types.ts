@@ -33,11 +33,11 @@ interface LoggingProvider {
  */
 export type Timer = {
     /**
-     * The Unix timestamp at which this timer started.
+     * The event timestamp at which this timer started.
      */
     startTime: number
     /**
-     * The Unix timestamp at which this timer is scheduled to end.
+     * The event timestamp at which this timer is scheduled to end.
      */
     endTime: number
     /**

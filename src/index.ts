@@ -151,7 +151,7 @@ function realTest<Variables, Return = Variables | boolean>(
             )
         }
 
-        if (has("$lte")) {
+        if (has("$le")) {
             return (
                 testWithPath(input.$le[0], variables, options, "$le[0]") <=
                 testWithPath(input.$le[1], variables, options, "$le[1]")
