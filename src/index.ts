@@ -200,7 +200,7 @@ function realTest<Variables, Return = Variables | boolean>(
 
                 timer = {
                     startTime: options.eventTimestamp,
-                    endTime: options.eventTimestamp + 1000 * seconds,
+                    endTime: options.eventTimestamp + seconds,
                     path,
                 }
 

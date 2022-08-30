@@ -29,17 +29,22 @@ interface LoggingProvider {
 }
 
 /**
+ * A game timestamp is a number of seconds (with milliseconds as decimals) since the start of a contract.
+ */
+export type GameTimestamp = number
+
+/**
  * The context for a running timer.
  */
 export type Timer = {
     /**
      * The event timestamp at which this timer started.
      */
-    startTime: number
+    startTime: GameTimestamp
     /**
      * The event timestamp at which this timer is scheduled to end.
      */
-    endTime: number
+    endTime: GameTimestamp
     /**
      * The path to this timer.
      */
