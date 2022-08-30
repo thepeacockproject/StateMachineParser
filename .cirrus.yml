@@ -6,3 +6,17 @@ Test_task:
   Populate_script: yarn
   Build_script: yarn build
   Run_Tests_script: yarn test
+
+Publish_task:
+  only_if: $CIRRUS_TAG != ''
+  env:
+    NPM_AUTH_TOKEN: ENCRYPTED[7375431cc8e2442ddf7289ab28cb5cdea81ad7009b4a9a479572505845e53d30ab4d3e85aefc6e13ced1d5834706f853]
+  container:
+    image: node:latest
+  Yarn_cache:
+    folder: .yarn/cache
+  Populate_script: yarn
+  Build_script: yarn build
+  Pack_script: yarn pack
+  Add_Token_script: yarn config set npmAuthToken $NPM_AUTH_TOKEN
+  Publish_script: yarn npm publish --access public
