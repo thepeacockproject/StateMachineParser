@@ -143,10 +143,9 @@ export interface TestOptions extends LoggingProvider {
     _path: string
 
     /**
-     * If applicable, the timestamp that the event occurred at. If not defined,
-     * it will fall back to the time the method is invoked.
+     * If applicable, the timestamp that the event occurred at.
      */
-    eventTimestamp: number
+    eventTimestamp?: number
 
     /**
      * All the timers that are currently active.

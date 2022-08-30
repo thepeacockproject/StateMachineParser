@@ -139,6 +139,6 @@ export function findNamedChild(reference: string, variables: any): any {
 /**
  * @internal
  */
-export function defaultDeepClone<T>(t: T): T {
+export function deepClone<T>(t: T): T {
     return JSON.parse(JSON.stringify(t))
 }

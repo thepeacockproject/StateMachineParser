@@ -15,7 +15,7 @@
  */
 
 import { handleActions, test } from "./index"
-import { defaultDeepClone, findNamedChild, set } from "./utils"
+import { deepClone, findNamedChild, set } from "./utils"
 import {
     HandleEventOptions,
     HandleEventReturn,
@@ -63,7 +63,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     const hasTimerState = !!csObject.$timer
 
     // ensure no circular references are present, and that this won't update the param by accident
-    let newContext = defaultDeepClone(context)
+    let newContext = deepClone(context)
 
     const doEventHandler = (handler: InStateEventHandler) => {
         // do we need to check conditions?

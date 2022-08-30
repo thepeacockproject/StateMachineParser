@@ -16,7 +16,7 @@
 
 import { handleEvent } from "./handleEvent"
 import { HandleActionsOptions, TestOptions } from "./types"
-import { defaultDeepClone, findNamedChild, set } from "./utils"
+import { deepClone, findNamedChild, set } from "./utils"
 import { handleArrayLogic } from "./arrayHandling"
 
 /**
@@ -52,7 +52,6 @@ export function test<Context = Record<string, unknown>>(
         _path: opts._path || "ROOTOBJ",
         _currentLoopDepth: 0,
         logger: opts.logger || (() => {}),
-        eventTimestamp: opts.eventTimestamp || Date.now(),
     })
 }
 
@@ -190,6 +189,13 @@ function realTest<Variables, Return = Variables | boolean>(
                 const seconds = <number>(
                     testWithPath(input.$after, variables, options, "$after")
                 )
+
+                if (!options.eventTimestamp) {
+                    log(
+                        "validation",
+                        "No event timestamp found when timer is supposed to be active"
+                    )
+                }
 
                 timer = {
                     startTime: options.eventTimestamp,
@@ -358,7 +364,7 @@ export function handleActions<Context>(
         const value = findNamedChild(input[op][1], context)
 
         // clone the thing
-        const array = defaultDeepClone(findNamedChild(reference, context))
+        const array = deepClone(findNamedChild(reference, context))
 
         if (unique) {
             if (array.indexOf(value) === -1) {
@@ -391,9 +397,7 @@ export function handleActions<Context>(
         const value = findNamedChild(input.$remove[1], context)
 
         // clone the thing
-        let array: unknown[] = defaultDeepClone(
-            findNamedChild(reference, context)
-        )
+        let array: unknown[] = deepClone(findNamedChild(reference, context))
 
         array = array.filter((item) => item !== value)
 
