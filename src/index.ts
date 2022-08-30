@@ -195,6 +195,7 @@ function realTest<Variables, Return = Variables | boolean>(
                         "validation",
                         "No event timestamp found when timer is supposed to be active"
                     )
+                    return false
                 }
 
                 timer = {
