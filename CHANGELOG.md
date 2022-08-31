@@ -1,5 +1,12 @@
 # Changelog
 
+## v5.0.0
+
+-   Removed debug in favor of a user-provided logging function.
+-   Reworked timers to use a better system that is controlled by the library consumer.
+-   Fixed the `$le` implementation.
+-   Refactored type definitions a bit.
+
 ## v4.3.0
 
 -   Fixed inconsistent getting and setting behavior as a result of the last patch.
