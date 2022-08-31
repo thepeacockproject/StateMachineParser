@@ -190,7 +190,8 @@ function realTest<Variables, Return = Variables | boolean>(
                     testWithPath(input.$after, variables, options, "$after")
                 )
 
-                if (!options.eventTimestamp) {
+                // zero is falsy, hence the extra check
+                if (!options.eventTimestamp && options.eventTimestamp !== 0) {
                     log(
                         "validation",
                         "No event timestamp found when timer is supposed to be active"

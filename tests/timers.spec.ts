@@ -16,6 +16,7 @@
 
 import { test, Timer } from "../src"
 import assert from "assert"
+import callSpy from "call-spy"
 
 const data = {
     After1: [
@@ -32,49 +33,53 @@ const data = {
     ],
 }
 
-/** Sat Jan 01 2022 00:00:00 GMT-0500 (Eastern Standard Time) */
-const START_2022 = 1641013200000
-/** Sat Jan 01 2022 00:00:05 GMT-0500 (Eastern Standard Time) */
-const START_2022_5 = 1641013205000
-
 describe("$after", () => {
     it("returns false with no timer array specified", () => {
         const [sm, vars] = data.After1
+
         assert.strictEqual(test(sm, vars), false)
     })
 
-    function validateAfter1(timers: Timer[]) {
-        assert.strictEqual(timers.length, 1, "incorrect timer count")
-        assert.strictEqual(
-            timers[0].startTime,
-            START_2022,
-            "start time not correct"
-        )
-        assert.strictEqual(
-            timers[0].endTime,
-            START_2022_5,
-            "end time not correct"
-        )
-    }
+    it("won't try to evaluate if no timestamp is specified", () => {
+        const [sm, vars] = data.After1
+
+        const [logger, loggerCallDetails] = callSpy((category, message) => {
+            if (category === "validation") {
+                assert.strictEqual(
+                    message,
+                    "No event timestamp found when timer is supposed to be active"
+                )
+            }
+        })
+
+        assert.strictEqual(test(sm, vars, { timers: [], logger }), false)
+        assert.strictEqual(loggerCallDetails.called, true)
+    })
 
     it("supports basic timers", () => {
-        const [sm, vars] = data.After1
+        function validate(timers: Timer[]) {
+            assert.strictEqual(timers.length, 1, "incorrect timer count")
+            assert.strictEqual(timers[0].startTime, 0, "start time not correct")
+            assert.strictEqual(timers[0].endTime, 8, "end time not correct")
+        }
+
+        const [sm, vars] = data.After2
 
         const timers: Timer[] = []
 
-        const result = test(sm, vars, { timers, eventTimestamp: START_2022 })
+        const result = test(sm, vars, { timers, eventTimestamp: 0 })
 
-        validateAfter1(timers)
+        validate(timers)
 
         assert.strictEqual(result, false, "timer returned true")
 
-        // now, let's try again, pretending 5 seconds have passed
+        // now, let's try again, pretending 8 seconds have passed
         const result2 = test(sm, vars, {
             timers,
-            eventTimestamp: START_2022_5,
+            eventTimestamp: 8,
         })
 
-        validateAfter1(timers)
+        validate(timers)
 
         assert.strictEqual(result2, true, "timer returned false")
     })

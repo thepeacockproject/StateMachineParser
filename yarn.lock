@@ -335,6 +335,7 @@ __metadata:
   dependencies:
     "@types/mocha": ^9.1.1
     "@types/node": ^18.7.14
+    call-spy: ^3.0.0
     esbuild: ^0.15.6
     esbuild-register: ^3.3.3
     get-package-type: ^0.1.0
@@ -607,6 +608,13 @@ __metadata:
     package-hash: ^4.0.0
     write-file-atomic: ^3.0.0
   checksum: c4db6939533b677866808de67c32f0aaf8bf4fd3e3b8dc957e5d630c007c06b7f11512d44c38a38287fb068e931067e8da9019c34d787259a44121c9a6b87a1f
+  languageName: node
+  linkType: hard
+
+"call-spy@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "call-spy@npm:3.0.0"
+  checksum: b575d540aaca92cacb47a597a2db119014fb8283bf70d1f5691852fd5611f4699b5c9e94bec98a6aca06a961279a29f546321c95dbd2b7d63d38096a2a7d0b2d
   languageName: node
   linkType: hard
 
