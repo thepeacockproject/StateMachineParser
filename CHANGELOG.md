@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.1.0
+
+-   Require a timestamp on all events (for timers). This is breaking, but needed to be done.
+
 ## v5.0.0
 
 -   Removed debug in favor of a user-provided logging function.

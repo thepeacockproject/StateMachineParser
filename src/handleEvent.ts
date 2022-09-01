@@ -125,6 +125,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                     },
                     logger: log,
                     timers: options.timers,
+                    eventTimestamp: options.timestamp,
                 }
             )
         }
@@ -189,6 +190,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                     currentState: state,
                     logger: log,
                     timers: options.timers,
+                    timestamp: options.timestamp,
                 }
             )
         }

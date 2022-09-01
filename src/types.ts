@@ -69,6 +69,11 @@ export interface HandleEventOptions extends Partial<LoggingProvider> {
      * All the timers that are currently active.
      */
     timers?: Timer[]
+
+    /**
+     * The time the event happened at.
+     */
+    timestamp: GameTimestamp
 }
 
 /**
