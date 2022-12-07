@@ -72,16 +72,6 @@ const data = {
             },
         },
     ],
-    Div1: [
-        {
-            $div: ["Context.Object", 5, "Context.Object"],
-        },
-        {
-            Context: {
-                Object: 90,
-            },
-        },
-    ],
 }
 
 describe("$inc", () => {
@@ -117,13 +107,5 @@ describe("$mul", () => {
         const [sm, vars] = data.Mul1
         const r = handleActions(sm, vars)
         assert.strictEqual(r.Context.Object, 90)
-    })
-})
-
-describe("$div", () => {
-    it("can divide a context object", () => {
-        const [sm, vars] = data.Div1
-        const r = handleActions(sm, vars)
-        assert.strictEqual(r.Context.Object, 18)
     })
 })

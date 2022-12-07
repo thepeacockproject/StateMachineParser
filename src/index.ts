@@ -316,21 +316,6 @@ export function handleActions<Context>(
         }
     }
 
-    const mulOrDiv = (op: string) => {
-        let reference = input[op][2]
-
-        const variableValue1 = findNamedChild(input[op][0], context)
-        const variableValue2 = findNamedChild(input[op][1], context)
-
-        set(
-            context,
-            reference,
-            op === "$mul"
-                ? variableValue1 * variableValue2
-                : variableValue1 / variableValue2
-        )
-    }
-
     if (has("$inc")) {
         addOrDec("$inc")
     }
@@ -340,11 +325,16 @@ export function handleActions<Context>(
     }
 
     if (has("$mul")) {
-        mulOrDiv("$mul")
-    }
+        let reference = input["$mul"][2]
 
-    if (has("$div")) {
-        mulOrDiv("$div")
+        const variableValue1 = findNamedChild(input["$mul"][0], context)
+        const variableValue2 = findNamedChild(input["$mul"][1], context)
+
+        set(
+            context,
+            reference,
+            variableValue1 * variableValue2
+        )
     }
 
     if (has("$set")) {

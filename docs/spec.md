@@ -15,7 +15,7 @@ This is a list of the possible nodes that can appear in a state machine, and wha
     -   [`$contains`](#contains)
 -   [Action Nodes](#action-nodes)
     -   [`$inc` and `$dec`](#inc-dec)
-    -   [`$mul` and `$div`](#mul-div)
+    -   [`$mul`](#mul)
     -   [`$push`](#push)
 -   [Common Nodes](#common-nodes)
     -   [`$pushunique`](#pushunique)
@@ -149,7 +149,7 @@ Side effect nodes are nodes that are only supposed to be used inside `Actions` d
 
 Documentation not yet done here. Feel free to open a PR!
 
-### `$mul`, `$div`
+### `$mul`
 
 Documentation not yet done here. Feel free to open a PR!
 
