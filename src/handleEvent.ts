@@ -55,7 +55,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
         // - we have no handler for the current state
         // - in this particular state, the state machine doesn't care about the current event
         return {
-            context: definition.Context,
+            context: context,
             state: currentState,
         }
     }
