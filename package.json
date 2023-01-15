@@ -54,6 +54,7 @@
     "scripts": {
         "prettier": "prettier --write \"**/*.{ts,md,json,js,cjs}\"",
         "build": "tsc && node build.mjs",
+        "prepack": "yarn build",
         "test": "nyc mocha --require esbuild-register --extension js,ts,cjs,mjs tests"
     },
     "prettier": {
