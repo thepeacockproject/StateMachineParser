@@ -149,8 +149,28 @@ Side effect nodes are nodes that are only supposed to be used inside `Actions` d
 
 This node increments or decrements a context variable. It's exact behavior depends how it's arguments are given.
 
-- If a string is given, it will increment or decrement the context variable with that name.
+- If a string is given, it will increment or decrement the context variable with that name by 1.
 - If an array is given, the first element will be the context variable pointer, and the second element will either be the number to increment or decrement by or a pointer to a value of that number.
+
+Examples:
+
+```json5
+{
+    $inc: "myVar", // -> myVar++
+}
+```
+
+```json5
+{
+    $inc: ["myVar", 5], // -> myVar += 5
+}
+```
+
+```json5
+{
+    $inc: ["myVar", "myOtherVar"], // -> myVar += valueOf(myOtherVar)
+}
+```
 
 ### `$mul`
 
