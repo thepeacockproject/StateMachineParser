@@ -92,7 +92,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 handler.Condition,
                 {
                     Value: event,
-                    ...(context || {}),
+                    ...(newContext || {}),
                     ...(definition.Constants || {}),
                 },
                 {
@@ -119,7 +119,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
                         referenceArray.push(item)
 
-                        set(context, reference, referenceArray)
+                        set(newContext, reference, referenceArray)
 
                         return true
                     },
