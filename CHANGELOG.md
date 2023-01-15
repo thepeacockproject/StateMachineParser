@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.2.0
+
+NOTE: This release contains 2 potentially breaking changes.
+They are in a semver-minor release because both align the parser more with the IOI behavior.
+
+-   Added prepack script so building from source works properly.
+-   *Breaking*: Fixed handleEvent resetting the context when an event is disregarded.
+-   *Breaking*: Removed support for `$div`, as it never actually existed in the game.
+-   Updated build dependencies.
+
 ## v5.1.0
 
 -   Require a timestamp on all events (for timers). This is breaking, but needed to be done.
