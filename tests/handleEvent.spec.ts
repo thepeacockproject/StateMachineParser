@@ -64,7 +64,7 @@ describe("handleEvent api", () => {
                 )
             }
 
-            if (event === 5) {
+            if (event === 4) {
                 assert.strictEqual(
                     result.state,
                     "NumberIsFive",
@@ -76,7 +76,7 @@ describe("handleEvent api", () => {
             assert.strictEqual(
                 result.state,
                 "Start",
-                "we should not have transitioned yet"
+                `Currently at event number ${event}. we should not have transitioned yet`
             )
         }
     })

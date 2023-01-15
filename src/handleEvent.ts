@@ -55,7 +55,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
         // - we have no handler for the current state
         // - in this particular state, the state machine doesn't care about the current event
         return {
-            context: definition.Context,
+            context: context,
             state: currentState,
         }
     }
@@ -92,7 +92,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 handler.Condition,
                 {
                     Value: event,
-                    ...(context || {}),
+                    ...(newContext || {}),
                     ...(definition.Constants || {}),
                 },
                 {
@@ -119,7 +119,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
                         referenceArray.push(item)
 
-                        set(context, reference, referenceArray)
+                        set(newContext, reference, referenceArray)
 
                         return true
                     },
