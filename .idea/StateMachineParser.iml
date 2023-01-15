@@ -8,6 +8,9 @@
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/.yarn/releases" />
+      <excludeFolder url="file://$MODULE_DIR$/.yarn/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/.nyc_output" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

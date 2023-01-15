@@ -28,7 +28,7 @@ describe("handleEvent api", () => {
                 Definition,
                 Definition.Context,
                 input.Value,
-                { eventName: input.Name }
+                { timestamp: 0, eventName: input.Name }
             )
 
             if (doneOnce) {
@@ -50,6 +50,7 @@ describe("handleEvent api", () => {
             event++
 
             const result = handleEvent(Definition, context, input.Value, {
+                timestamp: 0,
                 currentState: "Start",
                 eventName: input.Name,
             })
@@ -89,6 +90,7 @@ describe("handleEvent api", () => {
         const result = handleEvent(Definition, {}, null, {
             currentState: state,
             eventName: "-",
+            timestamp: 0,
         })
 
         assert.strictEqual(result.state, "Success", "Transition did not happen")
@@ -106,6 +108,7 @@ describe("handleEvent api", () => {
             {
                 currentState: state,
                 eventName: Input.Name,
+                timestamp: 0,
             }
         )
 
@@ -120,6 +123,7 @@ describe("handleEvent api", () => {
         let result = handleEvent(Definition, context, Input.Value, {
             currentState,
             eventName: Input.Name,
+            timestamp: 0,
         })
 
         context = <any>result.context
@@ -140,6 +144,7 @@ describe("handleEvent api", () => {
         result = handleEvent(Definition, context, Input.Value, {
             currentState,
             eventName: Input.Name,
+            timestamp: 0,
         })
 
         assert.strictEqual(context.Pacified.length, 1, "Unique check failed")
