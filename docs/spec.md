@@ -147,7 +147,10 @@ Side effect nodes are nodes that are only supposed to be used inside `Actions` d
 
 ### `$inc`, `$dec`
 
-Documentation not yet done here. Feel free to open a PR!
+This node increments or decrements a context variable. It's exact behavior depends how it's arguments are given.
+
+- If a string is given, it will increment or decrement the context variable with that name.
+- If an array is given, the first element will be the context variable pointer, and the second element will either be the number to increment or decrement by or a pointer to a value of that number.
 
 ### `$mul`
 
