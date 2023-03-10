@@ -211,7 +211,19 @@ function realTest<Variables, Return = Variables | boolean>(
             log("eventStamp", String(options.eventTimestamp))
             log("endTime", String(timer.endTime))
 
-            return options.eventTimestamp >= timer.endTime
+            if (options.eventTimestamp >= timer.endTime) {
+                const index = options.timers.findIndex(
+                    (timer) => timer.path === path
+                )
+
+                if (index !== -1) {
+                    options.timers.splice(index, 1)
+                }
+
+                return true
+            } else {
+                return false
+            }
         }
 
         if (has("$pushunique")) {
@@ -330,11 +342,7 @@ export function handleActions<Context>(
         const variableValue1 = findNamedChild(input["$mul"][0], context)
         const variableValue2 = findNamedChild(input["$mul"][1], context)
 
-        set(
-            context,
-            reference,
-            variableValue1 * variableValue2
-        )
+        set(context, reference, variableValue1 * variableValue2)
     }
 
     if (has("$set")) {
