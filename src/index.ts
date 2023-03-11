@@ -212,6 +212,8 @@ function realTest<Variables, Return = Variables | boolean>(
             log("endTime", String(timer.endTime))
 
             if (options.eventTimestamp >= timer.endTime) {
+                // The timer is up. Delete it from the timers array
+                // so that a new timer can be created if this state is visited again.
                 const index = options.timers.findIndex(
                     (timer) => timer.path === path
                 )
@@ -221,9 +223,9 @@ function realTest<Variables, Return = Variables | boolean>(
                 }
 
                 return true
-            } else {
-                return false
             }
+
+            return false
         }
 
         if (has("$pushunique")) {
