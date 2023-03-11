@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.3.0
+
+-   Fixed a bug which would cause timers to be persisted, preventing them from starting again.
+
 ## v5.2.0
 
 NOTE: This release contains 2 potentially breaking changes.
