@@ -57,20 +57,15 @@ describe("$after", () => {
     })
 
     it("supports basic timers", () => {
-        function validate(timers: Timer[]) {
-            assert.strictEqual(timers.length, 1, "incorrect timer count")
-            assert.strictEqual(timers[0].startTime, 0, "start time not correct")
-            assert.strictEqual(timers[0].endTime, 8, "end time not correct")
-        }
-
         const [sm, vars] = data.After2
 
         const timers: Timer[] = []
 
         const result = test(sm, vars, { timers, eventTimestamp: 0 })
 
-        validate(timers)
-
+        assert.strictEqual(timers.length, 1, "incorrect timer count")
+        assert.strictEqual(timers[0].startTime, 0, "start time not correct")
+        assert.strictEqual(timers[0].endTime, 8, "end time not correct")
         assert.strictEqual(result, false, "timer returned true")
 
         // now, let's try again, pretending 8 seconds have passed
@@ -79,8 +74,27 @@ describe("$after", () => {
             eventTimestamp: 8,
         })
 
-        validate(timers)
-
+        assert.strictEqual(timers.length, 0, "incorrect timer count")
         assert.strictEqual(result2, true, "timer returned false")
+
+        // Without a timer in effect, a new timer should be created.
+        const result3 = test(sm, vars, {
+            timers,
+            eventTimestamp: 9,
+        })
+
+        assert.strictEqual(timers.length, 1, "incorrect timer count")
+        assert.strictEqual(timers[0].startTime, 9, "start time not correct")
+        assert.strictEqual(timers[0].endTime, 17, "end time not correct")
+        assert.strictEqual(result3, false, "timer returned true")
+
+        // The second timer is up.
+        const result4 = test(sm, vars, {
+            timers,
+            eventTimestamp: 18,
+        })
+
+        assert.strictEqual(timers.length, 0, "incorrect timer count")
+        assert.strictEqual(result4, true, "timer returned false")
     })
 })
