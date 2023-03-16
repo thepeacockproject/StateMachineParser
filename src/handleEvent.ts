@@ -151,8 +151,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
                         },
                         {
                             Value: event,
-                            ...(options.ContractId && {
-                                ContractId: options.ContractId,
+                            ...(options.contractId && {
+                                ContractId: options.contractId,
                             }),
                             ...newContext,
                         },

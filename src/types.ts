@@ -79,7 +79,7 @@ export interface HandleEventOptions extends Partial<LoggingProvider> {
      * The contractId of the session the event took place in.
      * @since v5.4.0
      */
-    ContractId?: string
+    contractId?: string
 }
 
 /**
