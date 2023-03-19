@@ -74,6 +74,12 @@ export interface HandleEventOptions extends Partial<LoggingProvider> {
      * The time the event happened at.
      */
     timestamp: GameTimestamp
+
+    /**
+     * The contractId of the session the event took place in.
+     * @since v5.4.0
+     */
+    contractId?: string
 }
 
 /**

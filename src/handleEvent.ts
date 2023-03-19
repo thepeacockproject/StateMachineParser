@@ -151,6 +151,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
                         },
                         {
                             Value: event,
+                            ...(options.contractId && {
+                                ContractId: options.contractId,
+                            }),
                             ...newContext,
                         },
                         {}
@@ -163,6 +166,13 @@ export function handleEvent<Context = unknown, Event = unknown>(
             if (newContext.Value) {
                 // @ts-expect-error
                 delete newContext.Value
+            }
+
+            // drop this specific event's ContractId
+            // @ts-expect-error
+            if (newContext.ContractId) {
+                // @ts-expect-error
+                delete newContext.ContractId
             }
 
             // drop the constants
