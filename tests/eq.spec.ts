@@ -69,6 +69,12 @@ const data = {
         },
         {},
     ],
+    LongArray1: [
+        {
+            $eq: [1, 1, 1, 1],
+        },
+        {},
+    ],
 }
 
 describe("$eq", () => {
@@ -104,5 +110,10 @@ describe("$eq", () => {
             const [sm, vars] = data.NestedNeq1
             assert.strictEqual(test(sm, vars), false)
         })
+    })
+
+    it("array with more than 2 elements", () => {
+        const [sm, vars] = data.LongArray1
+        assert.strictEqual(test(sm, vars), true)
     })
 })
