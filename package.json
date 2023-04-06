@@ -1,6 +1,6 @@
 {
     "name": "@peacockproject/statemachine-parser",
-    "version": "5.3.0",
+    "version": "5.4.0",
     "description": "IOI state machine conditional parser.",
     "main": "build/index-cjs.js",
     "module": "build/index.js",

@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.4.0
+
+-   Added support for contract IDs in `$pushunique`.
+
 ## v5.3.0
 
 -   Fixed a bug which would cause timers to be persisted, preventing them from starting again.
