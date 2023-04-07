@@ -92,6 +92,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 handler.Condition,
                 {
                     Value: event,
+                    ...(options.contractId && {
+                        ContractId: options.contractId,
+                    }),
                     ...(newContext || {}),
                     ...(definition.Constants || {}),
                 },
@@ -201,6 +204,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                     logger: log,
                     timers: options.timers,
                     timestamp: options.timestamp,
+                    contractId: options.contractId,
                 }
             )
         }
