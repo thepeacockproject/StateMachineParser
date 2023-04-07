@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.5.1
+
+-   Fix contract IDs not being passed to conditions and transitions.
+
 ## v5.5.0
 
 -   Added support for long arrays to the `$eq` operator.
