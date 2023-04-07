@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.5.0
+
+-   Added support for long arrays to the `$eq` operator.
+
 ## v5.4.0
 
 -   Added support for contract IDs in `$pushunique`.
