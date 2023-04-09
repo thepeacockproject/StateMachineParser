@@ -1,8 +1,12 @@
 # Changelog
 
+## v5.5.2
+
+-   Fixed irregular events not being handled correctly.
+
 ## v5.5.1
 
--   Fix contract IDs not being passed to conditions and transitions.
+-   Fixed contract IDs not being passed to conditions and transitions.
 
 ## v5.5.0
 
