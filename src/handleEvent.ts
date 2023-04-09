@@ -142,7 +142,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
             if (hasIrregularEventKeys) {
                 ;(<unknown[]>Actions).push(
-                    ...irregularEventKeys.map((key) => handler[key])
+                    ...irregularEventKeys.map((key) => {
+                        return { [key]: handler[key] }
+                    })
                 )
             }
 
