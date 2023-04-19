@@ -17,6 +17,7 @@ This is a list of the possible nodes that can appear in a state machine, and wha
     -   [`$inc` and `$dec`](#inc-dec)
     -   [`$mul`](#mul)
     -   [`$push`](#push)
+    -   [`$reset`](#reset)
 -   [Common Nodes](#common-nodes)
     -   [`$pushunique`](#pushunique)
 
@@ -189,6 +190,21 @@ Example:
 {
     // sets the value of `CoolestCharacter` to "Rocco"
     $set: ["$CoolestCharacter", "Rocco"],
+}
+```
+
+### `$reset`
+
+This node sets the value of a context variable to an empty array (i.e. resetting the array).
+
+The node itself is given the name of the variable.
+
+Example:
+
+```json5
+{
+    // resets the array "Targets"
+    $reset: "Targets"
 }
 ```
 
