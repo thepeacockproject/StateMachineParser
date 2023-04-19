@@ -194,17 +194,21 @@ Example:
 ```
 
 ### `$reset`
-**Note:** This is currently implemented as a "get it working", it most likely resets a variable to the original value, which with how the SMP is designed, we cannot do.
 
-This node sets the value of a context variable to an empty array (i.e. resetting the array).
+This node sets the value of a context variable to the original value retrieved from the definition.
 
 The node itself is given the name of the variable.
 
 Example:
 
 ```json5
+// Starting context from definition
 {
-    // resets the array "Targets"
+    Targets: ["Tony"]
+}
+{
+    // Some actions may have preceded transforming the array i.e. $push
+    // This will reset the "Targets" array to ["Tony"]
     $reset: "Targets"
 }
 ```
