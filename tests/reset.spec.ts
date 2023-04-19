@@ -20,7 +20,8 @@ import assert from "assert"
 const data = {
     Reset1: [
         {
-            $reset: ["Targets"],
+            $push: ["Targets", "grappigegovert"],
+            $reset: "Targets",
         },
         {
             Targets: ["RDIL", "MoonySolari", "Tony"]
@@ -28,6 +29,7 @@ const data = {
     ],
     Reset2: [
         {
+            $push: ["Targets", "Tony"],
             $reset: "Targets",
         },
         {
@@ -37,15 +39,16 @@ const data = {
 }
 
 describe("$reset", () => {
+    // We use spread syntax below to quick and dirty "clone" it, otherwise it gets transformed
     it("can reset a non-empty array", () => {
         const [sm, vars] = data.Reset1
-        const r = handleActions(sm, vars)
-        assert.strictEqual(r.Targets?.length, 0)
+        const r = handleActions(sm, vars, { originalContext: { ...vars } })
+        assert.strictEqual(r.Targets?.length, 3)
     })
 
     it("can reset an empty array", () => {
         const [sm, vars] = data.Reset2
-        const r = handleActions(sm, vars)
+        const r = handleActions(sm, vars, { originalContext: { ...vars } })
         assert.strictEqual(r.Targets?.length, 0)
     })
 })

@@ -161,7 +161,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             }),
                             ...newContext,
                         },
-                        {}
+                        {
+                            originalContext: definition.Context ?? {}
+                        },
                     )
                 }
             }

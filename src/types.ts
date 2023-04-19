@@ -180,6 +180,14 @@ export interface TestOptions extends LoggingProvider {
 }
 
 /**
- * Options for {@link handleEvent}. (Future-proofing!)
+ * Options for {@link handleEvent}.
  */
-export interface HandleActionsOptions {}
+export interface HandleActionsOptions {
+    /**
+     * The original context, this value is retrieved from
+     * the definition, and used with the $reset op.
+     * 
+     * @since v5.6.0
+     */
+    originalContext?: unknown
+}
