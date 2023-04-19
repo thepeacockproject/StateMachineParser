@@ -418,7 +418,7 @@ export function handleActions<Context>(
 
     if (has("$reset")) {
         let reference = input.$reset
-        const value = findNamedChild(reference, options.originalContext ?? {})
+        const value = findNamedChild(reference, options.originalContext)
 
         set(context, reference, value)
     }
