@@ -194,6 +194,7 @@ Example:
 ```
 
 ### `$reset`
+**Note:** This is currently implemented as a "get it working", it most likely resets a variable to the original value, which with how the SMP is designed, we cannot do.
 
 This node sets the value of a context variable to an empty array (i.e. resetting the array).
 
