@@ -1,5 +1,10 @@
 # Changelog
 
+## v5.6.0
+
+-   Added support for the `$reset` operator using the original context from the definition.
+-   Added `originalContext` option to `HandleActionsOptions`.
+
 ## v5.5.2
 
 -   Fixed irregular events not being handled correctly.
