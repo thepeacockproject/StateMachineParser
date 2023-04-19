@@ -40,12 +40,12 @@ describe("$reset", () => {
     it("can reset a non-empty array", () => {
         const [sm, vars] = data.Reset1
         const r = handleActions(sm, vars)
-        assert.strictEqual(r.Targets, [])
+        assert.strictEqual(r.Targets?.length, 0)
     })
 
     it("can reset an empty array", () => {
         const [sm, vars] = data.Reset2
         const r = handleActions(sm, vars)
-        assert.strictEqual(r.Targets, [])
+        assert.strictEqual(r.Targets?.length, 0)
     })
 })
