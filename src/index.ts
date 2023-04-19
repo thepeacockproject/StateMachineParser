@@ -416,6 +416,12 @@ export function handleActions<Context>(
         set(context, reference, array)
     }
 
+    if (has("$reset")) {
+        let reference = input.$reset[0]
+
+        set(context, reference, [])
+    }
+
     return context
 }
 
