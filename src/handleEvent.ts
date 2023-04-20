@@ -160,6 +160,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                                 ContractId: options.contractId,
                             }),
                             ...newContext,
+                            ...(definition.Constants || {}),
                         },
                         {
                             originalContext: definition.Context ?? {}
