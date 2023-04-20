@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.6.1
+
+-   Fixed actions not getting constants from the definition.
+
 ## v5.6.0
 
 -   Added support for the `$reset` operator using the original context from the definition.
