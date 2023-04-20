@@ -40,6 +40,15 @@ const data = {
             },
         },
     ],
+    Inc3: [
+        {
+            $inc: ["Counter", "Value"]
+        },
+        {
+            Counter: 40,
+            Value: 2
+        }
+    ],
     Dec1: [
         {
             $dec: ["Some.Context.Object", 6],
@@ -85,6 +94,12 @@ describe("$inc", () => {
         const [sm, vars] = data.Inc2
         const r = handleActions(sm, vars)
         assert.strictEqual(r.Context.Object, 150151)
+    })
+
+    it("can increment a context object by the value of another context object", () => {
+        const [sm, vars] = data.Inc3
+        const r = handleActions(sm, vars)
+        assert.strictEqual(r.Counter, 42)
     })
 })
 
