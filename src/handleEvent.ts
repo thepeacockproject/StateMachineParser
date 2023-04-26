@@ -91,10 +91,10 @@ export function handleEvent<Context = unknown, Event = unknown>(
             conditionResult = test(
                 handler.Condition,
                 {
+                    ...(newContext || {}),
                     ...(options.contractId && {
                         ContractId: options.contractId,
                     }),
-                    ...(newContext || {}),
                     ...(definition.Constants || {}),
                     Value: event,
                 },
@@ -155,10 +155,10 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             [action]: actionSet[action],
                         },
                         {
+                            ...newContext,
                             ...(options.contractId && {
                                 ContractId: options.contractId,
                             }),
-                            ...newContext,
                             ...(definition.Constants || {}),
                             Value: event,
                         },
