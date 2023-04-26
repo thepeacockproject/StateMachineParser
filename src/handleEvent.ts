@@ -91,12 +91,12 @@ export function handleEvent<Context = unknown, Event = unknown>(
             conditionResult = test(
                 handler.Condition,
                 {
-                    Value: event,
+                    ...(newContext || {}),
                     ...(options.contractId && {
                         ContractId: options.contractId,
                     }),
-                    ...(newContext || {}),
                     ...(definition.Constants || {}),
+                    Value: event,
                 },
                 {
                     pushUniqueAction(reference, item) {
@@ -155,30 +155,28 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             [action]: actionSet[action],
                         },
                         {
-                            Value: event,
+                            ...newContext,
                             ...(options.contractId && {
                                 ContractId: options.contractId,
                             }),
-                            ...newContext,
                             ...(definition.Constants || {}),
+                            Value: event,
                         },
                         {
-                            originalContext: definition.Context ?? {}
-                        },
+                            originalContext: definition.Context ?? {},
+                        }
                     )
                 }
             }
 
             // drop this specific event's value
-            // @ts-expect-error
-            if (newContext.Value) {
+            if (newContext.hasOwnProperty("Value")) {
                 // @ts-expect-error
                 delete newContext.Value
             }
 
             // drop this specific event's ContractId
-            // @ts-expect-error
-            if (newContext.ContractId) {
+            if (newContext.hasOwnProperty("ContractId")) {
                 // @ts-expect-error
                 delete newContext.ContractId
             }
