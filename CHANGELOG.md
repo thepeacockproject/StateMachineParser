@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.6.2
+
+-   Fixed values not being properly deleted if they were truthy.
+
 ## v5.6.1
 
 -   Fixed actions not getting constants from the definition.
