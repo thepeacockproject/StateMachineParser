@@ -176,8 +176,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
             }
 
             // drop this specific event's ContractId
-            // @ts-expect-error
-            if (newContext.ContractId) {
+            if (newContext.hasOwnProperty("ContractId")) {
                 // @ts-expect-error
                 delete newContext.ContractId
             }
