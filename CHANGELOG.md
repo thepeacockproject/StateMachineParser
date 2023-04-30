@@ -10,8 +10,8 @@ NOTE: This release contains 2 potentially breaking changes.
 They are in a semver-minor release because both align the parser more with the IOI behavior.
 
 -   Added prepack script so building from source works properly.
--   *Breaking*: Fixed handleEvent resetting the context when an event is disregarded.
--   *Breaking*: Removed support for `$div`, as it never actually existed in the game.
+-   _Breaking_: Fixed handleEvent resetting the context when an event is disregarded.
+-   _Breaking_: Removed support for `$div`, as it never actually existed in the game.
 -   Updated build dependencies.
 
 ## v5.1.0
