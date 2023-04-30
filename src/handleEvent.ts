@@ -91,9 +91,12 @@ export function handleEvent<Context = unknown, Event = unknown>(
             conditionResult = test(
                 handler.Condition,
                 {
-                    Value: event,
                     ...(newContext || {}),
+                    ...(options.contractId && {
+                        ContractId: options.contractId,
+                    }),
                     ...(definition.Constants || {}),
+                    Value: event,
                 },
                 {
                     pushUniqueAction(reference, item) {
@@ -139,7 +142,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
             if (hasIrregularEventKeys) {
                 ;(<unknown[]>Actions).push(
-                    ...irregularEventKeys.map((key) => handler[key])
+                    ...irregularEventKeys.map((key) => {
+                        return { [key]: handler[key] }
+                    })
                 )
             }
 
@@ -150,19 +155,30 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             [action]: actionSet[action],
                         },
                         {
-                            Value: event,
                             ...newContext,
+                            ...(options.contractId && {
+                                ContractId: options.contractId,
+                            }),
+                            ...(definition.Constants || {}),
+                            Value: event,
                         },
-                        {}
+                        {
+                            originalContext: definition.Context ?? {},
+                        }
                     )
                 }
             }
 
             // drop this specific event's value
-            // @ts-expect-error
-            if (newContext.Value) {
+            if (newContext.hasOwnProperty("Value")) {
                 // @ts-expect-error
                 delete newContext.Value
+            }
+
+            // drop this specific event's ContractId
+            if (newContext.hasOwnProperty("ContractId")) {
+                // @ts-expect-error
+                delete newContext.ContractId
             }
 
             // drop the constants
@@ -191,6 +207,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                     logger: log,
                     timers: options.timers,
                     timestamp: options.timestamp,
+                    contractId: options.contractId,
                 }
             )
         }
