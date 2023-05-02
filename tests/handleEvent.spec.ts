@@ -96,7 +96,7 @@ describe("handleEvent api", () => {
         assert.strictEqual(result.state, "Success", "Transition did not happen")
     })
 
-    it("works with constants", () => {
+    it("supports tests with constants", () => {
         const { Definition, Input } = suites.testWithConstants
 
         let state = "Start"
@@ -113,6 +113,25 @@ describe("handleEvent api", () => {
         )
 
         assert.strictEqual(result.state, "Success", "Transition did not happen")
+    })
+
+    it("supports actions with constants", () => {
+        const { Definition, Input } = suites.actionWithConstants
+
+        let state = "Start"
+
+        const result = handleEvent(
+            Definition,
+            Definition.Context,
+            Input.Value,
+            {
+                currentState: state,
+                eventName: Input.Name,
+                timestamp: 0,
+            }
+        )
+
+        assert.strictEqual(result.context["Variable"], 500)
     })
 
     it("supports pushunique", () => {

@@ -117,6 +117,29 @@
             }
         }
     },
+    "actionWithConstants": {
+        "Definition": {
+            "Context": {
+                "Variable": 0
+            },
+            "Constants": {
+                "ValueToAdd": 500
+            },
+            "States": {
+                "Start": {
+                    "Event": {
+                        "Actions": {
+                            "$inc": ["Variable", "$.ValueToAdd"]
+                        }
+                    }
+                }
+            }
+        },
+        "Input": {
+            "Name": "Event",
+            "Value": {}
+        }
+    },
     "pushUniqueAsCondition": {
         "Definition": {
             "Context": {
