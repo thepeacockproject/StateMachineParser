@@ -152,6 +152,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                         {
                             Value: event,
                             ...newContext,
+                            ...(definition.Constants || {}),
                         },
                         {}
                     )
