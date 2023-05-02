@@ -74,6 +74,12 @@ export interface HandleEventOptions extends Partial<LoggingProvider> {
      * The time the event happened at.
      */
     timestamp: GameTimestamp
+
+    /**
+     * The contractId of the session the event took place in.
+     * @since v5.4.0
+     */
+    contractId?: string
 }
 
 /**
@@ -174,6 +180,14 @@ export interface TestOptions extends LoggingProvider {
 }
 
 /**
- * Options for {@link handleEvent}. (Future-proofing!)
+ * Options for {@link handleEvent}.
  */
-export interface HandleActionsOptions {}
+export interface HandleActionsOptions {
+    /**
+     * The original context, this value is retrieved from
+     * the definition, and used with the $reset op.
+     * 
+     * @since v5.6.0
+     */
+    originalContext?: unknown
+}

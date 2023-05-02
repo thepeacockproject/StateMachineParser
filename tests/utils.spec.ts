@@ -15,7 +15,7 @@
  */
 
 import { findNamedChild, set } from "../src/utils"
-import assert from "assert"
+import * as assert from "assert"
 
 // the main purpose of this is just to improve code coverage
 
@@ -34,6 +34,29 @@ describe("utils", () => {
                 undefined,
                 "prototype pollution succeeded"
             )
+
+            set(Object, "prototype.func", function func() {
+                return "polluted"
+            })
+
+            assert.strictEqual(
+                // @ts-expect-error I know.
+                Object.prototype.func,
+                undefined,
+                "prototype pollution succeeded"
+            )
+        })
+
+        it("creates objects when keys are not numbers or contain dots", () => {
+            const obj = {}
+            set(obj, "a.NaN.b", "value")
+            assert.deepEqual(obj, { a: { NaN: { b: "value" } } })
+        })
+
+        it("sets values in arrays when keys are numeric", () => {
+            const obj = {}
+            set(obj, "a.0.b", "value")
+            assert.deepEqual(obj, { a: [{ b: "value" }] })
         })
     })
 

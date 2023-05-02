@@ -1,5 +1,34 @@
 # Changelog
 
+## v5.6.2
+
+-   Fixed values not being properly deleted if they were truthy.
+
+## v5.6.1
+
+-   Fixed actions not getting constants from the definition.
+
+## v5.6.0
+
+-   Added support for the `$reset` operator using the original context from the definition.
+-   Added `originalContext` option to `HandleActionsOptions`.
+
+## v5.5.2
+
+-   Fixed irregular events not being handled correctly.
+
+## v5.5.1
+
+-   Fixed contract IDs not being passed to conditions and transitions.
+
+## v5.5.0
+
+-   Added support for long arrays to the `$eq` operator.
+
+## v5.4.0
+
+-   Added support for contract IDs in `$pushunique`.
+
 ## v5.3.0
 
 -   Fixed a bug which would cause timers to be persisted, preventing them from starting again.
@@ -10,8 +39,8 @@ NOTE: This release contains 2 potentially breaking changes.
 They are in a semver-minor release because both align the parser more with the IOI behavior.
 
 -   Added prepack script so building from source works properly.
--   *Breaking*: Fixed handleEvent resetting the context when an event is disregarded.
--   *Breaking*: Removed support for `$div`, as it never actually existed in the game.
+-   _Breaking_: Fixed handleEvent resetting the context when an event is disregarded.
+-   _Breaking_: Removed support for `$div`, as it never actually existed in the game.
 -   Updated build dependencies.
 
 ## v5.1.0

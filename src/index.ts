@@ -102,15 +102,25 @@ function realTest<Variables, Return = Variables | boolean>(
 
         if (has("$eq")) {
             // transform any strings inside these arrays into their intended context values
-            if (Array.isArray(input.$eq[0] || input.$eq[1])) {
+            if (input.$eq.some((val) => Array.isArray(val))) {
                 log("validation", "attempted to compare arrays (can't!)")
                 return false
             }
 
+            const res = testWithPath(input.$eq[0], variables, options, "$eq[0]")
+
             return (
-                // we test twice because we need to make sure that the value is fixed if it's a variable
-                testWithPath(input.$eq[0], variables, options, "$eq[0]") ===
-                testWithPath(input.$eq[1], variables, options, "$eq[1]")
+                // we test for each element because we need to make sure that the value is fixed if it's a variable
+                input.$eq.every(
+                    (val, index) =>
+                        index === 0 ||
+                        testWithPath(
+                            val,
+                            variables,
+                            options,
+                            `$eq[${index}]`
+                        ) === res
+                )
             )
         }
 
@@ -404,6 +414,13 @@ export function handleActions<Context>(
         array = array.filter((item) => item !== value)
 
         set(context, reference, array)
+    }
+
+    if (has("$reset")) {
+        let reference = input.$reset
+        const value = findNamedChild(reference, options.originalContext)
+
+        set(context, reference, value)
     }
 
     return context
