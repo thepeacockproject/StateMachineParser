@@ -119,7 +119,11 @@ function realTest<Variables, Return = Variables | boolean>(
                             variables,
                             options,
                             `$eq[${index}]`
-                        ) === res
+                        ) === res ||
+                        // If the value is a string which also happens to be the name of a field in the Context,
+                        // it is possible this it is intended to be taken as a string literal, instead of the value of that field.
+                        // Example: The Scenic Route (78286bd8-b178-46dd-afbb-55685a478a71)
+                        val === res
                 )
             )
         }
