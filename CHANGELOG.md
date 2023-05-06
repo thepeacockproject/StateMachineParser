@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.7.0
+
+-   Added support for 2 operand `$mul` actions.
+
 ## v5.6.2
 
 -   Fixed values not being properly deleted if they were truthy.
