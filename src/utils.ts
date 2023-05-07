@@ -103,6 +103,7 @@ export function set(obj: any, keys: string | string[], val: any): void {
  *
  * @param reference The reference to the target as a string.
  * @param variables The object that may contain the target.
+ * @param forAction true if this is for an action
  * @returns The value if found, or the reference if it wasn't /
  * something went wrong.
  */
