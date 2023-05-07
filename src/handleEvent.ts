@@ -102,9 +102,10 @@ export function handleEvent<Context = unknown, Event = unknown>(
                     pushUniqueAction(reference, item) {
                         const referenceArray = findNamedChild(
                             reference,
-                            newContext
+                            newContext,
+                            true
                         )
-                        item = findNamedChild(item, newContext)
+                        item = findNamedChild(item, newContext, true)
                         log(
                             "action",
                             `Running pushUniqueAction on ${reference} with ${item}`

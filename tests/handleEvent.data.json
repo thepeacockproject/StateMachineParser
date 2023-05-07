@@ -103,7 +103,7 @@
                 "Start": {
                     "Event": {
                         "Condition": {
-                            "$eq": ["$Value.RepositoryId", "SomeRepoId"]
+                            "$eq": ["$Value.RepositoryId", "$.SomeRepoId"]
                         },
                         "Transition": "Success"
                     }
