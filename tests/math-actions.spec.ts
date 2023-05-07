@@ -73,7 +73,7 @@ const data = {
     ],
     Mul1: [
         {
-            $mul: ["Context.Object", 5, "Context.Object"],
+            $mul: ["Context.Object", 5, "Context.Output"],
         },
         {
             Context: {
@@ -81,6 +81,16 @@ const data = {
             },
         },
     ],
+    Mul2: [
+        {
+            $mul: ["Context.Object", 10]
+        },
+        {
+            Context: {
+                Object: 42
+            }
+        }
+    ]
 }
 
 describe("$inc", () => {
@@ -118,9 +128,15 @@ describe("$dec", () => {
 })
 
 describe("$mul", () => {
-    it("can multiply a context object", () => {
+    it("can multiply a context object and store it in another", () => {
         const [sm, vars] = data.Mul1
         const r = handleActions(sm, vars)
-        assert.strictEqual(r.Context.Object, 90)
+        assert.strictEqual(r.Context.Output, 90)
+    })
+
+    it("can multiply a context object and store it in that object", () => {
+        const [sm, vars] = data.Mul2
+        const r= handleActions(sm, vars)
+        assert.strictEqual(r.Context.Object, 420)
     })
 })

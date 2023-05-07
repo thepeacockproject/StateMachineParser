@@ -353,7 +353,8 @@ export function handleActions<Context>(
     }
 
     if (has("$mul")) {
-        let reference = input["$mul"][2]
+        // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
+        let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
 
         const variableValue1 = findNamedChild(input["$mul"][0], context)
         const variableValue2 = findNamedChild(input["$mul"][1], context)
