@@ -20,7 +20,7 @@ import assert from "assert"
 const data = {
     Set1: [
         {
-            $set: ["MyContextObject", "OtherContextObject"],
+            $set: ["MyContextObject", "$.OtherContextObject"],
         },
         {
             MyContextObject: 1,

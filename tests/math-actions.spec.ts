@@ -42,7 +42,7 @@ const data = {
     ],
     Inc3: [
         {
-            $inc: ["Counter", "Value"]
+            $inc: ["Counter", "$.Value"]
         },
         {
             Counter: 40,

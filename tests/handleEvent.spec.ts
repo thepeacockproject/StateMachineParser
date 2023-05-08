@@ -174,6 +174,25 @@ describe("handleEvent api", () => {
         )
     })
 
+    it("supports parsing a string literal while having a context field of the same name", () => {
+        const { Definition, Input } = suites.testWithSameName
+
+        let state = "Start"
+
+        const result = handleEvent(
+            Definition,
+            Definition.Context,
+            Input.Value,
+            {
+                currentState: state,
+                eventName: Input.Name,
+                timestamp: 0,
+            }
+        )
+
+        assert.strictEqual(result.state, "Success", "Transition did not happen")
+    })
+
     it("can perform actions respecting the order of them", () => {
         const { Definition } = suites.ordering
         const context: Required<typeof Definition.Context> = Definition.Context
