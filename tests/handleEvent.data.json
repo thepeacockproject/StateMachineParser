@@ -177,5 +177,22 @@
                 "RepositoryId": "abc123"
             }
         }
+    },
+    "ordering": {
+        "Definition": {
+            "Context": {
+                "Var1": 1,
+                "Var2": 10
+            },
+            "States": {
+                "Start": {
+                    "-": {
+                        "$inc": "Var1",
+                        "$mul": ["Var2", "Var1"],
+                        "$dec": "Var1"
+                    }
+                }
+            }
+        }
     }
 }

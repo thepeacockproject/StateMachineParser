@@ -173,4 +173,19 @@ describe("handleEvent api", () => {
             "Second transition did not happen"
         )
     })
+
+    it("can perform actions respecting the order of them", () => {
+        const { Definition } = suites.ordering
+        let context: Required<typeof Definition.Context> = Definition.Context
+        let currentState = "Start"
+
+        const result = handleEvent(Definition, context, null, {
+            currentState: currentState,
+            eventName: "-",
+            timestamp: 0,
+        })
+
+        assert.strictEqual(result.context.Var1, 1)
+        assert.strictEqual(result.context.Var2, 20)
+    })
 })
