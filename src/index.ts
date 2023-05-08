@@ -308,11 +308,6 @@ export function handleActions<Context>(
         return context
     }
 
-    const has = (key: string) =>
-        Object.prototype.hasOwnProperty.call(input, key)
-
-    // TODO: Refactor this into a switch statement using the object keys instead of hasOwn.
-
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
             const variableValue = findNamedChild(input[op], context, true)
@@ -338,33 +333,6 @@ export function handleActions<Context>(
                     : variableValue - incrementBy
             )
         }
-    }
-
-    if (has("$inc")) {
-        addOrDec("$inc")
-    }
-
-    if (has("$dec")) {
-        addOrDec("$dec")
-    }
-
-    if (has("$mul")) {
-        // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
-        let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
-
-        // Therefore the 1st operand might get written to, but the 2nd one is purely a read.
-        const variableValue1 = findNamedChild(input["$mul"][0], context, true)
-        const variableValue2 = findNamedChild(input["$mul"][1], context, false)
-
-        set(context, reference, variableValue1 * variableValue2)
-    }
-
-    if (has("$set")) {
-        let reference = input.$set[0]
-
-        const value = findNamedChild(input.$set[1], context, false)
-
-        set(context, reference, value)
     }
 
     const push = (unique: boolean): void => {
@@ -393,38 +361,70 @@ export function handleActions<Context>(
         set(context, reference, array)
     }
 
-    if (has("$push")) {
-        push(false)
-    }
-
-    if (has("$pushunique")) {
-        push(true)
-    }
-
-    if (has("$remove")) {
-        let reference = input.$remove[0]
-
-        if (reference.startsWith("$")) {
-            reference = reference.substring(1)
+    for (const key of Object.keys(input)) {
+        switch (key) {
+            case "$inc": {
+                addOrDec("$inc")
+                break
+            }
+            case "$dec": {
+                addOrDec("$dec")
+                break
+            }
+            case "$mul": {
+                // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
+                let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
+        
+                // Therefore the 1st operand might get written to, but the 2nd one is purely a read.
+                const variableValue1 = findNamedChild(input["$mul"][0], context, true)
+                const variableValue2 = findNamedChild(input["$mul"][1], context, false)
+        
+                set(context, reference, variableValue1 * variableValue2)
+                break
+            }
+            case "$set": {
+                let reference = input.$set[0]
+        
+                const value = findNamedChild(input.$set[1], context, false)
+        
+                set(context, reference, value)
+                break
+            }
+            case "$push": {
+                push(false)
+                break
+            }
+            case "$pushunique": {
+                push(true)
+                break
+            }
+            case "$remove": {
+                let reference = input.$remove[0]
+        
+                if (reference.startsWith("$")) {
+                    reference = reference.substring(1)
+                }
+        
+                const value = findNamedChild(input.$remove[1], context, false)
+        
+                // clone the thing
+                let array: unknown[] = deepClone(
+                    findNamedChild(reference, context, true)
+                )
+        
+                array = array.filter((item) => item !== value)
+        
+                set(context, reference, array)
+                break
+            }
+            case "$reset": {
+                let reference = input.$reset
+                const value = findNamedChild(reference, options.originalContext, true)
+        
+                set(context, reference, value)
+                break
+            }
         }
-
-        const value = findNamedChild(input.$remove[1], context, false)
-
-        // clone the thing
-        let array: unknown[] = deepClone(
-            findNamedChild(reference, context, true)
-        )
-
-        array = array.filter((item) => item !== value)
-
-        set(context, reference, array)
-    }
-
-    if (has("$reset")) {
-        let reference = input.$reset
-        const value = findNamedChild(reference, options.originalContext, true)
-
-        set(context, reference, value)
     }
 
     return context
