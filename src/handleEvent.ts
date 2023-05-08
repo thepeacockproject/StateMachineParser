@@ -105,7 +105,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             newContext,
                             true
                         )
-                        item = findNamedChild(item, newContext, true)
+                        item = findNamedChild(item, newContext, false)
                         log(
                             "action",
                             `Running pushUniqueAction on ${reference} with ${item}`

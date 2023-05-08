@@ -93,24 +93,23 @@ export function set(obj: any, keys: string | string[], val: any): void {
  * Some references will have a prefix, which is used to determine
  * what the reference is.
  *
- * In actions:
+ * When writing to the reference:
  * - No prefix: A field in Context
- * - "$" e.g. $Timestamp: A field in the Event
- * In Conditions:
+ * When reading from the reference:
  * - No prefix: A string literal
  * - "$" e.g. $Timestamp: A field in the Event
  * - "$." e.g. $.LastAccidentTime: A field in Context or Constants
  *
  * @param reference The reference to the target as a string.
  * @param variables The object that may contain the target.
- * @param forAction true if this is for an action
+ * @param forWriting true if this reference is being written to.
  * @returns The value if found, or the reference if it wasn't /
  * something went wrong.
  */
 export function findNamedChild(
     reference: string,
     variables: any,
-    forAction = false
+    forWriting = false
 ): any {
     if (typeof reference !== "string") {
         return reference
@@ -129,14 +128,14 @@ export function findNamedChild(
 
     reference = trimParentheses(reference)
 
-    if (!forAction && !reference.startsWith("$")) {
-        // For conditions, it's a string literal if not starting with $
+    if (!forWriting && !reference.startsWith("$")) {
+        // For reading, it's a string literal if not starting with "$".
         return reference
     }
 
-    // It's not a string literal, so it's a field of either the Event or the Context
-    // Both are in the variables object, so trim the "$"" or "$." and find the field
-    // Here we are not distinguishing between the Event and the Context.
+    // It's not a string literal, so it's a field of the Event, the Context, or Constants.
+    // All are in the variables object, so trim the "$"" or "$." and find the field.
+    // Here we are not distinguishing between "$"" and "$.".
     reference = replaceBadCharacters(reference)
 
     let obj = variables

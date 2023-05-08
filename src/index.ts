@@ -328,7 +328,7 @@ export function handleActions<Context>(
             let reference = input[op][0]
 
             const variableValue = findNamedChild(reference, context, true)
-            const incrementBy = findNamedChild(input[op][1], context, true)
+            const incrementBy = findNamedChild(input[op][1], context, false)
 
             set(
                 context,
@@ -352,8 +352,9 @@ export function handleActions<Context>(
         // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
         let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
 
+        // Therefore the 1st operand might get written to, but the 2nd one is purely a read.
         const variableValue1 = findNamedChild(input["$mul"][0], context, true)
-        const variableValue2 = findNamedChild(input["$mul"][1], context, true)
+        const variableValue2 = findNamedChild(input["$mul"][1], context, false)
 
         set(context, reference, variableValue1 * variableValue2)
     }
@@ -374,7 +375,7 @@ export function handleActions<Context>(
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input[op][1], context, true)
+        const value = findNamedChild(input[op][1], context, false)
 
         // clone the thing
         const array = deepClone(findNamedChild(reference, context, true))
@@ -407,7 +408,7 @@ export function handleActions<Context>(
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input.$remove[1], context, true)
+        const value = findNamedChild(input.$remove[1], context, false)
 
         // clone the thing
         let array: unknown[] = deepClone(
