@@ -362,7 +362,7 @@ export function handleActions<Context>(
     if (has("$set")) {
         let reference = input.$set[0]
 
-        const value = findNamedChild(input.$set[1], context, true)
+        const value = findNamedChild(input.$set[1], context, false)
 
         set(context, reference, value)
     }
