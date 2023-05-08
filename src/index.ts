@@ -97,178 +97,166 @@ function realTest<Variables, Return = Variables | boolean>(
     }
 
     if (typeof input === "object") {
-        const has = (key: string) =>
-            Object.prototype.hasOwnProperty.call(input, key)
+        for (const key of Object.keys(input)) {
+            switch (key) {
+                case "$eq": { 
+                    // transform any strings inside these arrays into their intended context values
+                    if (input.$eq.some((val) => Array.isArray(val))) {
+                        log("validation", "attempted to compare arrays (can't!)")
+                        return false
+                    }
 
-        if (has("$eq")) {
-            // transform any strings inside these arrays into their intended context values
-            if (input.$eq.some((val) => Array.isArray(val))) {
-                log("validation", "attempted to compare arrays (can't!)")
-                return false
-            }
+                    const res = testWithPath(input.$eq[0], variables, options, "$eq[0]")
 
-            const res = testWithPath(input.$eq[0], variables, options, "$eq[0]")
-
-            return (
-                // we test for each element because we need to make sure that the value is fixed if it's a variable
-                input.$eq.every(
-                    (val, index) =>
-                        index === 0 ||
-                        testWithPath(
-                            val,
-                            variables,
-                            options,
-                            `$eq[${index}]`
-                        ) === res
-                )
-            )
-        }
-
-        if (has("$not")) {
-            return !testWithPath(input.$not, variables, options, "$not")
-        }
-
-        if (has("$and")) {
-            return input.$and.every((val, index) =>
-                testWithPath(val, variables, options, `$and[${index}]`)
-            )
-        }
-
-        if (has("$or")) {
-            return input.$or.some((val, index) =>
-                testWithPath(val, variables, options, `$or[${index}]`)
-            )
-        }
-
-        if (has("$gt")) {
-            return (
-                testWithPath(input.$gt[0], variables, options, "$gt[0]") >
-                testWithPath(input.$gt[1], variables, options, "$gt[1]")
-            )
-        }
-
-        if (has("$ge")) {
-            return (
-                testWithPath(input.$ge[0], variables, options, "$ge[0]") >=
-                testWithPath(input.$ge[1], variables, options, "$ge[1]")
-            )
-        }
-
-        if (has("$lt")) {
-            return (
-                testWithPath(input.$lt[0], variables, options, "$lt[0]") <
-                testWithPath(input.$lt[1], variables, options, "$lt[1]")
-            )
-        }
-
-        if (has("$le")) {
-            return (
-                testWithPath(input.$le[0], variables, options, "$le[0]") <=
-                testWithPath(input.$le[1], variables, options, "$le[1]")
-            )
-        }
-
-        if (has("$inarray")) {
-            return handleArrayLogic(
-                realTest,
-                input,
-                variables,
-                "$inarray",
-                options
-            )
-        }
-
-        if (has("$any")) {
-            return handleArrayLogic(realTest, input, variables, "$any", options)
-        }
-
-        if (has("$all")) {
-            return handleArrayLogic(realTest, input, variables, "$all", options)
-        }
-
-        if (has("$after")) {
-            const path = `${options._path}.$after`
-
-            if (!options.timers) {
-                return false
-            }
-
-            let timer = options.timers.find((timer) => timer.path === path)
-
-            if (!timer) {
-                const seconds = <number>(
-                    testWithPath(input.$after, variables, options, "$after")
-                )
-
-                // zero is falsy, hence the extra check
-                if (!options.eventTimestamp && options.eventTimestamp !== 0) {
-                    log(
-                        "validation",
-                        "No event timestamp found when timer is supposed to be active"
+                    return (
+                        // we test for each element because we need to make sure that the value is fixed if it's a variable
+                        input.$eq.every(
+                            (val, index) =>
+                                index === 0 ||
+                                testWithPath(
+                                    val,
+                                    variables,
+                                    options,
+                                    `$eq[${index}]`
+                                ) === res
+                        )
                     )
+                }
+                case "$not": {
+                    return !testWithPath(input.$not, variables, options, "$not")
+                }
+                case "$and": {
+                    return input.$and.every((val, index) =>
+                        testWithPath(val, variables, options, `$and[${index}]`)
+                    )
+                }
+                case "$or": {
+                    return input.$or.some((val, index) =>
+                        testWithPath(val, variables, options, `$or[${index}]`)
+                    )
+                }
+                case "$gt": {
+                    return (
+                        testWithPath(input.$gt[0], variables, options, "$gt[0]") >
+                        testWithPath(input.$gt[1], variables, options, "$gt[1]")
+                    )
+                }
+                case "$ge": {
+                    return (
+                        testWithPath(input.$ge[0], variables, options, "$ge[0]") >=
+                        testWithPath(input.$ge[1], variables, options, "$ge[1]")
+                    )
+                }
+                case "$lt": {
+                    return (
+                        testWithPath(input.$lt[0], variables, options, "$lt[0]") <
+                        testWithPath(input.$lt[1], variables, options, "$lt[1]")
+                    )
+                }
+                case "$le": {
+                    return (
+                        testWithPath(input.$le[0], variables, options, "$le[0]") <=
+                        testWithPath(input.$le[1], variables, options, "$le[1]")
+                    )
+                }
+                case "$inarray": {
+                    return handleArrayLogic(
+                        realTest,
+                        input,
+                        variables,
+                        "$inarray",
+                        options
+                    )
+                }
+                case "$any": {
+                    return handleArrayLogic(realTest, input, variables, "$any", options)
+                }
+                case "$all": {
+                    return handleArrayLogic(realTest, input, variables, "$all", options)
+                }
+                case "$after": {
+                    const path = `${options._path}.$after`
+        
+                    if (!options.timers) {
+                        return false
+                    }
+        
+                    let timer = options.timers.find((timer) => timer.path === path)
+        
+                    if (!timer) {
+                        const seconds = <number>(
+                            testWithPath(input.$after, variables, options, "$after")
+                        )
+        
+                        // zero is falsy, hence the extra check
+                        if (!options.eventTimestamp && options.eventTimestamp !== 0) {
+                            log(
+                                "validation",
+                                "No event timestamp found when timer is supposed to be active"
+                            )
+                            return false
+                        }
+        
+                        timer = {
+                            startTime: options.eventTimestamp,
+                            endTime: options.eventTimestamp + seconds,
+                            path,
+                        }
+        
+                        options.timers.push(timer)
+                    }
+        
+                    log("eventStamp", String(options.eventTimestamp))
+                    log("endTime", String(timer.endTime))
+        
+                    if (options.eventTimestamp >= timer.endTime) {
+                        // The timer is up. Delete it from the timers array
+                        // so that a new timer can be created if this state is visited again.
+                        const index = options.timers.findIndex(
+                            (timer) => timer.path === path
+                        )
+        
+                        if (index !== -1) {
+                            options.timers.splice(index, 1)
+                        }
+        
+                        return true
+                    }
+        
                     return false
                 }
-
-                timer = {
-                    startTime: options.eventTimestamp,
-                    endTime: options.eventTimestamp + seconds,
-                    path,
+                case "$pushunique": {
+                    return options.pushUniqueAction?.(
+                        input.$pushunique[0],
+                        testWithPath(
+                            input.$pushunique[1],
+                            variables,
+                            options,
+                            "$pushunique[1]"
+                        )
+                    )
                 }
-
-                options.timers.push(timer)
-            }
-
-            log("eventStamp", String(options.eventTimestamp))
-            log("endTime", String(timer.endTime))
-
-            if (options.eventTimestamp >= timer.endTime) {
-                // The timer is up. Delete it from the timers array
-                // so that a new timer can be created if this state is visited again.
-                const index = options.timers.findIndex(
-                    (timer) => timer.path === path
-                )
-
-                if (index !== -1) {
-                    options.timers.splice(index, 1)
+                case "$contains": {
+                    const first = testWithPath(
+                        input.$contains[0],
+                        variables,
+                        options,
+                        "$contains[0]"
+                    )
+                    const second = testWithPath(
+                        input.$contains[1],
+                        variables,
+                        options,
+                        "$contains[1]"
+                    )
+        
+                    if (typeof first === "string") {
+                        return first.includes(second)
+                    }
+        
+                    return false
                 }
-
-                return true
             }
-
-            return false
-        }
-
-        if (has("$pushunique")) {
-            return options.pushUniqueAction?.(
-                input.$pushunique[0],
-                testWithPath(
-                    input.$pushunique[1],
-                    variables,
-                    options,
-                    "$pushunique[1]"
-                )
-            )
-        }
-
-        if (has("$contains")) {
-            const first = testWithPath(
-                input.$contains[0],
-                variables,
-                options,
-                "$contains[0]"
-            )
-            const second = testWithPath(
-                input.$contains[1],
-                variables,
-                options,
-                "$contains[1]"
-            )
-
-            if (typeof first === "string") {
-                return first.includes(second)
-            }
-
-            return false
         }
     }
 
@@ -308,11 +296,6 @@ export function handleActions<Context>(
         return context
     }
 
-    const has = (key: string) =>
-        Object.prototype.hasOwnProperty.call(input, key)
-
-    // TODO: Refactor this into a switch statement using the object keys instead of hasOwn.
-
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
             const variableValue = findNamedChild(input[op], context)
@@ -338,32 +321,6 @@ export function handleActions<Context>(
                     : variableValue - incrementBy
             )
         }
-    }
-
-    if (has("$inc")) {
-        addOrDec("$inc")
-    }
-
-    if (has("$dec")) {
-        addOrDec("$dec")
-    }
-
-    if (has("$mul")) {
-        // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
-        let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
-
-        const variableValue1 = findNamedChild(input["$mul"][0], context)
-        const variableValue2 = findNamedChild(input["$mul"][1], context)
-
-        set(context, reference, variableValue1 * variableValue2)
-    }
-
-    if (has("$set")) {
-        let reference = input.$set[0]
-
-        const value = findNamedChild(input.$set[1], context)
-
-        set(context, reference, value)
     }
 
     const push = (unique: boolean): void => {
@@ -392,36 +349,67 @@ export function handleActions<Context>(
         set(context, reference, array)
     }
 
-    if (has("$push")) {
-        push(false)
-    }
+    for (const key in Object.keys(input)) {
+        switch (key) {
+            case "$inc": {
+                addOrDec("$inc")
+                break
+            }
+            case "$dec": {
+                addOrDec("$dec")
+                break
+            }
+            case "$mul": {
+                // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
+                let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
+        
+                const variableValue1 = findNamedChild(input["$mul"][0], context)
+                const variableValue2 = findNamedChild(input["$mul"][1], context)
+        
+                set(context, reference, variableValue1 * variableValue2)
+                break
+            }
+            case "$set": {
+                let reference = input.$set[0]
 
-    if (has("$pushunique")) {
-        push(true)
-    }
+                const value = findNamedChild(input.$set[1], context)
 
-    if (has("$remove")) {
-        let reference = input.$remove[0]
-
-        if (reference.startsWith("$")) {
-            reference = reference.substring(1)
+                set(context, reference, value)
+                break
+            }
+            case "$push": {
+                push(false)
+                break
+            }
+            case "$pushunique": {
+                push(true)
+                break
+            }
+            case "$remove": {
+                let reference = input.$remove[0]
+        
+                if (reference.startsWith("$")) {
+                    reference = reference.substring(1)
+                }
+        
+                const value = findNamedChild(input.$remove[1], context)
+        
+                // clone the thing
+                let array: unknown[] = deepClone(findNamedChild(reference, context))
+        
+                array = array.filter((item) => item !== value)
+        
+                set(context, reference, array)
+                break
+            }
+            case "$reset": {
+                let reference = input.$reset
+                const value = findNamedChild(reference, options.originalContext)
+        
+                set(context, reference, value)
+                break
+            }
         }
-
-        const value = findNamedChild(input.$remove[1], context)
-
-        // clone the thing
-        let array: unknown[] = deepClone(findNamedChild(reference, context))
-
-        array = array.filter((item) => item !== value)
-
-        set(context, reference, array)
-    }
-
-    if (has("$reset")) {
-        let reference = input.$reset
-        const value = findNamedChild(reference, options.originalContext)
-
-        set(context, reference, value)
     }
 
     return context
