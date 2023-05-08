@@ -16,6 +16,14 @@
 
 const PROTOTYPE_POLLUTION_KEYS = ["__proto__", "constructor", "prototype"]
 
+function trimParentheses(input: string): string {
+    while (input.includes("(") || input.includes(")")) {
+        input = input.replace("(", "").replace(")", "")
+    }
+
+    return input
+}
+
 /**
  * When we are getting or setting a named child, we don't want:
  * - A leading $
@@ -23,10 +31,6 @@ const PROTOTYPE_POLLUTION_KEYS = ["__proto__", "constructor", "prototype"]
  * - Any ( or )
  */
 function replaceBadCharacters(input: string): string {
-    while (input.includes("(") || input.includes(")")) {
-        input = input.replace("(", "").replace(")", "")
-    }
-
     if (input.startsWith("$.")) {
         return input.substring(2)
     }
@@ -46,6 +50,7 @@ function replaceBadCharacters(input: string): string {
  */
 export function set(obj: any, keys: string | string[], val: any): void {
     if (typeof keys === "string") {
+        keys = trimParentheses(keys)
         keys = replaceBadCharacters(keys)
         keys = keys.split(".")
     }
@@ -85,12 +90,27 @@ export function set(obj: any, keys: string | string[], val: any): void {
  * For instance, `myObj.property.hi` would be the same as
  * `myObj["property"]["hi"]` in actual JavaScript.
  *
+ * Some references will have a prefix, which is used to determine
+ * what the reference is.
+ *
+ * When writing to the reference:
+ * - No prefix: A field in Context
+ * When reading from the reference:
+ * - No prefix: A string literal
+ * - "$" e.g. $Timestamp: A field in the Event
+ * - "$." e.g. $.LastAccidentTime: A field in Context or Constants
+ *
  * @param reference The reference to the target as a string.
  * @param variables The object that may contain the target.
+ * @param forWriting true if this reference is being written to.
  * @returns The value if found, or the reference if it wasn't /
  * something went wrong.
  */
-export function findNamedChild(reference: string, variables: any): any {
+export function findNamedChild(
+    reference: string,
+    variables: any,
+    forWriting = false
+): any {
     if (typeof reference !== "string") {
         return reference
     }
@@ -106,6 +126,16 @@ export function findNamedChild(reference: string, variables: any): any {
         return reference
     }
 
+    reference = trimParentheses(reference)
+
+    if (!forWriting && !reference.startsWith("$")) {
+        // For reading, it's a string literal if not starting with "$".
+        return reference
+    }
+
+    // It's not a string literal, so it's a field of the Event, the Context, or Constants.
+    // All are in the variables object, so trim the "$"" or "$." and find the field.
+    // Here we are not distinguishing between "$"" and "$.".
     reference = replaceBadCharacters(reference)
 
     let obj = variables
@@ -133,7 +163,8 @@ export function findNamedChild(reference: string, variables: any): any {
         return obj
     }
 
-    return reference // it's just a string
+    // Default to the reference itself
+    return reference 
 }
 
 /**

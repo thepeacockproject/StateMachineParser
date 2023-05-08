@@ -315,7 +315,7 @@ export function handleActions<Context>(
 
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
-            const variableValue = findNamedChild(input[op], context)
+            const variableValue = findNamedChild(input[op], context, true)
 
             let reference = input[op]
 
@@ -327,8 +327,8 @@ export function handleActions<Context>(
         } else {
             let reference = input[op][0]
 
-            const variableValue = findNamedChild(reference, context)
-            const incrementBy = findNamedChild(input[op][1], context)
+            const variableValue = findNamedChild(reference, context, true)
+            const incrementBy = findNamedChild(input[op][1], context, false)
 
             set(
                 context,
@@ -352,8 +352,9 @@ export function handleActions<Context>(
         // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
         let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
 
-        const variableValue1 = findNamedChild(input["$mul"][0], context)
-        const variableValue2 = findNamedChild(input["$mul"][1], context)
+        // Therefore the 1st operand might get written to, but the 2nd one is purely a read.
+        const variableValue1 = findNamedChild(input["$mul"][0], context, true)
+        const variableValue2 = findNamedChild(input["$mul"][1], context, false)
 
         set(context, reference, variableValue1 * variableValue2)
     }
@@ -361,7 +362,7 @@ export function handleActions<Context>(
     if (has("$set")) {
         let reference = input.$set[0]
 
-        const value = findNamedChild(input.$set[1], context)
+        const value = findNamedChild(input.$set[1], context, false)
 
         set(context, reference, value)
     }
@@ -374,10 +375,10 @@ export function handleActions<Context>(
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input[op][1], context)
+        const value = findNamedChild(input[op][1], context, false)
 
         // clone the thing
-        const array = deepClone(findNamedChild(reference, context))
+        const array = deepClone(findNamedChild(reference, context, true))
 
         if (unique) {
             if (array.indexOf(value) === -1) {
@@ -407,10 +408,12 @@ export function handleActions<Context>(
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input.$remove[1], context)
+        const value = findNamedChild(input.$remove[1], context, false)
 
         // clone the thing
-        let array: unknown[] = deepClone(findNamedChild(reference, context))
+        let array: unknown[] = deepClone(
+            findNamedChild(reference, context, true)
+        )
 
         array = array.filter((item) => item !== value)
 
@@ -419,7 +422,7 @@ export function handleActions<Context>(
 
     if (has("$reset")) {
         let reference = input.$reset
-        const value = findNamedChild(reference, options.originalContext)
+        const value = findNamedChild(reference, options.originalContext, true)
 
         set(context, reference, value)
     }

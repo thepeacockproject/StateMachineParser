@@ -103,7 +103,7 @@
                 "Start": {
                     "Event": {
                         "Condition": {
-                            "$eq": ["$Value.RepositoryId", "SomeRepoId"]
+                            "$eq": ["$Value.RepositoryId", "$.SomeRepoId"]
                         },
                         "Transition": "Success"
                     }
@@ -175,6 +175,45 @@
             "Name": "Pacify",
             "Value": {
                 "RepositoryId": "abc123"
+            }
+        }
+    },
+    "testWithSameName": {
+        "Definition": {
+            "Context": {
+                "Painting_A": false,
+                "Painting_B": false
+            },
+            "States": {
+                "Start": {
+                    "Level_Setup_Events": [
+                        {
+                            "Condition": {
+                                "$or": [
+                                    {
+                                        "$eq": [
+                                            "$Value.Event_metricvalue",
+                                            "Painting_A"
+                                        ]
+                                    },
+                                    {
+                                        "$eq": [
+                                            "$Value.Event_metricvalue",
+                                            "Painting_B"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "Transition": "Success"
+                        }
+                    ]
+                }
+            }
+        },
+        "Input": {
+            "Name": "Level_Setup_Events",
+            "Value": {
+                "Event_metricvalue": "Painting_A"
             }
         }
     }

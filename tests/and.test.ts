@@ -61,7 +61,7 @@ const data = {
                     $eq: ["val3", "val3"],
                 },
                 {
-                    $eq: ["Conditions.3", "hello"],
+                    $eq: ["$.Conditions.3", "hello"],
                 },
                 {
                     $eq: [false, false],
