@@ -136,7 +136,7 @@ describe("$mul", () => {
 
     it("can multiply a context object and store it in that object", () => {
         const [sm, vars] = data.Mul2
-        const r= handleActions(sm, vars)
+        const r = handleActions(sm, vars)
         assert.strictEqual(r.Context.Object, 420)
     })
 })
