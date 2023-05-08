@@ -1,5 +1,10 @@
 # Changelog
 
+## v5.8.0
+
+-   Context is only read from if a reference is prepended with a `$`.
+-   Switch statements are now used when handling ops, this means ordering is now respected.
+
 ## v5.7.0
 
 -   Added support for 2 operand `$mul` actions.
