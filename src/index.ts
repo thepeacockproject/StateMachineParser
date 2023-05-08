@@ -349,7 +349,7 @@ export function handleActions<Context>(
         set(context, reference, array)
     }
 
-    for (const key in Object.keys(input)) {
+    for (const key of Object.keys(input)) {
         switch (key) {
             case "$inc": {
                 addOrDec("$inc")
