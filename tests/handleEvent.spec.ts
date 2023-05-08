@@ -176,11 +176,10 @@ describe("handleEvent api", () => {
 
     it("can perform actions respecting the order of them", () => {
         const { Definition } = suites.ordering
-        let context: Required<typeof Definition.Context> = Definition.Context
-        let currentState = "Start"
+        const context: Required<typeof Definition.Context> = Definition.Context
 
         const result = handleEvent(Definition, context, null, {
-            currentState: currentState,
+            currentState: "Start",
             eventName: "-",
             timestamp: 0,
         })
