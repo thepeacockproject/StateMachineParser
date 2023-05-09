@@ -1,5 +1,10 @@
 # Changelog
 
+## v5.9.0
+
+-   Timers are now properly cleared on state transition.
+-   Timers are now handled first before anything else.
+
 ## v5.8.0
 
 -   Context is only read from if a reference is prepended with a `$`.
