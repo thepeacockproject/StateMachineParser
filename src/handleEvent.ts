@@ -200,7 +200,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
             // When transitioning, we have to reset all timers.
             // Since this is pass-by-reference, we have to modify the existing array!
-            if(options.timers) {
+            if (options.timers) {
                 options.timers.length = 0
             }
 
@@ -242,7 +242,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
             }
         }
 
-        return undefined;
+        return undefined
     }
 
     let eventHandlers = csObject[eventName]
@@ -266,13 +266,13 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
         // Timers are a special snowflake, if they cause a state transition we have to continue processing normal events.
         // Since the handlers don't know what they are processing and to prevent constantly checking for timers, we just run them separately.
-        doEventHandlers(timerEventHandlers);
+        doEventHandlers(timerEventHandlers)
     }
 
     const result = doEventHandlers(eventHandlers)
 
-    if(result) {
-        return result;
+    if (result) {
+        return result
     }
     
     return {
