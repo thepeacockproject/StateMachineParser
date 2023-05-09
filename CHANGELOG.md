@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.9.1
+
+-   Timers are now cleared using pop to ensure they're garbage collected.
+
 ## v5.9.0
 
 -   Timers are now properly cleared on state transition.
