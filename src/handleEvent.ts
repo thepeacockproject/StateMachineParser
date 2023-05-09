@@ -200,7 +200,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
             // When transitioning, we have to reset all timers.
             // Since this is pass-by-reference, we have to modify the existing array!
-            options.timers.length = 0
+            if(options.timers) {
+                options.timers.length = 0
+            }
 
             return handleEvent(
                 definition,
