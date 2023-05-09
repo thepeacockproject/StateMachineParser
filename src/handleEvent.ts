@@ -198,6 +198,12 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 `${currentState} is performing a transition to ${state} - running its "-" event`
             )
 
+            // When transitioning, we have to reset all timers.
+            // Since this is pass-by-reference, we have to modify the existing array!
+            if(options.timers) {
+                options.timers.length = 0
+            }
+
             return handleEvent(
                 definition,
                 newContext,
@@ -219,6 +225,26 @@ export function handleEvent<Context = unknown, Event = unknown>(
         }
     }
 
+    type EHArray = InStateEventHandler[]
+
+    const doEventHandlers = (eventHandlers: EHArray) => {
+        for (const handler of eventHandlers) {
+            const out = doEventHandler(handler)
+
+            newContext = out.context
+
+            if (out.state !== currentState) {
+                // we swapped states while in a handler, so our work here is done
+                return {
+                    context: newContext,
+                    state: out.state,
+                }
+            }
+        }
+
+        return undefined;
+    }
+
     let eventHandlers = csObject[eventName]
 
     if (!Array.isArray(eventHandlers)) {
@@ -226,32 +252,29 @@ export function handleEvent<Context = unknown, Event = unknown>(
         eventHandlers = [eventHandlers].filter(Boolean)
     }
 
-    type EHArray = InStateEventHandler[]
-
     if (hasTimerState) {
         const timerState = csObject.$timer
+        const timerEventHandlers: EHArray = []
 
+        // Timers will always have to be handled first.
+        // An expired timer might transition to another state and that has to happen as soon as possible.
         if (Array.isArray(timerState)) {
-            ;(eventHandlers as EHArray).push(...timerState)
+            timerEventHandlers.unshift(...timerState)
         } else {
-            ;(eventHandlers as EHArray).push(timerState)
+            timerEventHandlers.unshift(timerState)
         }
+
+        // Timers are a special snowflake, if they cause a state transition we have to continue processing normal events.
+        // Since the handlers don't know what they are processing and to prevent constantly checking for timers, we just run them separately.
+        doEventHandlers(timerEventHandlers);
     }
 
-    for (const handler of eventHandlers) {
-        const out = doEventHandler(handler)
+    const result = doEventHandlers(eventHandlers)
 
-        newContext = out.context
-
-        if (out.state !== currentState) {
-            // we swapped states while in a handler, so our work here is done
-            return {
-                context: newContext,
-                state: out.state,
-            }
-        }
+    if(result) {
+        return result;
     }
-
+    
     return {
         state: currentState,
         context: newContext,
