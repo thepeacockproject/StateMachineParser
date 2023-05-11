@@ -254,6 +254,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
         eventHandlers = [eventHandlers].filter(Boolean)
     }
 
+    let timerResult = undefined
+
     if (hasTimerState) {
         const timerState = csObject.$timer
         const timerEventHandlers: EHArray = []
@@ -268,15 +270,19 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
         // Timers are a special snowflake, if they cause a state transition we have to continue processing normal events.
         // Since the handlers don't know what they are processing and to prevent constantly checking for timers, we just run them separately.
-        doEventHandlers(timerEventHandlers)
+        timerResult = doEventHandlers(timerEventHandlers)
     }
 
     const result = doEventHandlers(eventHandlers)
 
+    if (timerResult) {
+        return timerResult
+    }
+
     if (result) {
         return result
     }
-    
+
     return {
         state: currentState,
         context: newContext,
