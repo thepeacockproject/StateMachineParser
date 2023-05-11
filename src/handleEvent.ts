@@ -282,7 +282,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     if (result) {
         return result
     }
-    
+
     return {
         state: currentState,
         context: newContext,
