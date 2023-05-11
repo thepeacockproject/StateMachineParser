@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.9.2
+
+-   Timers are now properly returned and saved when `doEventHandlers` is called.
+
 ## v5.9.1
 
 -   Timers are now cleared using pop to ensure they're garbage collected.
