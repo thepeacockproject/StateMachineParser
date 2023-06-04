@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.9.3
+
+-   Fixes an issue where when a timer performs a state transition, events were still ran with the old state.
+
 ## v5.9.2
 
 -   Timers are now properly returned and saved when `doEventHandlers` is called.
