@@ -270,7 +270,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
         // Since the handlers don't know what they are processing and to prevent constantly checking for timers, we just run them separately.
         const timerResult = doEventHandlers(timerEventHandlers)
 
-        //If the timer resulted in a state transition, we have to replay the current event again.
+        // If the timer resulted in a state transition, we have to replay the current event again.
         if (timerResult) {
             log(
                 "timer",
