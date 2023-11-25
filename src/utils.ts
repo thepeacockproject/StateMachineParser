@@ -164,7 +164,7 @@ export function findNamedChild(
     }
 
     // Default to the reference itself
-    return reference 
+    return reference
 }
 
 /**

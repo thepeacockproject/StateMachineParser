@@ -67,7 +67,7 @@ function testWithPath(input: any, context, options: TestOptions, name: string) {
     })
 }
 
-function realTest<Variables, Return = Variables | boolean>(
+function realTest<Variables>(
     input: any,
     variables: Variables,
     options: TestOptions
@@ -373,20 +373,29 @@ export function handleActions<Context>(
             }
             case "$mul": {
                 // $mul can have 2 or 3 operands, 2 means multiply the context variable (1st operand) by the 2nd operand
-                let reference = input["$mul"][input["$mul"].length === 3 ? 2 : 0]
-        
+                let reference =
+                    input["$mul"][input["$mul"].length === 3 ? 2 : 0]
+
                 // Therefore the 1st operand might get written to, but the 2nd one is purely a read.
-                const variableValue1 = findNamedChild(input["$mul"][0], context, true)
-                const variableValue2 = findNamedChild(input["$mul"][1], context, false)
-        
+                const variableValue1 = findNamedChild(
+                    input["$mul"][0],
+                    context,
+                    true
+                )
+                const variableValue2 = findNamedChild(
+                    input["$mul"][1],
+                    context,
+                    false
+                )
+
                 set(context, reference, variableValue1 * variableValue2)
                 break
             }
             case "$set": {
                 let reference = input.$set[0]
-        
+
                 const value = findNamedChild(input.$set[1], context, false)
-        
+
                 set(context, reference, value)
                 break
             }
@@ -400,27 +409,31 @@ export function handleActions<Context>(
             }
             case "$remove": {
                 let reference = input.$remove[0]
-        
+
                 if (reference.startsWith("$")) {
                     reference = reference.substring(1)
                 }
-        
+
                 const value = findNamedChild(input.$remove[1], context, false)
-        
+
                 // clone the thing
                 let array: unknown[] = deepClone(
                     findNamedChild(reference, context, true)
                 )
-        
+
                 array = array.filter((item) => item !== value)
-        
+
                 set(context, reference, array)
                 break
             }
             case "$reset": {
                 let reference = input.$reset
-                const value = findNamedChild(reference, options.originalContext, true)
-        
+                const value = findNamedChild(
+                    reference,
+                    options.originalContext,
+                    true
+                )
+
                 set(context, reference, value)
                 break
             }

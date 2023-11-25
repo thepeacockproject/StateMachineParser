@@ -186,7 +186,7 @@ export interface HandleActionsOptions {
     /**
      * The original context, this value is retrieved from
      * the definition, and used with the $reset op.
-     * 
+     *
      * @since v5.6.0
      */
     originalContext?: unknown

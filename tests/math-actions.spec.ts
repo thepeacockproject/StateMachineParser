@@ -42,12 +42,12 @@ const data = {
     ],
     Inc3: [
         {
-            $inc: ["Counter", "$.Value"]
+            $inc: ["Counter", "$.Value"],
         },
         {
             Counter: 40,
-            Value: 2
-        }
+            Value: 2,
+        },
     ],
     Dec1: [
         {
@@ -83,14 +83,14 @@ const data = {
     ],
     Mul2: [
         {
-            $mul: ["Context.Object", 10]
+            $mul: ["Context.Object", 10],
         },
         {
             Context: {
-                Object: 42
-            }
-        }
-    ]
+                Object: 42,
+            },
+        },
+    ],
 }
 
 describe("$inc", () => {

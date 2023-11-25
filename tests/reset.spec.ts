@@ -24,7 +24,7 @@ const data = {
             $reset: "Targets",
         },
         {
-            Targets: ["RDIL", "MoonySolari", "Tony"]
+            Targets: ["RDIL", "MoonySolari", "Tony"],
         },
     ],
     Reset2: [
@@ -33,7 +33,7 @@ const data = {
             $reset: "Targets",
         },
         {
-            Targets: []
+            Targets: [],
         },
     ],
 }
