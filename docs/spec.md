@@ -226,3 +226,41 @@ These nodes can be used as both conditions and actions.
 > **Warning**: This node is the only one that is both a condition and an action.
 
 Documentation not yet done here. Feel free to open a PR!
+
+## Special Snowflakes
+
+Other things that work but are unused or overcomplicated.
+
+### `$select`
+
+> [!CAUTION]
+> `$select` works in H3 (and maybe older versions, untested thus far), however it isn't used anywhere by the game, and this library does not support it due to it's complexity.
+
+`$select` is a node that essentially acts as a for-each loop on an array that runs a specific action when met with true.
+It can only be used as an action.
+
+Parameters:
+
+- `in` - A pointer to, or the literal value of the array to be checked.
+- `?` - The condition to test against each array value.
+- `!` - The action to perform on matching values.
+
+Example:
+
+```json5
+// for each number in the `input` context object that is equal to 1, add 5 to the counter
+$select: {
+    "in": "$.input",
+    "?": {
+        $eq: [
+            "$.#",
+            1
+        ]
+    },
+    "!": [
+        {
+            $inc: ["counter", 5]
+        }
+    ]
+}
+```
