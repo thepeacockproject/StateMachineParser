@@ -274,7 +274,7 @@ For _action_ use, this will try to push the `item` to `reference`. Here's an exa
             $pushunique: [
                 "Targets",
                 "John"
-            ] // -> `Targets` array now contains two elements: "Tony" and "John"
+            ] // -> `Targets` array now contains two elements: "Tony", "John"
         }
     },
     {
@@ -282,7 +282,7 @@ For _action_ use, this will try to push the `item` to `reference`. Here's an exa
             $pushunique: [
                 "Targets",
                 "Tony"
-            ] // -> `Targets` array now contains one element: "Tony"
+            ] // -> `Targets` array now contains two element: "Tony", "John"
         }
     },
     {
@@ -296,7 +296,7 @@ For _action_ use, this will try to push the `item` to `reference`. Here's an exa
 ]
 ```
 
-For _condition_ use, it still try to push `item` to `reference`, but returns a boolean value about if the push action performed, but be cautious that a ___false___ judgement means the `item` ___exists___ while ___true___ means the ___opposite___. Here's the example:
+For _condition_ use, it still try to push `item` to `reference`, but returns a boolean value which is determined by whether the action is executed or not. Also, please be cautious that a ___false___ result means the `item` ___exists___ while ___true___ means the ___opposite___. Here's the example:
 
 ```json5
 // Starting context from definition
@@ -310,7 +310,7 @@ For _condition_ use, it still try to push `item` to `reference`, but returns a b
             $pushunique: [
                 "Targets",
                 "Tony"
-            ] // -> false, because the element "Tony" had been there
+            ] // -> false, because the element "Tony" had already been there
         }
     },
     {
@@ -318,7 +318,7 @@ For _condition_ use, it still try to push `item` to `reference`, but returns a b
             $pushunique: [
                 "Targets",
                 "John"
-            ] // -> true, because push action was performed
+            ] // -> true, because push action could be performed
         }
     }
 ]
