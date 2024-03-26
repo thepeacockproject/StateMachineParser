@@ -253,14 +253,18 @@ These nodes can be used as both conditions and actions.
 
 > **Warning**: This node is the only one that is both a condition and an action.
 
-`$pushunique` is a node via which the game can both check if certain element exists in the array you targeted and add an element into the array you targeted. When the given element is already in the array, only one of this element will be retained.
+`$pushunique` is a node with a double purpose:
+
+- As a condition, it checks if an element is already in an array.
+- As an action, it adds the element to the array if it's not already present.
+- If the condition is true, it performs the action after finishing the evaluation of the condition.
 
 It should contain two elements:
 
 - `reference` - An array in which you try to push element.
 - `item` - The element you try to add.
 
-For _action_ use, this will try to push the `item` to `reference`. Here's an example:
+For *action* use, this will try to push the `item` to `reference`. Here's an example:
 
 ```json5
 // Starting context from definition
@@ -296,7 +300,7 @@ For _action_ use, this will try to push the `item` to `reference`. Here's an exa
 ]
 ```
 
-For _condition_ use, it still try to push `item` to `reference`, but returns a boolean value which is determined by whether the action is executed or not. Also, please be cautious that a ___false___ result means the `item` ___exists___ while ___true___ means the ___opposite___. Here's the example:
+For *condition* use, it still tries to push `item` to `reference`, but returns a boolean value which is determined by whether the action is executed or not. Here's an example:
 
 ```json5
 // Starting context from definition
@@ -318,7 +322,7 @@ For _condition_ use, it still try to push `item` to `reference`, but returns a b
             $pushunique: [
                 "Targets",
                 "John"
-            ] // -> true, because push action could be performed
+            ] // -> true, and "John" will now be in the array
         }
     }
 ]
