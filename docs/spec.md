@@ -215,7 +215,35 @@ Example:
 
 ### `$push`
 
-Documentation not yet done here. Feel free to open a PR!
+Like `$pushunique` (see below), the `$push` node also adds an element to a targeted array. The difference is that `$push` doesn't care if the element is already in the array before the action, which can cause duplicated elements.
+
+Example:
+
+```json5
+// Starting context from definition
+{
+    Targets: ["Tony"]
+}
+
+[
+    {
+        Actions: {
+            $push: [
+                "Targets",
+                "John"
+            ] // -> `Targets` array now has two elements: "Tony", "John"
+        }
+    },
+    {
+        Actions: {
+            $push: [
+                "Targets",
+                "Tony"
+            ] // -> `Targets` array now has three elements: "Tony", "John", "Tony"
+        }
+    }
+]
+```
 
 ## Common Nodes
 
@@ -225,7 +253,80 @@ These nodes can be used as both conditions and actions.
 
 > **Warning**: This node is the only one that is both a condition and an action.
 
-Documentation not yet done here. Feel free to open a PR!
+`$pushunique` is a node with a double purpose:
+
+- As a condition, it checks if an element is already in an array.
+- As an action, it adds the element to the array if it's not already present.
+- If the condition is true, it performs the action after finishing the evaluation of the condition.
+
+It should contain two elements:
+
+- `reference` - An array in which you try to push element.
+- `item` - The element you try to add.
+
+For *action* use, this will try to push the `item` to `reference`. Here's an example:
+
+```json5
+// Starting context from definition
+{
+    Targets: ["Tony"]
+}
+
+[
+    {
+        Actions: {
+            $pushunique: [
+                "Targets",
+                "John"
+            ] // -> `Targets` array now contains two elements: "Tony", "John"
+        }
+    },
+    {
+        Actions: {
+            $pushunique: [
+                "Targets",
+                "Tony"
+            ] // -> `Targets` array now contains two element: "Tony", "John"
+        }
+    },
+    {
+        Actions: {
+            $pushunique: [
+                "TargetsPending",
+                "Tony"
+            ] // -> Error: Could not find "TargetsPending" in context
+        }
+    }
+]
+```
+
+For *condition* use, it still tries to push `item` to `reference`, but returns a boolean value which is determined by whether the action is executed or not. Here's an example:
+
+```json5
+// Starting context from definition
+{
+    Targets: ["Tony"]
+}
+
+[
+    {
+        Condition: {
+            $pushunique: [
+                "Targets",
+                "Tony"
+            ] // -> false, because the element "Tony" had already been there
+        }
+    },
+    {
+        Condition:{
+            $pushunique: [
+                "Targets",
+                "John"
+            ] // -> true, and "John" will now be in the array
+        }
+    }
+]
+```
 
 ## Special Snowflakes
 
