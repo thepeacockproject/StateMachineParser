@@ -280,6 +280,14 @@ For _action_ use, this will try to push the `item` to `reference`. Here's an exa
     {
         Actions: {
             $pushunique: [
+                "Targets",
+                "Tony"
+            ] // -> `Targets` array now contains one element: "Tony"
+        }
+    },
+    {
+        Actions: {
+            $pushunique: [
                 "TargetsPending",
                 "Tony"
             ] // -> Error: Could not find "TargetsPending" in context
