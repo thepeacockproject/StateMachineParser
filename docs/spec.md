@@ -215,7 +215,7 @@ Example:
 
 ### `$push`
 
-Like `$uniquepush` (see below), the `$push` node also push an element to a targeted array. The difference is that `$push` would not check if the element an existed element in the array before the action, which might cause duplicated elements.
+Like `$pushunique` (see below), the `$push` node also adds an element to a targeted array. The difference is that `$push` doesn't care if the element is already in the array before the action, which can cause duplicated elements.
 
 Example:
 
@@ -231,7 +231,7 @@ Example:
             $push: [
                 "Targets",
                 "John"
-            ] // -> `Targets` array now has two elements: "Tony" and "John"
+            ] // -> `Targets` array now has two elements: "Tony", "John"
         }
     },
     {
@@ -239,7 +239,7 @@ Example:
             $push: [
                 "Targets",
                 "Tony"
-            ] // -> `Targets` array now has two elements: "Tony" and "Tony"
+            ] // -> `Targets` array now has three elements: "Tony", "John", "Tony"
         }
     }
 ]
