@@ -130,13 +130,102 @@ This node is indented for delaying a state machine's evaluation by a number of s
 
 > Implementation Note: This node is very loosely implemented, and will be rewritten in the near future.
 
+It accepts a parameter `seconds`, which should be a number value indicating after how many seconds the judgement value becomes `true`.
+
+Example:
+
+```json5
+{
+    $after: 5
+} // -> return `true` after 5 seconds
+```
+
 ### `$inarray`, `$any`
 
-Documentation not yet done here. Feel free to open a PR!
+These two nodes seem to perform the same function, which is to check if the targeted element exists in the context.
+
+Parameters:
+
+- `in` - A pointer to, or the literal value of the array to be checked.
+- `?` - The condition to test against each array value.
+
+Example:
+
+```json5
+// check if any element in the context object is equal to the given value
+{
+    Targets: ["Tony"]
+}
+
+[
+    {
+        $inarray: {
+            "in": "$.Targets",
+            "?": {
+                $eq: [
+                    "$.#",
+                    "Tony"
+                ]
+            }
+        } // -> true
+    },
+    {
+        $inarray: {
+            "in": "$.Targets",
+            "?": {
+                $eq: [
+                    "$.#",
+                    "John"
+                ]
+            }
+        } // -> false
+    }
+]
+```
 
 ### `$all`
 
-Documentation not yet done here. Feel free to open a PR!
+This node can check if all element in the context has the same property.
+
+Parameters:
+
+- `in` - A pointer to, or the literal value of the array to be checked.
+- `?` - The condition to test against each array value.
+
+Example:
+
+```json5
+// check if any element in the context object is equal to the given value
+{
+    Targets: ["Tony", "Tony"],
+    TargetsPending: ["Tony", "John"]
+}
+
+[
+    {
+        $all: {
+            "in": "$.Targets",
+            "?": {
+                $eq: [
+                    "$.#",
+                    "Tony"
+                ]
+            }
+        } // -> true
+    },
+    {
+        $all: {
+            "in": "$.TargetsPending",
+            "?": {
+                $eq: [
+                    "$.#",
+                    "Tony"
+                ]
+            }
+        } // -> false
+    }
+]
+```
 
 ### `$contains`
 
@@ -175,7 +264,15 @@ Examples:
 
 ### `$mul`
 
-Documentation not yet done here. Feel free to open a PR!
+This node now functions to execute a multiplication with two context variables (whose values must be numeric) and substitute the first parameter with the result.
+
+Example:
+
+```json5
+{
+    $mul: ["myVar", "myOtherVar"] // ->myVar *= myOtherVar
+}
+```
 
 ### `$set`
 
@@ -255,9 +352,9 @@ These nodes can be used as both conditions and actions.
 
 `$pushunique` is a node with a double purpose:
 
-- As a condition, it checks if an element is already in an array.
 - As an action, it adds the element to the array if it's not already present.
-- If the condition is true, it performs the action after finishing the evaluation of the condition.
+- As a condition, it checks if an element is already in an array.
+    - If the condition is true, it performs the action after finishing the evaluation of the condition.
 
 It should contain two elements:
 
@@ -286,7 +383,7 @@ For *action* use, this will try to push the `item` to `reference`. Here's an exa
             $pushunique: [
                 "Targets",
                 "Tony"
-            ] // -> `Targets` array now contains two element: "Tony", "John"
+            ] // -> `Targets` array now contains two elements: "Tony", "John"
         }
     },
     {
