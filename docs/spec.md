@@ -229,7 +229,21 @@ Example:
 
 ### `$contains`
 
-Documentation not yet done here. Feel free to open a PR!
+This node can check whether the given two arguments are string-typed and whether the first string contains the content of the second string.
+
+Example:
+
+``` json5
+{
+    "$contains": [true, true] // -> false, because they are not both string-typed
+},
+{
+    "$contains": ["hokkaido_flu", "hokkaido"] // -> true
+},
+{
+    "$contains": ["colombia", "colombia_anaconda"] // -> false
+}
+```
 
 ## Action Nodes
 
@@ -264,13 +278,20 @@ Examples:
 
 ### `$mul`
 
-This node now functions to execute a multiplication with two context variables (whose values must be numeric) and substitute the first parameter with the result.
+This node executes a multiplication given two or three context variables (whose values must be numeric) with a double purpose:
+
+- If given 2 parameters, it assign the product to the first argument.
+- If given 3 parameters, it let the first and second arguments be multiplied and assign the product to the third argument.
 
 Example:
 
 ```json5
 {
-    $mul: ["myVar", "myOtherVar"] // ->myVar *= myOtherVar
+    $mul: ["myVar", "myOtherVar"] // -> myVar *= myOtherVar
+}
+
+{
+    $mul: ["myVar1", "myVar2", "myVar"] // -> myVar = myVar1 * myVar2
 }
 ```
 
