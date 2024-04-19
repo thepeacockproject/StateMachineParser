@@ -136,7 +136,7 @@ Example:
 
 ```json5
 {
-    $after: 5
+    $after: 5,
 } // -> return `true` after 5 seconds
 ```
 
@@ -146,8 +146,8 @@ These two nodes seem to perform the same function, which is to check if the targ
 
 Parameters:
 
-- `in` - A pointer to, or the literal value of the array to be checked.
-- `?` - The condition to test against each array value.
+-   `in` - A pointer to, or the literal value of the array to be checked.
+-   `?` - The condition to test against each array value.
 
 Example:
 
@@ -185,12 +185,13 @@ Example:
 
 Additionally, there exists a special nested usage amongst the `$inarray`, `$any`, `$all` nodes. Depending on nodes you choose, they can check whether the elements of an array has a certain property in part or in whole.
 
-- `$inarray`/`$any` -> `$inarray`/`$any`: To check if the targeted set of elements consists of at least one element meeting both conditions at the same time, otherwise returns false;
-- `$all` -> `$all`: To check if the targeted set of elements only consists of elements meeting both two conditions, otherwise returns false;
-- `$inarray`/`$any` -> `$all`: To check if the targeted set of elements consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the former condition (optional), otherwise returns false;
-- `$all` -> `$inarray`/`$any`: To check if the targeted set of elements consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the latter condition (optional), otherwise returns false.
+-   `$inarray`/`$any` -> `$inarray`/`$any`: To check if the targeted set of elements consists of at least one element meeting both conditions at the same time, otherwise returns false;
+-   `$all` -> `$all`: To check if the targeted set of elements only consists of elements meeting both two conditions, otherwise returns false;
+-   `$inarray`/`$any` -> `$all`: To check if the targeted set of elements consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the former condition (optional), otherwise returns false;
+-   `$all` -> `$inarray`/`$any`: To check if the targeted set of elements consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the latter condition (optional), otherwise returns false.
 
 Example:
+
 ```json5
 {
     $any: {
@@ -213,8 +214,8 @@ This node can check if all element in the context has the same property.
 
 Parameters:
 
-- `in` - A pointer to, or the literal value of the array to be checked.
-- `?` - The condition to test against each array value.
+-   `in` - A pointer to, or the literal value of the array to be checked.
+-   `?` - The condition to test against each array value.
 
 Example:
 
@@ -254,7 +255,7 @@ This node can check whether the given two arguments are string-typed and whether
 
 Example:
 
-``` json5
+```json5
 {
     $contains: [true, true] // -> false, because they are not both string-typed
 },
@@ -301,8 +302,8 @@ Examples:
 
 This node executes a multiplication given two or three context variables (whose values must be numeric) with a double purpose:
 
-- If given 2 parameters, it assign the product to the first argument;
-- If given 3 parameters, it let the first and second arguments be multiplied and assign the product to the third argument.
+-   If given 2 parameters, it assign the product to the first argument;
+-   If given 3 parameters, it let the first and second arguments be multiplied and assign the product to the third argument.
 
 Example:
 
@@ -394,16 +395,16 @@ These nodes can be used as both conditions and actions.
 
 `$pushunique` is a node with a double purpose:
 
-- As an action, it adds the element to the array if it's not already present.
-- As a condition, it checks if an element is already in an array.
-    - If the condition is true, it performs the action after finishing the evaluation of the condition.
+-   As an action, it adds the element to the array if it's not already present.
+-   As a condition, it checks if an element is already in an array.
+    -   If the condition is true, it performs the action after finishing the evaluation of the condition.
 
 It should contain two elements:
 
-- `reference` - An array in which you try to push element.
-- `item` - The element you try to add.
+-   `reference` - An array in which you try to push element.
+-   `item` - The element you try to add.
 
-For *action* use, this will try to push the `item` to `reference`. Here's an example:
+For _action_ use, this will try to push the `item` to `reference`. Here's an example:
 
 ```json5
 // Starting context from definition
@@ -439,7 +440,7 @@ For *action* use, this will try to push the `item` to `reference`. Here's an exa
 ]
 ```
 
-For *condition* use, it still tries to push `item` to `reference`, but returns a boolean value which is determined by whether the action is executed or not. Here's an example:
+For _condition_ use, it still tries to push `item` to `reference`, but returns a boolean value which is determined by whether the action is executed or not. Here's an example:
 
 ```json5
 // Starting context from definition
@@ -473,17 +474,16 @@ Other things that work but are unused or overcomplicated.
 
 ### `$select`
 
-> [!CAUTION]
-> `$select` works in H3 (and maybe older versions, untested thus far), however it isn't used anywhere by the game, and this library does not support it due to it's complexity.
+> [!CAUTION] > `$select` works in H3 (and maybe older versions, untested thus far), however it isn't used anywhere by the game, and this library does not support it due to it's complexity.
 
 `$select` is a node that essentially acts as a for-each loop on an array that runs a specific action when met with true.
 It can only be used as an action.
 
 Parameters:
 
-- `in` - A pointer to, or the literal value of the array to be checked.
-- `?` - The condition to test against each array value.
-- `!` - The action to perform on matching values.
+-   `in` - A pointer to, or the literal value of the array to be checked.
+-   `?` - The condition to test against each array value.
+-   `!` - The action to perform on matching values.
 
 Example:
 
