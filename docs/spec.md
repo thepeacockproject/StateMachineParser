@@ -159,9 +159,9 @@ Example:
 
 [
     {
-        $inarray: {
-            "in": "$.Targets",
-            "?": {
+        $any: {
+            in: "$.Targets",
+            ?: {
                 $eq: [
                     "$.#",
                     "Tony"
@@ -170,9 +170,9 @@ Example:
         } // -> true
     },
     {
-        $inarray: {
-            "in": "$.Targets",
-            "?": {
+        $any: {
+            in: "$.Targets",
+            ?: {
                 $eq: [
                     "$.#",
                     "John"
@@ -181,6 +181,30 @@ Example:
         } // -> false
     }
 ]
+```
+
+Additionally, there exists a special nested usage amongst the `$inarray`, `$any`, `$all` nodes. Depending on nodes you choose, they can check whether the elements of an array has a certain property in part or in whole.
+
+- `$inarray`/`$any` -> `$inarray`/`$any`: To check if there exists at least one element meeting both conditions, otherwise returns false;
+- `$all` -> `$all`: To check if only elements meeting both two conditions are in the judgement, otherwise returns false;
+- `$inarray`/`$any` -> `$all`: To check if there is at least one element that satisfies only the latter condition or satisfies neither conditions. If so, returns false;
+- `$all` -> `$inarray`/`$any`: To check if there is at least one element that satisfies only the former condition or satisfies neither conditions. If so, returns false.
+
+Example:
+```json5
+{
+    $any: {
+        ?: {
+            $any: {
+                ?: {
+                    $eq: ["$.#", "$.##"]
+                },
+                in: ["apple", "pear"]
+            }
+        }
+        in: ["apple", "banana"]
+    } // -> true, "apple" satisfies both two conditions
+}
 ```
 
 ### `$all`
@@ -196,16 +220,11 @@ Example:
 
 ```json5
 // check if any element in the context object is equal to the given value
-{
-    Targets: ["Tony", "Tony"],
-    TargetsPending: ["Tony", "John"]
-}
-
 [
     {
         $all: {
-            "in": "$.Targets",
-            "?": {
+            in: ["Tony", "Tony"],
+            ?: {
                 $eq: [
                     "$.#",
                     "Tony"
@@ -215,8 +234,8 @@ Example:
     },
     {
         $all: {
-            "in": "$.TargetsPending",
-            "?": {
+            in: ["Tony", "John"],
+            ?: {
                 $eq: [
                     "$.#",
                     "Tony"
@@ -227,6 +246,8 @@ Example:
 ]
 ```
 
+For nested usage, see [`$inarray` and `$any`](#inarray-any) section above.
+
 ### `$contains`
 
 This node can check whether the given two arguments are string-typed and whether the first string contains the content of the second string.
@@ -235,13 +256,13 @@ Example:
 
 ``` json5
 {
-    "$contains": [true, true] // -> false, because they are not both string-typed
+    $contains: [true, true] // -> false, because they are not both string-typed
 },
 {
-    "$contains": ["hokkaido_flu", "hokkaido"] // -> true
+    $contains: ["hokkaido_flu", "hokkaido"] // -> true
 },
 {
-    "$contains": ["colombia", "colombia_anaconda"] // -> false
+    $contains: ["colombia", "colombia_anaconda"] // -> false
 }
 ```
 
@@ -280,7 +301,7 @@ Examples:
 
 This node executes a multiplication given two or three context variables (whose values must be numeric) with a double purpose:
 
-- If given 2 parameters, it assign the product to the first argument.
+- If given 2 parameters, it assign the product to the first argument;
 - If given 3 parameters, it let the first and second arguments be multiplied and assign the product to the third argument.
 
 Example:
