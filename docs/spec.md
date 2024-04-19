@@ -185,10 +185,10 @@ Example:
 
 Additionally, there exists a special nested usage amongst the `$inarray`, `$any`, `$all` nodes. Depending on nodes you choose, they can check whether the elements of an array has a certain property in part or in whole.
 
-- `$inarray`/`$any` -> `$inarray`/`$any`: To check if there exists at least one element meeting both conditions, otherwise returns false;
-- `$all` -> `$all`: To check if only elements meeting both two conditions are in the judgement, otherwise returns false;
-- `$inarray`/`$any` -> `$all`: To check if there is at least one element that satisfies only the latter condition or satisfies neither conditions. If so, returns false;
-- `$all` -> `$inarray`/`$any`: To check if there is at least one element that satisfies only the former condition or satisfies neither conditions. If so, returns false.
+- `$inarray`/`$any` -> `$inarray`/`$any`: To check if the targeted array consists of at least one element meeting both conditions at the same time, otherwise returns false;
+- `$all` -> `$all`: To check if the targeted array only consists of elements meeting both two conditions, otherwise returns false;
+- `$inarray`/`$any` -> `$all`: To check if the targeted array consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the former condition (optional), otherwise returns false;
+- `$all` -> `$inarray`/`$any`: To check if the targeted array consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the latter condition (optional), otherwise returns false.
 
 Example:
 ```json5
