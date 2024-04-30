@@ -20,6 +20,7 @@ This is a list of the possible nodes that can appear in a state machine, and wha
     -   [`$reset`](#reset)
 -   [Common Nodes](#common-nodes)
     -   [`$pushunique`](#pushunique)
+-   [Nesting Array Nodes](#nesting-array-nodes)
 
 ## Conditional Nodes
 
@@ -142,7 +143,7 @@ Example:
 
 ### `$inarray`, `$any`
 
-These two nodes seem to perform the same function, which is to check if the targeted element exists in the context.
+These two nodes are aliases of each other, and check if at least one element in an array pass the given condition.
 
 Parameters:
 
@@ -183,13 +184,6 @@ Example:
 ]
 ```
 
-Additionally, there exists a special nested usage amongst the `$inarray`, `$any`, `$all` nodes. Depending on nodes you choose, they can check whether the elements of an array has a certain property in part or in whole.
-
--   `$inarray`/`$any` -> `$inarray`/`$any`: To check if the targeted set of elements consists of at least one element meeting both conditions at the same time, otherwise returns false;
--   `$all` -> `$all`: To check if the targeted set of elements only consists of elements meeting both two conditions, otherwise returns false;
--   `$inarray`/`$any` -> `$all`: To check if the targeted set of elements consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the former condition (optional), otherwise returns false;
--   `$all` -> `$inarray`/`$any`: To check if the targeted set of elements consists of elements that satisfy both conditions at the same time, and at least 0 elements satisfy the latter condition (optional), otherwise returns false.
-
 Example:
 
 ```json5
@@ -210,7 +204,7 @@ Example:
 
 ### `$all`
 
-This node can check if all element in the context has the same property.
+This node checks if all elements in an array, evaluated by the condition, return true.
 
 Parameters:
 
@@ -246,8 +240,6 @@ Example:
     }
 ]
 ```
-
-For nested usage, see [`$inarray` and `$any`](#inarray-any) section above.
 
 ### `$contains`
 
@@ -489,18 +481,74 @@ Example:
 
 ```json5
 // for each number in the `input` context object that is equal to 1, add 5 to the counter
-$select: {
-    "in": "$.input",
-    "?": {
-        $eq: [
-            "$.#",
-            1
+{
+    $select: {
+        "in": "$.input",
+        "?": {
+            $eq: [
+                "$.#",
+                1
+            ]
+        },
+        "!": [
+            {
+                $inc: ["counter", 5]
+            }
         ]
-    },
-    "!": [
-        {
-            $inc: ["counter", 5]
-        }
+    }
+}
+```
+
+## Nesting Array Nodes
+
+Sometimes, performing multiple levels of recursion at once is needed with one of the array nodes (`$inarray`/`$any` or `$all`).
+If this is the case, it is possible to nest them. In a single-layer array, the `$.#` context variable is set to the current item being iterated over.
+For each nested loop (each layer down you go), you add an extra `#` to the end to get that loop's current value.
+So if you have a two-layer array, the outer current item will be `$.#`, and the inner current item will be `$.##`.
+
+Here's an example:
+
+Say you're writing a state machine where you want to ensure that multiple targets are killed with poison.
+You _could_ write something along the lines of:
+
+```json5
+{
+    $and: [
+        // pretend these are fully filled out
+        $eq: {}, // target 1 was killed with poison
+        $eq: {}, // target 2 was killed with poison
     ]
+}
+```
+
+But that's inefficient. You're just copying and pasting the condition, and making it more difficult to change!
+Let's instead rewrite it with a nested loop:
+
+```json5
+// For this example, assume we have 2 arrays in the context:
+// Targets - a list of the targets we're checking for this objective
+// PoisonKills - a list of target IDs that have been killed with poison
+
+{
+    // this is the outer loop, which checks each target. this means that 
+    $all: {
+        // Targets would be a context variable like `["target-1-repo-id", "target-2-repo-id"]`
+        in: "$.Targets",
+        ?: {
+            // this is the inner loop (layer 2), where we check if a given target (from the outer loop) equals one of the items in the inner loop's array
+            // (so, if any target in the outer loop matches one of the targets in the PoisonKills array)
+            $inarray: {
+                in: "$.PoisonKills",
+                ?: {
+                    $eq: [
+                        // the current value of the outer loop's iteration (current target in `Targets`)
+                        "$.#",
+                        // the current value of the inner loop's iteration (current target in `PoisonKills`)
+                        "$.##"
+                    ]
+                }
+            }
+        }
+    }
 }
 ```
