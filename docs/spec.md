@@ -131,7 +131,7 @@ This node is indented for delaying a state machine's evaluation by a number of s
 
 > Implementation Note: This node is very loosely implemented, and will be rewritten in the near future.
 
-It accepts a parameter `seconds`, which should be a number value indicating after how many seconds the judgement value becomes `true`.
+It accepts a parameter `seconds`, which should be a number value indicating after how many seconds the node evaluates to `true`.
 
 Example:
 
