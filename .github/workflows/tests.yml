@@ -31,8 +31,9 @@ jobs:
       run: yarn build
 
     - name: Run tests with coverage
-      run: yarn test
+      run: yarn coverage
 
     - uses: codecov/codecov-action@v4
       with:
         use_oidc: true
+        files: ./coverage/lcov.info

@@ -56,7 +56,8 @@
         "prettier": "prettier --write \"**/*.{ts,md,json,js,cjs}\"",
         "build": "tsc && node build.mjs",
         "prepack": "yarn build",
-        "test": "c8 mocha --require esbuild-register --extension js,ts,cjs,mjs tests"
+        "test": "mocha --require esbuild-register --extension js,ts,cjs,mjs tests",
+        "coverage": "c8 --reporter=lcov --reporter=text-summary yarn test"
     },
     "prettier": {
         "semi": false,
