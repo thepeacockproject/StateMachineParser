@@ -34,7 +34,7 @@
     },
     "author": "The Peacock Project <admin@thepeacockproject.org> (https://thepeacockproject.org)",
     "license": "Apache-2.0",
-    "packageManager": "yarn@4.0.0-rc.42",
+    "packageManager": "yarn@4.2.2",
     "exports": {
         "import": "./build/index.js",
         "require": "./build/index-cjs.js"
