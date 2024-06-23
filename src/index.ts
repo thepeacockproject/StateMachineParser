@@ -310,9 +310,9 @@ export function handleActions<Context>(
 
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
-            const variableValue = findNamedChild(input[op], context, true)
-
             let reference = input[op]
+
+            const variableValue = findNamedChild(input[op], context, true)
 
             set(
                 context,
