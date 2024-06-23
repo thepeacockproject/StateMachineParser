@@ -310,9 +310,13 @@ export function handleActions<Context>(
 
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
+            let reference = input[op]
+
             const variableValue = findNamedChild(input[op], context, true)
 
-            let reference = input[op]
+            if (typeof variableValue !== "number") {
+                return
+            }
 
             set(
                 context,
@@ -324,6 +328,10 @@ export function handleActions<Context>(
 
             const variableValue = findNamedChild(reference, context, true)
             const incrementBy = findNamedChild(input[op][1], context, false)
+
+            if (typeof variableValue !== "number") {
+                return
+            }
 
             set(
                 context,
@@ -347,6 +355,10 @@ export function handleActions<Context>(
 
         // clone the thing
         const array = deepClone(findNamedChild(reference, context, true))
+
+        if (!Array.isArray(array)) {
+            return
+        }
 
         if (unique) {
             if (array.indexOf(value) === -1) {
@@ -388,6 +400,10 @@ export function handleActions<Context>(
                     false
                 )
 
+                if (typeof variableValue1 !== "number" || typeof variableValue2 !== "number") {
+                    break
+                }
+
                 set(context, reference, variableValue1 * variableValue2)
                 break
             }
@@ -420,6 +436,10 @@ export function handleActions<Context>(
                 let array: unknown[] = deepClone(
                     findNamedChild(reference, context, true)
                 )
+
+                if (!Array.isArray(array)) {
+                    break
+                }
 
                 array = array.filter((item) => item !== value)
 
