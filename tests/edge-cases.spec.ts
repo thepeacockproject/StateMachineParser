@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 The Peacock Project
+ *    Copyright (c) 2022-2024 The Peacock Project
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ describe("edge cases", () => {
                 $inc: "MyCoolArray"
             }
             const context = {}
-            
+
             let newContext = handleActions(action1, context)
             newContext = handleActions(action2, newContext)
 
@@ -69,7 +69,7 @@ describe("edge cases", () => {
                 $dec: "MyCoolArray",
             }
             const context = {}
-            
+
             let newContext = handleActions(action1, context)
             newContext = handleActions(action2, newContext)
 
@@ -81,7 +81,7 @@ describe("edge cases", () => {
                 $mul: ["MyCoolArray", 3],
             }
             const context = {}
-            
+
             const newContext = handleActions(action, context)
 
             assert.deepStrictEqual(newContext, {})
@@ -92,7 +92,7 @@ describe("edge cases", () => {
                 $push: ["MyCoolArray", 4],
             }
             const context = {}
-            
+
             const newContext = handleActions(action, context)
 
             assert.deepStrictEqual(newContext, {})
@@ -103,7 +103,7 @@ describe("edge cases", () => {
                 $pushunique: ["MyCoolArray", 5],
             }
             const context = {}
-            
+
             const newContext = handleActions(action, context)
 
             assert.deepStrictEqual(newContext, {})
@@ -114,7 +114,7 @@ describe("edge cases", () => {
                 $remove: ["MyCoolArray", 6],
             }
             const context = {}
-            
+
             const newContext = handleActions(action, context)
 
             assert.deepStrictEqual(newContext, {})
