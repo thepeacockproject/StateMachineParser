@@ -47,23 +47,31 @@ describe("edge cases", () => {
 
     describe("trying to modify non-existant context vars does not error", () => {
         it("using the $inc action", () => {
-            const action = {
+            const action1 = {
                 $inc: ["MyCoolArray", 1],
+            }
+            const action2 = {
+                $inc: "MyCoolArray"
             }
             const context = {}
             
-            const newContext = handleActions(action, context)
+            let newContext = handleActions(action1, context)
+            newContext = handleActions(action2, newContext)
 
             assert.deepStrictEqual(newContext, {})
         })
 
         it("using the $dec action", () => {
-            const action = {
+            const action1 = {
                 $dec: ["MyCoolArray", 2],
+            }
+            const action2 = {
+                $dec: "MyCoolArray",
             }
             const context = {}
             
-            const newContext = handleActions(action, context)
+            let newContext = handleActions(action1, context)
+            newContext = handleActions(action2, newContext)
 
             assert.deepStrictEqual(newContext, {})
         })
