@@ -111,10 +111,8 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             `Running pushUniqueAction on ${reference} with ${item}`
                         )
 
-                        if (!referenceArray) {
-                            throw new Error(
-                                `Could not find ${reference} in context`
-                            )
+                        if (!Array.isArray(referenceArray)) {
+                            return false
                         }
 
                         if (referenceArray.includes(item)) {
