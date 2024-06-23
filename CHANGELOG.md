@@ -1,8 +1,12 @@
 # Changelog
 
+## v6.0.0
+
+-   Fixed an issue where trying to run actions in an invalid way would cause errors. They now no-op.
+
 ## v5.9.3
 
--   Fixes an issue where when a timer performs a state transition, events were still ran with the old state.
+-   Fixed an issue where when a timer performs a state transition, events were still ran with the old state.
 
 ## v5.9.2
 
