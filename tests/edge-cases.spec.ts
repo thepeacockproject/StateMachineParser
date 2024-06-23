@@ -15,6 +15,7 @@
  */
 
 import { findNamedChild, set } from "../src/utils"
+import { handleActions, handleEvent } from "../src"
 import * as assert from "assert"
 
 describe("edge cases", () => {
@@ -41,6 +42,106 @@ describe("edge cases", () => {
                 `{"JNames":["bob","bill","ben"]}`,
                 "values not equal"
             )
+        })
+    })
+
+    describe("trying to modify non-existant context vars does not error", () => {
+        it("using the $inc action", () => {
+            const action = {
+                $inc: ["MyCoolArray", 1],
+            }
+            const context = {}
+            
+            const newContext = handleActions(action, context)
+
+            assert.deepStrictEqual(newContext, {})
+        })
+
+        it("using the $dec action", () => {
+            const action = {
+                $dec: ["MyCoolArray", 2],
+            }
+            const context = {}
+            
+            const newContext = handleActions(action, context)
+
+            assert.deepStrictEqual(newContext, {})
+        })
+
+        it("using the $mul action", () => {
+            const action = {
+                $mul: ["MyCoolArray", 3],
+            }
+            const context = {}
+            
+            const newContext = handleActions(action, context)
+
+            assert.deepStrictEqual(newContext, {})
+        })
+
+        it("using the $push action", () => {
+            const action = {
+                $push: ["MyCoolArray", 4],
+            }
+            const context = {}
+            
+            const newContext = handleActions(action, context)
+
+            assert.deepStrictEqual(newContext, {})
+        })
+
+        it("using the $pushunique action", () => {
+            const action = {
+                $pushunique: ["MyCoolArray", 5],
+            }
+            const context = {}
+            
+            const newContext = handleActions(action, context)
+
+            assert.deepStrictEqual(newContext, {})
+        })
+
+        it("using the $remove action", () => {
+            const action = {
+                $remove: ["MyCoolArray", 6],
+            }
+            const context = {}
+            
+            const newContext = handleActions(action, context)
+
+            assert.deepStrictEqual(newContext, {})
+        })
+
+        it("using the $pushunique condition", () => {
+            const Definition = {
+                Context: {},
+                States: {
+                    Start: {
+                        EventName: {
+                            Condition: {
+                                $pushunique: ["MyOtherCoolArray", "bofa"],
+                            },
+                        },
+                    },
+                },
+            }
+            const Input = {
+                Name: "EventName",
+                Value: {},
+            }
+
+            const result = handleEvent(
+                Definition,
+                Definition.Context,
+                Input.Value,
+                {
+                    currentState: "Start",
+                    eventName: Input.Name,
+                    timestamp: 0,
+                },
+            )
+
+            assert.deepStrictEqual(result.context, {})
         })
     })
 })
