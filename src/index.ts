@@ -432,14 +432,14 @@ export function handleActions<Context>(
 
                 const value = findNamedChild(input.$remove[1], context, false)
 
-                if (!Array.isArray(value)) {
-                    break
-                }
-
                 // clone the thing
                 let array: unknown[] = deepClone(
                     findNamedChild(reference, context, true)
                 )
+
+                if (!Array.isArray(array)) {
+                    break
+                }
 
                 array = array.filter((item) => item !== value)
 
