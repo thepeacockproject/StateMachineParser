@@ -45,7 +45,7 @@ describe("edge cases", () => {
         })
     })
 
-    describe("trying to modify non-existant context vars does not error", () => {
+    describe("trying to modify non-existent context vars does not error", () => {
         it("using the $inc action", () => {
             const action1 = {
                 $inc: ["MyCoolArray", 1],
