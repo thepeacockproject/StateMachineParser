@@ -36,7 +36,7 @@ describe("$remove", () => {
 
         assert.strictEqual(
             JSON.stringify(r.FavoriteFoods),
-            JSON.stringify(["apples", "oranges"])
+            JSON.stringify(["apples", "oranges"]),
         )
     })
 })

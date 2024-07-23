@@ -47,7 +47,7 @@ describe("$after", () => {
             if (category === "validation") {
                 assert.strictEqual(
                     message,
-                    "No event timestamp found when timer is supposed to be active"
+                    "No event timestamp found when timer is supposed to be active",
                 )
             }
         })

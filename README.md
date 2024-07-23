@@ -58,6 +58,6 @@ const result = test(
         Value: {
             Greeting: "Hi!",
         },
-    } // the variables object, which is essentially the input values.
+    }, // the variables object, which is essentially the input values.
 )
 ```

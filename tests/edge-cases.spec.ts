@@ -40,7 +40,7 @@ describe("edge cases", () => {
             assert.strictEqual(
                 JSON.stringify(ctx),
                 `{"JNames":["bob","bill","ben"]}`,
-                "values not equal"
+                "values not equal",
             )
         })
     })
@@ -51,7 +51,7 @@ describe("edge cases", () => {
                 $inc: ["MyCoolArray", 1],
             }
             const action2 = {
-                $inc: "MyCoolArray"
+                $inc: "MyCoolArray",
             }
             const context = {}
 

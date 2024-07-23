@@ -28,7 +28,7 @@ describe("handleEvent api", () => {
                 Definition,
                 Definition.Context,
                 input.Value,
-                { timestamp: 0, eventName: input.Name }
+                { timestamp: 0, eventName: input.Name },
             )
 
             if (doneOnce) {
@@ -61,7 +61,7 @@ describe("handleEvent api", () => {
                 assert.strictEqual(
                     result.context.Number,
                     5,
-                    "$set action was not performed"
+                    "$set action was not performed",
                 )
             }
 
@@ -69,7 +69,7 @@ describe("handleEvent api", () => {
                 assert.strictEqual(
                     result.state,
                     "NumberIsFive",
-                    "not in NumberIsFive state"
+                    "not in NumberIsFive state",
                 )
                 break
             }
@@ -77,7 +77,7 @@ describe("handleEvent api", () => {
             assert.strictEqual(
                 result.state,
                 "Start",
-                `Currently at event number ${event}. we should not have transitioned yet`
+                `Currently at event number ${event}. we should not have transitioned yet`,
             )
         }
     })
@@ -109,7 +109,7 @@ describe("handleEvent api", () => {
                 currentState: state,
                 eventName: Input.Name,
                 timestamp: 0,
-            }
+            },
         )
 
         assert.strictEqual(result.state, "Success", "Transition did not happen")
@@ -128,7 +128,7 @@ describe("handleEvent api", () => {
                 currentState: state,
                 eventName: Input.Name,
                 timestamp: 0,
-            }
+            },
         )
 
         assert.strictEqual(result.context["Variable"], 500)
@@ -151,12 +151,12 @@ describe("handleEvent api", () => {
         assert.strictEqual(
             currentState,
             "OnePacified",
-            "Transition did not happen"
+            "Transition did not happen",
         )
         assert.strictEqual(
             context.Pacified.length,
             1,
-            "Pacified array was not pushed"
+            "Pacified array was not pushed",
         )
 
         // once more, we should now be in the OnePacified state
@@ -170,7 +170,7 @@ describe("handleEvent api", () => {
         assert.strictEqual(
             result.state,
             "Success",
-            "Second transition did not happen"
+            "Second transition did not happen",
         )
     })
 
@@ -187,7 +187,7 @@ describe("handleEvent api", () => {
                 currentState: state,
                 eventName: Input.Name,
                 timestamp: 0,
-            }
+            },
         )
 
         assert.strictEqual(result.state, "Success", "Transition did not happen")

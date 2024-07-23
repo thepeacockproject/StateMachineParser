@@ -79,9 +79,9 @@ export function set(obj: any, keys: string | string[], val: any): void {
             typeof (currKey = curr[key]) === typeof keys
                 ? currKey
                 : // @ts-expect-error Very interesting type stuff going on here.
-                keys[i] * 0 !== 0 || !!~("" + keys[i]).indexOf(".")
-                ? {}
-                : []
+                  keys[i] * 0 !== 0 || !!~("" + keys[i]).indexOf(".")
+                  ? {}
+                  : []
     }
 }
 
@@ -109,7 +109,7 @@ export function set(obj: any, keys: string | string[], val: any): void {
 export function findNamedChild(
     reference: string,
     variables: any,
-    forWriting = false
+    forWriting = false,
 ): any {
     if (typeof reference !== "string") {
         return reference

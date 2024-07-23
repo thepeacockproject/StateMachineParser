@@ -37,7 +37,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     definition: StateMachineLike<Partial<Context>>,
     context: Partial<Context>,
     event: Event,
-    options: HandleEventOptions
+    options: HandleEventOptions,
 ): HandleEventReturn<Partial<Context>> {
     const log = options.logger || (() => {})
 
@@ -49,7 +49,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     if (!csObject || (!csObject?.[eventName] && !csObject?.$timer)) {
         log(
             "disregard-event",
-            `SM in state ${currentState} disregarding ${eventName}`
+            `SM in state ${currentState} disregarding ${eventName}`,
         )
         // we are here because either:
         // - we have no handler for the current state
@@ -73,7 +73,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
         // IOI sometimes puts the actions along-side keys like Transition and Condition,
         // yet both still apply
         const irregularEventKeys = Object.keys(handler).filter((k) =>
-            k.includes("$")
+            k.includes("$"),
         )
         const hasIrregularEventKeys = irregularEventKeys.length > 0
 
@@ -103,12 +103,12 @@ export function handleEvent<Context = unknown, Event = unknown>(
                         const referenceArray = findNamedChild(
                             reference,
                             newContext,
-                            true
+                            true,
                         )
                         item = findNamedChild(item, newContext, false)
                         log(
                             "action",
-                            `Running pushUniqueAction on ${reference} with ${item}`
+                            `Running pushUniqueAction on ${reference} with ${item}`,
                         )
 
                         if (!Array.isArray(referenceArray)) {
@@ -128,7 +128,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                     logger: log,
                     timers: options.timers,
                     eventTimestamp: options.timestamp,
-                }
+                },
             )
         }
 
@@ -143,7 +143,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 ;(<unknown[]>Actions).push(
                     ...irregularEventKeys.map((key) => {
                         return { [key]: handler[key] }
-                    })
+                    }),
                 )
             }
 
@@ -163,7 +163,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                         },
                         {
                             originalContext: definition.Context ?? {},
-                        }
+                        },
                     )
                 }
             }
@@ -193,7 +193,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
             log(
                 "transition",
-                `${currentState} is performing a transition to ${state} - running its "-" event`
+                `${currentState} is performing a transition to ${state} - running its "-" event`,
             )
 
             // When transitioning, we have to reset all timers.
@@ -215,7 +215,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                     timers: options.timers,
                     timestamp: options.timestamp,
                     contractId: options.contractId,
-                }
+                },
             )
         }
 
@@ -272,7 +272,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
         if (timerResult) {
             log(
                 "timer",
-                "Timer caused a state transition, replaying current event with new state."
+                "Timer caused a state transition, replaying current event with new state.",
             )
 
             options.currentState = timerResult.state

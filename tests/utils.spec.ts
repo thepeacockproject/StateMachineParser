@@ -32,7 +32,7 @@ describe("utils", () => {
                 // @ts-expect-error I know.
                 Object.prototype.func,
                 undefined,
-                "prototype pollution succeeded"
+                "prototype pollution succeeded",
             )
 
             set(Object, "prototype.func", function func() {
@@ -43,7 +43,7 @@ describe("utils", () => {
                 // @ts-expect-error I know.
                 Object.prototype.func,
                 undefined,
-                "prototype pollution succeeded"
+                "prototype pollution succeeded",
             )
         })
 
@@ -81,7 +81,7 @@ describe("utils", () => {
             assert.strictEqual(
                 findNamedChild(ref, data),
                 ref,
-                "prototype fetched"
+                "prototype fetched",
             )
         })
     })

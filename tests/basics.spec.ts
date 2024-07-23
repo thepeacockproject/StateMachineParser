@@ -54,7 +54,7 @@ describe("essential validation", () => {
         assert.strictEqual(
             JSON.stringify(result),
             expected,
-            "arrays did not match"
+            "arrays did not match",
         )
     })
 })

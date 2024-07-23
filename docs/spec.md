@@ -138,7 +138,8 @@ Example:
 ```json5
 {
     $after: 5,
-} // -> return `true` after 5 seconds
+}
+ // -> return `true` after 5 seconds
 ```
 
 ### `$inarray`, `$any`
@@ -483,19 +484,16 @@ Example:
 // for each number in the `input` context object that is equal to 1, add 5 to the counter
 {
     $select: {
-        "in": "$.input",
+        in: "$.input",
         "?": {
-            $eq: [
-                "$.#",
-                1
-            ]
+            $eq: ["$.#", 1],
         },
         "!": [
             {
-                $inc: ["counter", 5]
-            }
-        ]
-    }
+                $inc: ["counter", 5],
+            },
+        ],
+    },
 }
 ```
 
@@ -530,7 +528,7 @@ Let's instead rewrite it with a nested loop:
 // PoisonKills - a list of target IDs that have been killed with poison
 
 {
-    // this is the outer loop, which checks each target. this means that 
+    // this is the outer loop, which checks each target. this means that
     $all: {
         // Targets would be a context variable like `["target-1-repo-id", "target-2-repo-id"]`
         in: "$.Targets",
