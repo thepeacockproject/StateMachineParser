@@ -46,7 +46,7 @@ describe("$any", () => {
         assert.strictEqual(test(sm, vars), true)
     })
 
-    it("returns false if a property isn't in present", () => {
+    it("returns false if a property isn't present", () => {
         const [sm, vars] = data.Any4
         assert.strictEqual(test(sm, vars), false)
     })
