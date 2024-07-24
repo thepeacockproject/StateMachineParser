@@ -32,12 +32,22 @@ describe("$inarray", () => {
 
 describe("$any", () => {
     it("can find a string in a context array", () => {
-        const [sm, vars] = data.Inarray1
+        const [sm, vars] = data.Any1
         assert.strictEqual(test(sm, vars), true)
     })
 
     it("returns false if the item isn't present", () => {
-        const [sm, vars] = data.Inarray2
+        const [sm, vars] = data.Any2
+        assert.strictEqual(test(sm, vars), false)
+    })
+
+    it("can find a property in a context array", () => {
+        const [sm, vars] = data.Any3
+        assert.strictEqual(test(sm, vars), true)
+    })
+
+    it("returns false if a property isn't in present", () => {
+        const [sm, vars] = data.Any4
         assert.strictEqual(test(sm, vars), false)
     })
 })

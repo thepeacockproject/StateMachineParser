@@ -70,5 +70,55 @@
                 ]
             }
         }
+    ],
+    "Any3": [
+        {
+            "$any": {
+                "in": "$Value.listvar",
+                "?": {
+                    "$eq": [
+                        "$.#.prop",
+                        6
+                    ]
+                }
+            }
+        },
+        {
+            "Value": {
+                "listvar": [
+                    {
+                        "prop": 4
+                    },
+                    {
+                        "prop": 6
+                    }
+                ]
+            }
+        }
+    ],
+    "Any4": [
+        {
+            "$any": {
+                "in": "$Value.listvar",
+                "?": {
+                    "$eq": [
+                        "$.#.prop",
+                        5
+                    ]
+                }
+            }
+        },
+        {
+            "Value": {
+                "listvar": [
+                    {
+                        "prop": 4
+                    },
+                    {
+                        "prop": 6
+                    }
+                ]
+            }
+        }
     ]
 }
