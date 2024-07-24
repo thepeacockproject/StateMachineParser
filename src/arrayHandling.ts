@@ -15,7 +15,6 @@
  */
 
 import type { RealTestFunc, TestOptions } from "./index"
-import { findNamedChild } from "./utils"
 
 const fillHashtags = (count: number): string => "#".repeat(count)
 
@@ -70,7 +69,7 @@ export function handleArrayLogic<Variables>(
                     const newReference = `$${reference.substring(
                         reference.indexOf("#.") + 1,
                     )}`
-                    const found = findNamedChild(newReference, item)
+                    const found = options.findNamedChild(newReference, item)
                     if (found !== newReference) return found
                 }
 
