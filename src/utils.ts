@@ -140,9 +140,7 @@ export function findNamedChild(
     let obj = variables
 
     // if we have a global matching the exact name of the reference, this is probably what we want
-    // note: not sure why exactly but if we don't do this proto check,
-    // `handleEvent api > supports actions with constants` fails
-    if (Object.prototype.hasOwnProperty.call(reference)) {
+    if (Object.prototype.hasOwnProperty.call(obj, reference)) {
         return obj[reference]
     }
 
