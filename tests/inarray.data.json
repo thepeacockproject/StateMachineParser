@@ -70,5 +70,86 @@
                 ]
             }
         }
+    ],
+    "Any3": [
+        {
+            "$any": {
+                "in": "$Value.listvar",
+                "?": {
+                    "$eq": [
+                        "$.#.prop",
+                        6
+                    ]
+                }
+            }
+        },
+        {
+            "Value": {
+                "listvar": [
+                    {
+                        "prop": 4
+                    },
+                    {
+                        "prop": 6
+                    }
+                ]
+            }
+        }
+    ],
+    "Any4": [
+        {
+            "$any": {
+                "in": "$Value.listvar",
+                "?": {
+                    "$eq": [
+                        "$.#.prop",
+                        5
+                    ]
+                }
+            }
+        },
+        {
+            "Value": {
+                "listvar": [
+                    {
+                        "prop": 4
+                    },
+                    {
+                        "prop": 6
+                    }
+                ]
+            }
+        }
+    ],
+    "Invalid_Crash_Nested": [
+        {
+            "$any": {
+                "in": "$.MyList",
+                "?": {
+                    "$any": {
+                        "in": "$.#",
+                        "?": {
+                            "$eq": ["$.##.prop", 4]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "Value": {
+                "MyList": [
+                    [
+                        {
+                            "prop": 4
+                        }
+                    ],
+                    [
+                        {
+                            "prop": 6
+                        }
+                    ]
+                ]
+            }
+        }
     ]
 }
