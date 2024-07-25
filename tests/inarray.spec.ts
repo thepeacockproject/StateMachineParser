@@ -50,4 +50,13 @@ describe("$any", () => {
         const [sm, vars] = data.Any4
         assert.strictEqual(test(sm, vars), false)
     })
+
+    describe("nested", () => {
+        it("throws when trying to use current iteration as an `in` value", () => {
+            const [sm, vars] = data.Invalid_Crash_Nested
+            assert.throws(() => {
+                test(sm, vars)
+            }, /Nested array nodes cannot use current iteration \(`\$.#`\) as an `in` value/)
+        })
+    })
 })

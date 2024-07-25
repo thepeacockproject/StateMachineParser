@@ -19,14 +19,12 @@ import type { RealTestFunc, TestOptions } from "./index"
 const fillHashtags = (count: number): string => "#".repeat(count)
 
 /**
- * Function that creates an array-like test node parser.
- * It's split into a separate file for the sake of organization, and uses the proxy function to avoid circular dependencies.
- *
- * @param realTest The realTest function (internal).
+ * Handles `$any`, `$all`, and `$inarray`. Works with nested loops!
+ * @param realTest The realTest function.
  * @param input The state machine.
  * @param variables The variables.
  * @param op The operation being performed.
- * @param options The test option.
+ * @param options The test options.
  * @internal
  */
 export function handleArrayLogic<Variables>(
@@ -34,13 +32,22 @@ export function handleArrayLogic<Variables>(
     input: any,
     variables: Variables,
     op: string,
-    options: TestOptions,
+    options: TestOptions
 ): boolean {
+    const inValue = input[op]["in"]
+    const depth = (options._currentLoopDepth || 0) + 1
+
+    if (inValue.includes("#")) {
+        throw new TypeError("Nested array nodes cannot use current iteration (`$.#`) as an `in` value", {
+            cause: options._path
+        })
+    }
+
     // find the array
-    const array = realTest(input[op]["in"], variables, {
+    const array = realTest(inValue, variables, {
         ...options,
-        _currentLoopDepth: (options._currentLoopDepth || 0) + 1,
-        _path: `${options._path}.${op}.in`,
+        _currentLoopDepth: depth,
+        _path: `${options._path}.${op}.in`
     }) as unknown as unknown[]
 
     const itemConditions = input[op]["?"]
@@ -48,12 +55,11 @@ export function handleArrayLogic<Variables>(
     for (const item of array) {
         const test = realTest(itemConditions, variables, {
             ...options,
-            _currentLoopDepth: (options._currentLoopDepth || 0) + 1,
+            _currentLoopDepth: depth,
+            _path: `${options._path}.${op}.?`,
             findNamedChild(reference, variables) {
                 // NOTE: if we have a multi-layered loop, this should one-by-one fall back until the targeted loop is hit
-                const hashtags = fillHashtags(
-                    (options._currentLoopDepth || 0) + 1,
-                )
+                const hashtags = fillHashtags(depth)
 
                 // a little future-proofing, as sometimes the $ is there, and other times it isn't.
                 // we strip it out somewhere, but it shouldn't matter too much.
@@ -67,14 +73,14 @@ export function handleArrayLogic<Variables>(
                 // handle properties of an object
                 if (typeof item === "object") {
                     const newReference = `$${reference.substring(
-                        reference.indexOf("#.") + 1,
+                        reference.indexOf("#.") + 1
                     )}`
                     const found = options.findNamedChild(newReference, item)
                     if (found !== newReference) return found
                 }
 
                 return options.findNamedChild(reference, variables)
-            },
+            }
         })
 
         if (test && (op === "$inarray" || op === "$any")) {

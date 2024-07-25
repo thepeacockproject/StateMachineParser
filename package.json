@@ -57,7 +57,7 @@
         "build": "tsc && node build.mjs",
         "prepack": "yarn build",
         "test": "mocha --require esbuild-register --extension js,ts,cjs,mjs tests",
-        "coverage": "c8 --reporter=lcov --reporter=text-summary yarn test"
+        "coverage": "c8 --reporter=lcov --reporter=text-summary --exclude=.yarn yarn test"
     },
     "prettier": {
         "semi": false,
