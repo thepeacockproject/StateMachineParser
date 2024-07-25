@@ -209,14 +209,22 @@ describe("handleEvent api", () => {
 
     it("supports $.ContractId", () => {
         const { Definition, Input } = suites.withContractId
-        const result = handleEvent(Definition, Definition.Context, Input.Value, {
-            currentState: "Start",
-            eventName: Input.Name,
-            timestamp: 0,
-            contractId: "abc123",
-        })
+        const result = handleEvent(
+            Definition,
+            Definition.Context,
+            Input.Value,
+            {
+                currentState: "Start",
+                eventName: Input.Name,
+                timestamp: 0,
+                contractId: "abc123",
+            },
+        )
 
-        assert.ok(!result.context["ContractId"], "ContractId should not be in the context after the event")
+        assert.ok(
+            !result.context["ContractId"],
+            "ContractId should not be in the context after the event",
+        )
         assert.strictEqual(result.state, "Success")
     })
 })
