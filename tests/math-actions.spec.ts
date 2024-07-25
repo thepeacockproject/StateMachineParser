@@ -78,6 +78,7 @@ const data = {
         {
             Context: {
                 Object: 18,
+                Output: 0,
             },
         },
     ],
