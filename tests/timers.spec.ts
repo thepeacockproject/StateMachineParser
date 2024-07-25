@@ -17,6 +17,7 @@
 import { test, Timer } from "../src"
 import assert from "assert"
 import callSpy from "call-spy"
+import { setLogger } from "../src/logging"
 
 const data = {
     After1: [
@@ -34,6 +35,10 @@ const data = {
 }
 
 describe("$after", () => {
+    afterEach(() => {
+        setLogger(console.log)
+    })
+
     it("returns false with no timer array specified", () => {
         const [sm, vars] = data.After1
 
@@ -52,7 +57,9 @@ describe("$after", () => {
             }
         })
 
-        assert.strictEqual(test(sm, vars, { timers: [], logger }), false)
+        setLogger(logger)
+
+        assert.strictEqual(test(sm, vars, { timers: [] }), false)
         assert.strictEqual(loggerCallDetails.called, true)
     })
 
