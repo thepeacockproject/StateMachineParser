@@ -141,7 +141,7 @@ export function findNamedChild(
     let obj = variables
 
     // if we have a global matching the exact name of the reference, this is probably what we want
-    if (obj[reference]) {
+    if (Object.prototype.hasOwnProperty.call(obj, reference)) {
         return obj[reference]
     }
 
