@@ -206,4 +206,17 @@ describe("handleEvent api", () => {
         assert.strictEqual(result.context.Var1, 1)
         assert.strictEqual(result.context.Var2, 20)
     })
+
+    it("supports $.ContractId", () => {
+        const { Definition, Input } = suites.withContractId
+        const result = handleEvent(Definition, Definition.Context, Input.Value, {
+            currentState: "Start",
+            eventName: Input.Name,
+            timestamp: 0,
+            contractId: "abc123",
+        })
+
+        assert.ok(!result.context["ContractId"], "ContractId should not be in the context after the event")
+        assert.strictEqual(result.state, "Success")
+    })
 })

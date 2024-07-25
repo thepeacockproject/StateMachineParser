@@ -8,7 +8,10 @@
                 "Start": {
                     "Pacify": {
                         "Condition": {
-                            "$eq": ["$Value.RepositoryId", "$Target"]
+                            "$eq": [
+                                "$Value.RepositoryId",
+                                "$Target"
+                            ]
                         },
                         "Transition": "Success"
                     }
@@ -39,18 +42,27 @@
                     "Disguised": [
                         {
                             "Condition": {
-                                "$eq": ["$Value.RepositoryId", "$Outfit"]
+                                "$eq": [
+                                    "$Value.RepositoryId",
+                                    "$Outfit"
+                                ]
                             },
                             "Actions": [
                                 {
-                                    "$set": ["$Number", 5]
+                                    "$set": [
+                                        "$Number",
+                                        5
+                                    ]
                                 }
                             ]
                         }
                     ],
                     "AmbientChanged": {
                         "Condition": {
-                            "$eq": ["$Number", 5]
+                            "$eq": [
+                                "$Number",
+                                5
+                            ]
                         },
                         "Transition": "NumberIsFive"
                     }
@@ -103,7 +115,10 @@
                 "Start": {
                     "Event": {
                         "Condition": {
-                            "$eq": ["$Value.RepositoryId", "$.SomeRepoId"]
+                            "$eq": [
+                                "$Value.RepositoryId",
+                                "$.SomeRepoId"
+                            ]
                         },
                         "Transition": "Success"
                     }
@@ -129,7 +144,10 @@
                 "Start": {
                     "Event": {
                         "Actions": {
-                            "$inc": ["Variable", "$.ValueToAdd"]
+                            "$inc": [
+                                "Variable",
+                                "$.ValueToAdd"
+                            ]
                         }
                     }
                 }
@@ -151,7 +169,10 @@
                 "Start": {
                     "Pacify": {
                         "Condition": {
-                            "$pushunique": ["Pacified", "$Value.RepositoryId"]
+                            "$pushunique": [
+                                "Pacified",
+                                "$Value.RepositoryId"
+                            ]
                         },
                         "Transition": "OnePacified"
                     }
@@ -227,11 +248,36 @@
                 "Start": {
                     "-": {
                         "$inc": "Var1",
-                        "$mul": ["Var2", "$.Var1"],
+                        "$mul": [
+                            "Var2",
+                            "$.Var1"
+                        ],
                         "$dec": "Var1"
                     }
                 }
             }
+        }
+    },
+    "withContractId": {
+        "Definition": {
+            "Context": {},
+            "States": {
+                "Start": {
+                    "ContractStarted": {
+                        "Condition": {
+                            "$eq": [
+                                "$.ContractId",
+                                "abc123"
+                            ]
+                        },
+                        "Transition": "Success"
+                    }
+                }
+            }
+        },
+        "Input": {
+            "Name": "ContractStarted",
+            "Value": null
         }
     }
 }
