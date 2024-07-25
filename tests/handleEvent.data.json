@@ -266,7 +266,7 @@
                     "ContractStarted": {
                         "Condition": {
                             "$eq": [
-                                "$.ContractId",
+                                "$ContractId",
                                 "abc123"
                             ]
                         },
