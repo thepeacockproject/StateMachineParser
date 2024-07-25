@@ -103,14 +103,13 @@ export function set(obj: any, keys: string | string[], val: any): void {
  * @param reference The reference to the target as a string.
  * @param variables The object that may contain the target.
  * @param forWriting true if this reference is being written to.
- * @returns The value if found, or the reference if it wasn't /
- * something went wrong.
+ * @returns The value if found, or the reference if it wasn't / something went wrong.
  */
 export function findNamedChild(
     reference: string,
     variables: any,
-    forWriting = false,
-): any {
+    forWriting = false
+): boolean | string | number | any {
     if (typeof reference !== "string") {
         return reference
     }
@@ -141,7 +140,9 @@ export function findNamedChild(
     let obj = variables
 
     // if we have a global matching the exact name of the reference, this is probably what we want
-    if (obj[reference]) {
+    // note: not sure why exactly but if we don't do this proto check,
+    // `handleEvent api > supports actions with constants` fails
+    if (Object.prototype.hasOwnProperty.call(reference)) {
         return obj[reference]
     }
 

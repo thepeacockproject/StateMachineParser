@@ -35,7 +35,7 @@ import { getLogger, setLogger } from "./logging"
 export function test<Context = Record<string, unknown>>(
     input: any,
     context: Context,
-    options?: Partial<TestOptions>
+    options?: Partial<TestOptions>,
 ): boolean | any {
     if (!input) {
         throw new Error("State machine is falsy!")
@@ -51,7 +51,7 @@ export function test<Context = Record<string, unknown>>(
         findNamedChild: opts.findNamedChild || findNamedChild,
         ...opts,
         _path: opts._path || "Root",
-        _currentLoopDepth: 0
+        _currentLoopDepth: 0,
     })
 }
 
@@ -60,17 +60,22 @@ export function test<Context = Record<string, unknown>>(
  * The benefit of using this is that it's a single, inline call, instead of 4
  * lines per call.
  */
-function testWithPath<Context>(input: any, context: Context, options: TestOptions, name: string): boolean | Context {
+function testWithPath<Context>(
+    input: any,
+    context: Context,
+    options: TestOptions,
+    name: string,
+): boolean | Context {
     return realTest<Context>(input, context, {
         ...options,
-        _path: `${options._path}.${name}`
+        _path: `${options._path}.${name}`,
     })
 }
 
 function realTest<Variables>(
     input: any,
     variables: Variables,
-    options: TestOptions
+    options: TestOptions,
 ): Variables | boolean {
     const log = getLogger()
 
@@ -92,7 +97,7 @@ function realTest<Variables>(
     if (Array.isArray(input)) {
         // @ts-expect-error Type mismatch thing.
         return input.map((val, index) =>
-            testWithPath(val, variables, options, `[${index}]`)
+            testWithPath(val, variables, options, `[${index}]`),
         )
     }
 
@@ -115,8 +120,8 @@ function realTest<Variables>(
                             val,
                             variables,
                             options,
-                            `$eq[${index}]`
-                        ) === res
+                            `$eq[${index}]`,
+                        ) === res,
                 )
             )
         }
@@ -127,13 +132,13 @@ function realTest<Variables>(
 
         if (input.$and) {
             return input.$and.every((val, index) =>
-                testWithPath(val, variables, options, `$and[${index}]`)
+                testWithPath(val, variables, options, `$and[${index}]`),
             )
         }
 
         if (input.$or) {
             return input.$or.some((val, index) =>
-                testWithPath(val, variables, options, `$or[${index}]`)
+                testWithPath(val, variables, options, `$or[${index}]`),
             )
         }
 
@@ -171,7 +176,7 @@ function realTest<Variables>(
                 input,
                 variables,
                 "$inarray",
-                options
+                options,
             )
         }
 
@@ -201,7 +206,7 @@ function realTest<Variables>(
                 if (!options.eventTimestamp && options.eventTimestamp !== 0) {
                     log(
                         "validation",
-                        "No event timestamp found when timer is supposed to be active"
+                        "No event timestamp found when timer is supposed to be active",
                     )
                     return false
                 }
@@ -209,7 +214,7 @@ function realTest<Variables>(
                 timer = {
                     startTime: options.eventTimestamp,
                     endTime: options.eventTimestamp + seconds,
-                    path
+                    path,
                 }
 
                 options.timers.push(timer)
@@ -222,7 +227,7 @@ function realTest<Variables>(
                 // The timer is up. Delete it from the timers array
                 // so that a new timer can be created if this state is visited again.
                 const index = options.timers.findIndex(
-                    (timer) => timer.path === path
+                    (timer) => timer.path === path,
                 )
 
                 if (index !== -1) {
@@ -242,8 +247,8 @@ function realTest<Variables>(
                     input.$pushunique[1],
                     variables,
                     options,
-                    "$pushunique[1]"
-                )
+                    "$pushunique[1]",
+                ),
             )
         }
 
@@ -252,13 +257,13 @@ function realTest<Variables>(
                 input.$contains[0],
                 variables,
                 options,
-                "$contains[0]"
+                "$contains[0]",
             )
             const second = testWithPath(
                 input.$contains[1],
                 variables,
                 options,
-                "$contains[1]"
+                "$contains[1]",
             ) as string
 
             if (typeof first === "string") {
@@ -299,7 +304,7 @@ export type RealTestFunc = typeof realTest
 export function handleActions<Context>(
     input: any,
     context: Context,
-    options?: HandleActionsOptions
+    options?: HandleActionsOptions,
 ): Context {
     if (!input || typeof input !== "object") {
         return context
@@ -318,7 +323,7 @@ export function handleActions<Context>(
             set(
                 context,
                 reference,
-                op === "$inc" ? variableValue + 1 : variableValue - 1
+                op === "$inc" ? variableValue + 1 : variableValue - 1,
             )
         } else {
             let reference = input[op][0]
@@ -335,7 +340,7 @@ export function handleActions<Context>(
                 reference,
                 op === "$inc"
                     ? variableValue + incrementBy
-                    : variableValue - incrementBy
+                    : variableValue - incrementBy,
             )
         }
     }
@@ -389,12 +394,12 @@ export function handleActions<Context>(
                 const variableValue1 = findNamedChild(
                     input["$mul"][0],
                     context,
-                    true
+                    true,
                 )
                 const variableValue2 = findNamedChild(
                     input["$mul"][1],
                     context,
-                    false
+                    false,
                 )
 
                 if (
@@ -434,7 +439,7 @@ export function handleActions<Context>(
 
                 // clone the thing
                 let array: unknown[] = deepClone(
-                    findNamedChild(reference, context, true)
+                    findNamedChild(reference, context, true),
                 )
 
                 if (!Array.isArray(array)) {
@@ -451,7 +456,7 @@ export function handleActions<Context>(
                 const value = findNamedChild(
                     reference,
                     options.originalContext,
-                    true
+                    true,
                 )
 
                 set(context, reference, value)

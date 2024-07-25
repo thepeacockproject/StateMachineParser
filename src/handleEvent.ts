@@ -27,7 +27,7 @@ function runCAT<Context = unknown, Event = unknown>(
     definition: StateMachineLike<Partial<Context>>,
     newContext: Partial<Context>,
     event: Event,
-    options: HandleEventOptions
+    options: HandleEventOptions,
 ): HandleEventReturn<Partial<Context>> {
     const log = getLogger()
     // do we need to check conditions?
@@ -37,7 +37,7 @@ function runCAT<Context = unknown, Event = unknown>(
     // IOI sometimes puts the actions along-side keys like Transition and Condition,
     // yet both still apply
     const irregularEventKeys = Object.keys(handler).filter((k) =>
-        k.includes("$")
+        k.includes("$"),
     )
     const hasIrregularEventKeys = irregularEventKeys.length > 0
 
@@ -57,22 +57,22 @@ function runCAT<Context = unknown, Event = unknown>(
             {
                 ...(newContext || {}),
                 ...(options.contractId && {
-                    ContractId: options.contractId
+                    ContractId: options.contractId,
                 }),
                 ...(definition.Constants || {}),
-                Value: event
+                Value: event,
             },
             {
                 pushUniqueAction(reference, item) {
                     const referenceArray = findNamedChild(
                         reference,
                         newContext,
-                        true
+                        true,
                     )
                     item = findNamedChild(item, newContext, false)
-                    getLogger()(
+                    log(
                         "action",
-                        `Running pushUniqueAction on ${reference} with ${item}`
+                        `Running pushUniqueAction on ${reference} with ${item}`,
                     )
 
                     if (!Array.isArray(referenceArray)) {
@@ -90,8 +90,8 @@ function runCAT<Context = unknown, Event = unknown>(
                     return true
                 },
                 timers: options.timers,
-                eventTimestamp: options.timestamp
-            }
+                eventTimestamp: options.timestamp,
+            },
         )
     }
 
@@ -106,7 +106,7 @@ function runCAT<Context = unknown, Event = unknown>(
             ;(<unknown[]>Actions).push(
                 ...irregularEventKeys.map((key) => {
                     return { [key]: handler[key] }
-                })
+                }),
             )
         }
 
@@ -114,31 +114,31 @@ function runCAT<Context = unknown, Event = unknown>(
             for (const action of Object.keys(actionSet)) {
                 newContext = handleActions(
                     {
-                        [action]: actionSet[action]
+                        [action]: actionSet[action],
                     },
                     {
                         ...newContext,
                         ...(definition.Constants || {}),
                         ...(options.contractId && {
-                            ContractId: options.contractId
+                            ContractId: options.contractId,
                         }),
-                        Value: event
+                        Value: event,
                     },
                     {
-                        originalContext: definition.Context ?? {}
-                    }
+                        originalContext: definition.Context ?? {},
+                    },
                 )
             }
         }
 
         // drop this specific event's value
-        if (newContext.hasOwnProperty("Value")) {
+        if (newContext["Value"]) {
             // @ts-expect-error
             delete newContext.Value
         }
 
         // drop this specific event's ContractId
-        if (newContext.hasOwnProperty("ContractId")) {
+        if (newContext["ContractId"]) {
             // @ts-expect-error
             delete newContext.ContractId
         }
@@ -156,7 +156,7 @@ function runCAT<Context = unknown, Event = unknown>(
 
         log(
             "transition",
-            `${options.currentState} is performing a transition to ${state} - running its "-" event`
+            `${options.currentState} is performing a transition to ${state} - running its "-" event`,
         )
 
         // When transitioning, we have to reset all timers.
@@ -176,14 +176,14 @@ function runCAT<Context = unknown, Event = unknown>(
                 currentState: state,
                 timers: options.timers,
                 timestamp: options.timestamp,
-                contractId: options.contractId
-            }
+                contractId: options.contractId,
+            },
         )
     }
 
     return {
         context: newContext,
-        state
+        state,
     }
 }
 
@@ -201,7 +201,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     definition: StateMachineLike<Partial<Context>>,
     context: Partial<Context>,
     event: Event,
-    options: HandleEventOptions
+    options: HandleEventOptions,
 ): HandleEventReturn<Partial<Context>> {
     const log = getLogger()
     const { eventName, currentState = "Start" } = options
@@ -209,20 +209,22 @@ export function handleEvent<Context = unknown, Event = unknown>(
     // (current state object - reduces code duplication)
     let eventToCatsMap = definition.States?.[currentState]
 
-    const hasPreExecState = !!Object.keys(eventToCatsMap || {}).find(key => key.startsWith("$"))
+    const hasPreExecState = !!Object.keys(eventToCatsMap || {}).find((key) =>
+        key.startsWith("$"),
+    )
     const hasEventState = !!eventToCatsMap?.[eventName]
 
     if (!eventToCatsMap || (!hasEventState && !hasPreExecState)) {
         log(
             "disregard-event",
-            `SM in state ${currentState} disregarding ${eventName}`
+            `SM in state ${currentState} disregarding ${eventName}`,
         )
         // we are here because either:
         // - we have no handler for the current state
         // - in this particular state, the state machine doesn't care about the current event
         return {
             context: context,
-            state: currentState
+            state: currentState,
         }
     }
 
@@ -231,7 +233,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
     type CATList = CATObject[]
 
-    function runCATsUntilCompletionOrTransition(eventHandlers: CATList): HandleEventReturn<Partial<Context>> | undefined {
+    function runCATsUntilCompletionOrTransition(
+        eventHandlers: CATList,
+    ): HandleEventReturn<Partial<Context>> | undefined {
         for (const handler of eventHandlers) {
             const out = runCAT(handler, definition, newContext, event, options)
 
@@ -241,7 +245,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 // we swapped states while in a handler, so our work here is done
                 return {
                     context: newContext,
-                    state: out.state
+                    state: out.state,
                 }
             }
         }
@@ -257,7 +261,9 @@ export function handleEvent<Context = unknown, Event = unknown>(
     }
 
     // Handle timers/anything that starts with $ because they need to run first.
-    for (const preExecStateName of Object.keys(eventToCatsMap).filter(k => k.startsWith("$"))) {
+    for (const preExecStateName of Object.keys(eventToCatsMap).filter((k) =>
+        k.startsWith("$"),
+    )) {
         const preExecState = eventToCatsMap[preExecStateName]
         const preExecHandlers: CATList = []
 
@@ -277,7 +283,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
         if (timerResult) {
             log(
                 "timer",
-                "Timer caused a state transition, replaying current event with new state."
+                "Timer caused a state transition, replaying current event with new state.",
             )
 
             options.currentState = timerResult.state
@@ -294,6 +300,6 @@ export function handleEvent<Context = unknown, Event = unknown>(
 
     return {
         state: currentState,
-        context: newContext
+        context: newContext,
     }
 }

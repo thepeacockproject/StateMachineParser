@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-import { test, Timer } from "../src"
+import { setLogger, test, Timer } from "../src"
 import assert from "assert"
 import callSpy from "call-spy"
-import { setLogger } from "../src/logging"
 
 const data = {
     After1: [
