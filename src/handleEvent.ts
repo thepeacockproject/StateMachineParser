@@ -23,7 +23,8 @@ import { getLogger } from "./logging"
  * Run conditions, actions, and transitions.
  */
 function runCAT<Context = unknown, Event = unknown>(
-    handler: CATObject, definition: StateMachineLike<Partial<Context>>,
+    handler: CATObject,
+    definition: StateMachineLike<Partial<Context>>,
     newContext: Partial<Context>,
     event: Event,
     options: HandleEventOptions
