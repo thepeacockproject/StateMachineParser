@@ -1,5 +1,9 @@
 # Changelog
 
+## v6.1.0
+
+-   Added support for arrays of objects in array operations.
+
 ## v6.0.0
 
 -   Fixed an issue where trying to run actions in an invalid way would cause errors. They now no-op.
