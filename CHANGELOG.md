@@ -1,5 +1,9 @@
 # Changelog
 
+## v6.2.0
+
+-   Fixed an issue where if the first value of a `$eq` operation was null or undefined it did not always return false.
+
 ## v6.1.0
 
 -   Added support for arrays of objects in array operations.
