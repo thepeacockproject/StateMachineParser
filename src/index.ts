@@ -106,6 +106,8 @@ function realTest<Variables>(
 
             const res = testWithPath(input.$eq[0], variables, options, "$eq[0]")
 
+            if (res == null) return false
+
             return (
                 // we test for each element because we need to make sure that the value is fixed if it's a variable
                 input.$eq.every(

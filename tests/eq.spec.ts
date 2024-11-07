@@ -75,6 +75,32 @@ const data = {
         },
         {},
     ],
+    UndefinedCheck1: [
+        {
+            $eq: ["$Value.a"],
+        },
+        {
+            Value: {},
+        },
+    ],
+    UndefinedCheck2: [
+        {
+            $eq: ["$Value.a", "$Value.a"],
+        },
+        {
+            Value: {},
+        },
+    ],
+    NullCheck2: [
+        {
+            $eq: ["$Value.a", "$Value.a"],
+        },
+        {
+            Value: {
+                a: null,
+            },
+        },
+    ],
 }
 
 describe("$eq", () => {
@@ -115,5 +141,22 @@ describe("$eq", () => {
     it("array with more than 2 elements", () => {
         const [sm, vars] = data.LongArray1
         assert.strictEqual(test(sm, vars), true)
+    })
+
+    context("$eq with undefined or null variables", () => {
+        it("1 (one) undefined variable", () => {
+            const [sm, vars] = data.UndefinedCheck1
+            assert.strictEqual(test(sm, vars), false)
+        })
+
+        it("2 undefined variables", () => {
+            const [sm, vars] = data.UndefinedCheck2
+            assert.strictEqual(test(sm, vars), false)
+        })
+
+        it("2 null variables", () => {
+            const [sm, vars] = data.NullCheck2
+            assert.strictEqual(test(sm, vars), false)
+        })
     })
 })
