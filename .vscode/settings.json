@@ -1,0 +1,11 @@
+{
+    "npm.packageManager": "yarn",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "mochaExplorer.files": ["tests/**/*.{js,ts,cjs,mjs}"],
+    "mochaExplorer.require": [
+        "esbuild-register"
+    ]
+}
