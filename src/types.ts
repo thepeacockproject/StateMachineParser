@@ -17,18 +17,6 @@
 import { findNamedChild } from "./utils"
 
 /**
- * A function that logs a message.
- */
-export type LogFunction = (category: string, message: string) => void
-
-interface LoggingProvider {
-    /**
-     * The logging implementation.
-     */
-    logger: LogFunction
-}
-
-/**
  * A game timestamp is a number of seconds (with milliseconds as decimals) since the start of a contract.
  */
 export type GameTimestamp = number
@@ -54,7 +42,7 @@ export type Timer = {
 /**
  * Options that are passed to {@link handleEvent}.
  */
-export interface HandleEventOptions extends Partial<LoggingProvider> {
+export interface HandleEventOptions {
     /**
      * The event's name.
      */
@@ -92,9 +80,9 @@ export interface HandleEventReturn<Context> {
 }
 
 /**
- * @internal
+ * CAT - condition, actions, transition.
  */
-export interface InStateEventHandler {
+export type CATObject = {
     Condition?: unknown | unknown[]
     Actions?: unknown | unknown[]
     Transition?: string
@@ -105,7 +93,7 @@ export interface InStateEventHandler {
  * A state machine, in a minimal form.
  * Context and Constants are generic, so they can be typed by library consumers.
  */
-export interface StateMachineLike<Context, Constants = any | undefined> {
+export interface StateMachineLike<Context, Constants = any> {
     /**
      * The globals.
      */
@@ -122,14 +110,16 @@ export interface StateMachineLike<Context, Constants = any | undefined> {
      * We may need this in the future.
      */
     Scope?: string
-    /**
-     * Mapping of state name to mapping of event name to handler.
-     */
     States: {
         [stateName: string]: {
-            [eventName: string]: InStateEventHandler | InStateEventHandler[]
-            $timer?: InStateEventHandler | InStateEventHandler[]
-            ["-"]?: InStateEventHandler | InStateEventHandler[]
+            /**
+             * If eventName starts with $, it will be run before any other handlers.
+             */
+            [eventName: string]: CATObject | CATObject[]
+            /**
+             * Special: run on every event.
+             */
+            ["-"]?: CATObject | CATObject[]
         }
     }
 }
@@ -139,7 +129,7 @@ export interface StateMachineLike<Context, Constants = any | undefined> {
  */
 export type FindNamedChildFunc = typeof findNamedChild
 
-export interface TestOptions extends LoggingProvider {
+export interface TestOptions {
     /**
      * The findNamedChild function that should be used for resolution of
      * variables.

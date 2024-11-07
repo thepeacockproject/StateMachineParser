@@ -18,6 +18,7 @@ import { handleEvent } from "./handleEvent"
 import { HandleActionsOptions, TestOptions } from "./types"
 import { deepClone, findNamedChild, set } from "./utils"
 import { handleArrayLogic } from "./arrayHandling"
+import { getLogger, setLogger } from "./logging"
 
 /**
  * Recursively evaluate a value or object.
@@ -49,9 +50,8 @@ export function test<Context = Record<string, unknown>>(
     return realTest(input, context, {
         findNamedChild: opts.findNamedChild || findNamedChild,
         ...opts,
-        _path: opts._path || "ROOTOBJ",
+        _path: opts._path || "Root",
         _currentLoopDepth: 0,
-        logger: opts.logger || (() => {}),
     })
 }
 
@@ -60,8 +60,13 @@ export function test<Context = Record<string, unknown>>(
  * The benefit of using this is that it's a single, inline call, instead of 4
  * lines per call.
  */
-function testWithPath(input: any, context, options: TestOptions, name: string) {
-    return realTest(input, context, {
+function testWithPath<Context>(
+    input: any,
+    context: Context,
+    options: TestOptions,
+    name: string,
+): boolean | Context {
+    return realTest<Context>(input, context, {
         ...options,
         _path: `${options._path}.${name}`,
     })
@@ -72,7 +77,7 @@ function realTest<Variables>(
     variables: Variables,
     options: TestOptions,
 ): Variables | boolean {
-    const log = options.logger
+    const log = getLogger()
 
     log("visit", `Visiting ${options._path}`)
 
@@ -261,7 +266,7 @@ function realTest<Variables>(
                 variables,
                 options,
                 "$contains[1]",
-            )
+            ) as string
 
             if (typeof first === "string") {
                 return first.includes(second)
@@ -282,7 +287,7 @@ function realTest<Variables>(
 export type RealTestFunc = typeof realTest
 
 /**
- * Handles a group of action nodes (a.k.a. side-effect nodes).
+ * Handles a group of action nodes.
  * Actions will modify the context, which will then be returned.
  *
  * @param input The actions to take.
@@ -465,5 +470,5 @@ export function handleActions<Context>(
     return context
 }
 
-export { handleEvent }
+export { handleEvent, setLogger }
 export * from "./types"
