@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-import type { RealTestFunc, TestOptions } from "./index"
+import type { TestOptions, TestWithPathFunc } from "./index"
 
 const fillHashtags = (count: number): string => "#".repeat(count)
 
 /**
  * Handles `$any`, `$all`, and `$inarray`. Works with nested loops!
- * @param realTest The realTest function.
+ * @param testWithPath The testWithPath function.
  * @param input The state machine.
  * @param variables The variables.
  * @param op The operation being performed.
@@ -28,60 +28,71 @@ const fillHashtags = (count: number): string => "#".repeat(count)
  * @internal
  */
 export function handleArrayLogic<Variables>(
-    realTest: RealTestFunc,
+    testWithPath: TestWithPathFunc,
     input: any,
     variables: Variables,
     op: string,
-    options: TestOptions
+    options: TestOptions,
 ): boolean {
     const inValue = input[op]["in"]
     const depth = (options._currentLoopDepth || 0) + 1
 
     if (inValue.includes("#")) {
-        throw new TypeError("Nested array nodes cannot use current iteration (`$.#`) as an `in` value", {
-            cause: options._path
-        })
+        throw new TypeError(
+            "Nested array nodes cannot use current iteration (`$.#`) as an `in` value",
+            {
+                cause: options._path,
+            },
+        )
     }
 
     // find the array
-    const array = realTest(inValue, variables, {
-        ...options,
-        _currentLoopDepth: depth,
-        _path: `${options._path}.${op}.in`
-    }) as unknown as unknown[]
+    const array = testWithPath(
+        inValue,
+        variables,
+        {
+            ...options,
+            _currentLoopDepth: depth,
+        },
+        `${op}.in`,
+    ) as unknown as unknown[]
 
     const itemConditions = input[op]["?"]
 
     for (const item of array) {
-        const test = realTest(itemConditions, variables, {
-            ...options,
-            _currentLoopDepth: depth,
-            _path: `${options._path}.${op}.?`,
-            findNamedChild(reference, variables) {
-                // NOTE: if we have a multi-layered loop, this should one-by-one fall back until the targeted loop is hit
-                const hashtags = fillHashtags(depth)
+        const test = testWithPath(
+            itemConditions,
+            variables,
+            {
+                ...options,
+                _currentLoopDepth: depth,
+                findNamedChild(reference, variables) {
+                    // NOTE: if we have a multi-layered loop, this should one-by-one fall back until the targeted loop is hit
+                    const hashtags = fillHashtags(depth)
 
-                // a little future-proofing, as sometimes the $ is there, and other times it isn't.
-                // we strip it out somewhere, but it shouldn't matter too much.
-                if (
-                    reference === `$.${hashtags}` ||
-                    reference === `.${hashtags}`
-                ) {
-                    return item
-                }
+                    // a little future-proofing, as sometimes the $ is there, and other times it isn't.
+                    // we strip it out somewhere, but it shouldn't matter too much.
+                    if (
+                        reference === `$.${hashtags}` ||
+                        reference === `.${hashtags}`
+                    ) {
+                        return item
+                    }
 
-                // handle properties of an object
-                if (typeof item === "object") {
-                    const newReference = `$${reference.substring(
-                        reference.indexOf("#.") + 1
-                    )}`
-                    const found = options.findNamedChild(newReference, item)
-                    if (found !== newReference) return found
-                }
+                    // handle properties of an object
+                    if (typeof item === "object") {
+                        const newReference = `$${reference.substring(
+                            reference.indexOf("#.") + 1,
+                        )}`
+                        const found = options.findNamedChild(newReference, item)
+                        if (found !== newReference) return found
+                    }
 
-                return options.findNamedChild(reference, variables)
-            }
-        })
+                    return options.findNamedChild(reference, variables)
+                },
+            },
+            `${op}.?`,
+        )
 
         if (test && (op === "$inarray" || op === "$any")) {
             return true

@@ -46,13 +46,18 @@ export function test<Context = Record<string, unknown>>(
 
     const opts = options || {}
 
-    return realTest(input, context, {
-        findNamedChild: opts.findNamedChild || findNamedChild,
-        ...opts,
-        _path: opts._path || "ROOTOBJ",
-        _currentLoopDepth: 0,
-        logger: opts.logger || (() => {}),
-    })
+    return testWithPath(
+        input,
+        context,
+        {
+            findNamedChild: opts.findNamedChild || findNamedChild,
+            ...opts,
+            _path: "",
+            _currentLoopDepth: 0,
+            logger: opts.logger || (() => {}),
+        },
+        "",
+    )
 }
 
 /**
@@ -60,11 +65,22 @@ export function test<Context = Record<string, unknown>>(
  * The benefit of using this is that it's a single, inline call, instead of 4
  * lines per call.
  */
-function testWithPath(input: any, context, options: TestOptions, name: string) {
-    return realTest(input, context, {
+function testWithPath<Context>(
+    input: any,
+    context: Context,
+    options: TestOptions,
+    name: string,
+) {
+    // the top-most call
+    const thePath = options._path ? `${options._path}.${name}` : name
+    const displayPath = thePath || "(root)"
+    options.logger?.("visit", `Visiting ${displayPath}`)
+    const result = realTest(input, context, {
         ...options,
-        _path: `${options._path}.${name}`,
+        _path: thePath,
     })
+    options.logger?.("trace", `${displayPath} evaluated to: ${result}`)
+    return result
 }
 
 function realTest<Variables>(
@@ -73,8 +89,6 @@ function realTest<Variables>(
     options: TestOptions,
 ): Variables | boolean {
     const log = options.logger
-
-    log("visit", `Visiting ${options._path}`)
 
     if (
         typeof input === "number" ||
@@ -169,7 +183,7 @@ function realTest<Variables>(
 
         if (input.$inarray) {
             return handleArrayLogic(
-                realTest,
+                testWithPath,
                 input,
                 variables,
                 "$inarray",
@@ -178,11 +192,23 @@ function realTest<Variables>(
         }
 
         if (input.$any) {
-            return handleArrayLogic(realTest, input, variables, "$any", options)
+            return handleArrayLogic(
+                testWithPath,
+                input,
+                variables,
+                "$any",
+                options,
+            )
         }
 
         if (input.$all) {
-            return handleArrayLogic(realTest, input, variables, "$all", options)
+            return handleArrayLogic(
+                testWithPath,
+                input,
+                variables,
+                "$all",
+                options,
+            )
         }
 
         if (input.$after) {
@@ -264,7 +290,7 @@ function realTest<Variables>(
             )
 
             if (typeof first === "string") {
-                return first.includes(second)
+                return first.includes(second as string)
             }
 
             return false
@@ -279,7 +305,7 @@ function realTest<Variables>(
 /**
  * @internal
  */
-export type RealTestFunc = typeof realTest
+export type TestWithPathFunc = typeof testWithPath
 
 /**
  * Handles a group of action nodes (a.k.a. side-effect nodes).
