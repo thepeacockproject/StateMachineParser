@@ -45,7 +45,7 @@
         "c8": "^10.1.2",
         "c8-as-nyc": "^1.1.11",
         "call-spy": "^3.0.1",
-        "esbuild": "^0.21.5",
+        "esbuild": "^0.25.0",
         "esbuild-register": "^3.5.0",
         "get-package-type": "^0.1.0",
         "mocha": "^10.4.0",
