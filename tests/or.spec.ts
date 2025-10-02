@@ -16,7 +16,6 @@
 
 import { test } from "../src"
 import assert from "assert"
-import { describe } from "mocha"
 
 const data = {
     Or1: [

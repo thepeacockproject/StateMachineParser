@@ -18,6 +18,7 @@ import { handleEvent } from "./handleEvent"
 import { HandleActionsOptions, TestOptions } from "./types"
 import { deepClone, findNamedChild, set } from "./utils"
 import { handleArrayLogic } from "./arrayHandling"
+import { create } from "mutative"
 
 /**
  * Recursively evaluate a value or object.
@@ -333,33 +334,52 @@ export function handleActions<Context>(
         return context
     }
 
+    return create(context, (draft) => {
+        handleActionsOnDraft(input, draft, context, options)
+    })
+}
+
+/**
+ * Internal function that applies actions directly to a draft object.
+ * This is used both by handleActions and handleEvent to avoid code duplication.
+ */
+export function handleActionsOnDraft<Context>(
+    input: any,
+    draft: any,
+    originalContext: Context,
+    options?: HandleActionsOptions,
+): void {
+    if (!input || typeof input !== "object") {
+        return
+    }
+
     const addOrDec = (op: string) => {
         if (typeof input[op] === "string") {
             let reference = input[op]
 
-            const variableValue = findNamedChild(input[op], context, true)
+            const variableValue = findNamedChild(input[op], originalContext, true)
 
             if (typeof variableValue !== "number") {
                 return
             }
 
             set(
-                context,
+                draft,
                 reference,
                 op === "$inc" ? variableValue + 1 : variableValue - 1,
             )
         } else {
             let reference = input[op][0]
 
-            const variableValue = findNamedChild(reference, context, true)
-            const incrementBy = findNamedChild(input[op][1], context, false)
+            const variableValue = findNamedChild(reference, originalContext, true)
+            const incrementBy = findNamedChild(input[op][1], originalContext, false)
 
             if (typeof variableValue !== "number") {
                 return
             }
 
             set(
-                context,
+                draft,
                 reference,
                 op === "$inc"
                     ? variableValue + incrementBy
@@ -376,10 +396,10 @@ export function handleActions<Context>(
             reference = reference.substring(1)
         }
 
-        const value = findNamedChild(input[op][1], context, false)
+        const value = findNamedChild(input[op][1], originalContext, false)
 
         // clone the thing
-        const array = deepClone(findNamedChild(reference, context, true))
+        const array = deepClone(findNamedChild(reference, originalContext, true))
 
         if (!Array.isArray(array)) {
             return
@@ -395,7 +415,7 @@ export function handleActions<Context>(
             array.push(value)
         }
 
-        set(context, reference, array)
+        set(draft, reference, array)
     }
 
     for (const key of Object.keys(input)) {
@@ -416,12 +436,12 @@ export function handleActions<Context>(
                 // Therefore the 1st operand might get written to, but the 2nd one is purely a read.
                 const variableValue1 = findNamedChild(
                     input["$mul"][0],
-                    context,
+                    originalContext,
                     true,
                 )
                 const variableValue2 = findNamedChild(
                     input["$mul"][1],
-                    context,
+                    originalContext,
                     false,
                 )
 
@@ -432,15 +452,15 @@ export function handleActions<Context>(
                     break
                 }
 
-                set(context, reference, variableValue1 * variableValue2)
+                set(draft, reference, variableValue1 * variableValue2)
                 break
             }
             case "$set": {
                 let reference = input.$set[0]
 
-                const value = findNamedChild(input.$set[1], context, false)
+                const value = findNamedChild(input.$set[1], originalContext, false)
 
-                set(context, reference, value)
+                set(draft, reference, value)
                 break
             }
             case "$push": {
@@ -458,11 +478,11 @@ export function handleActions<Context>(
                     reference = reference.substring(1)
                 }
 
-                const value = findNamedChild(input.$remove[1], context, false)
+                const value = findNamedChild(input.$remove[1], originalContext, false)
 
                 // clone the thing
                 let array: unknown[] = deepClone(
-                    findNamedChild(reference, context, true),
+                    findNamedChild(reference, originalContext, true),
                 )
 
                 if (!Array.isArray(array)) {
@@ -471,24 +491,22 @@ export function handleActions<Context>(
 
                 array = array.filter((item) => item !== value)
 
-                set(context, reference, array)
+                set(draft, reference, array)
                 break
             }
             case "$reset": {
                 let reference = input.$reset
                 const value = findNamedChild(
                     reference,
-                    options.originalContext,
+                    options?.originalContext,
                     true,
                 )
 
-                set(context, reference, value)
+                set(draft, reference, value)
                 break
             }
         }
     }
-
-    return context
 }
 
 export { handleEvent }

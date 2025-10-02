@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022-2024 The Peacock Project
+ *    Copyright (c) 2025 The Peacock Project
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  *    limitations under the License.
  */
 
-import esbuild, { analyzeMetafile } from "esbuild"
+import { defineConfig } from "vitest/config"
 
-const esm = await esbuild.build({
-    entryPoints: ["src/index.ts"],
-    bundle: true,
-    write: true,
-    outdir: "build",
-    metafile: true,
-    sourcemap: true,
-    format: "esm",
-    external: ["mutative"],
+export default defineConfig({
+    test: {
+        globals: true,
+        coverage: {
+            provider: "v8",
+            exclude: ["build", "build.mjs", ".yarn", "vite.config.ts"]
+        }
+    }
 })
-
-console.log(await analyzeMetafile(esm.metafile))
