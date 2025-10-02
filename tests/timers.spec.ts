@@ -16,7 +16,7 @@
 
 import { test, Timer } from "../src"
 import assert from "assert"
-import callSpy from "call-spy"
+import { vi } from "vitest"
 
 const data = {
     After1: [
@@ -43,7 +43,7 @@ describe("$after", () => {
     it("won't try to evaluate if no timestamp is specified", () => {
         const [sm, vars] = data.After1
 
-        const [logger, loggerCallDetails] = callSpy((category, message) => {
+        const logger = vi.fn((category, message) => {
             if (category === "validation") {
                 assert.strictEqual(
                     message,
@@ -53,7 +53,7 @@ describe("$after", () => {
         })
 
         assert.strictEqual(test(sm, vars, { timers: [], logger }), false)
-        assert.strictEqual(loggerCallDetails.called, true)
+        assert.strictEqual(logger.mock.calls.length > 1, true)
     })
 
     it("supports basic timers", () => {

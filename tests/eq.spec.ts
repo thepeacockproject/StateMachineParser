@@ -16,7 +16,7 @@
 
 import { test } from "../src"
 import assert from "assert"
-import { describe } from "mocha"
+import { describe } from "vitest"
 
 const data = {
     Equality1: [
@@ -119,14 +119,14 @@ describe("$eq", () => {
         assert.strictEqual(test(sm, vars), true)
     })
 
-    context("inequality", () => {
+    describe("inequality", () => {
         it("1 neq 2", () => {
             const [sm, vars] = data.Inequality1
             assert.strictEqual(test(sm, vars), false)
         })
     })
 
-    context("nested $eq", () => {
+    describe("nested $eq", () => {
         it("can understand nested $eq", () => {
             const [sm, vars] = data.NestedEq1
             assert.strictEqual(test(sm, vars), true)
@@ -143,7 +143,7 @@ describe("$eq", () => {
         assert.strictEqual(test(sm, vars), true)
     })
 
-    context("$eq with undefined or null variables", () => {
+    describe("$eq with undefined or null variables", () => {
         it("1 (one) undefined variable", () => {
             const [sm, vars] = data.UndefinedCheck1
             assert.strictEqual(test(sm, vars), false)

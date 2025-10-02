@@ -3,7 +3,8 @@
     "compilerOptions": {
         "noEmit": true,
         "emitDeclarationOnly": false,
-        "rootDir": "."
+        "rootDir": ".",
+        "types": ["vitest/globals"]
     },
-    "include": ["tests", "tests/handleEvent.data.json", "src"]
+    "include": ["tests", "tests/handleEvent.data.json", "src", "vite.config.ts"]
 }
