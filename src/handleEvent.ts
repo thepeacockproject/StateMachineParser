@@ -14,14 +14,16 @@
  *    limitations under the License.
  */
 
-import { handleActions, test } from "./index"
-import { deepClone, findNamedChild, set } from "./utils"
+import { test, handleActionsOnDraft } from "./index"
+import { findNamedChild } from "./utils"
 import {
     HandleEventOptions,
     HandleEventReturn,
     InStateEventHandler,
     StateMachineLike,
 } from "./types"
+import { create } from "mutative"
+
 
 /**
  * This function simulates an event happening, as if in game.
@@ -63,7 +65,7 @@ export function handleEvent<Context = unknown, Event = unknown>(
     const hasTimerState = !!csObject.$timer
 
     // ensure no circular references are present, and that this won't update the param by accident
-    let newContext = deepClone(context)
+    let newContext = context
 
     const doEventHandler = (handler: InStateEventHandler) => {
         // do we need to check conditions?
@@ -100,12 +102,17 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 },
                 {
                     pushUniqueAction(reference, item) {
-                        const referenceArray = findNamedChild(
-                            reference,
-                            newContext,
-                            true,
-                        )
-                        item = findNamedChild(item, newContext, false)
+                        const workingContext = {
+                            ...newContext,
+                            ...(definition.Constants || {}),
+                            ...(options.contractId && {
+                                ContractId: options.contractId,
+                            }),
+                            Value: event,
+                        }
+                        
+                        const referenceArray = findNamedChild(reference, workingContext, true)
+                        item = findNamedChild(item, workingContext, false)
                         log(
                             "action",
                             `Running pushUniqueAction on ${reference} with ${item}`,
@@ -119,9 +126,13 @@ export function handleEvent<Context = unknown, Event = unknown>(
                             return false
                         }
 
-                        referenceArray.push(item)
-
-                        set(newContext, reference, referenceArray)
+                        // Actually modify the context using Mutative
+                        newContext = create(newContext, (draft) => {
+                            const draftArray = findNamedChild(reference, draft, true)
+                            if (Array.isArray(draftArray) && !draftArray.includes(item)) {
+                                draftArray.push(item)
+                            }
+                        })
 
                         return true
                     },
@@ -147,43 +158,52 @@ export function handleEvent<Context = unknown, Event = unknown>(
                 )
             }
 
-            for (const actionSet of Actions as unknown[]) {
-                for (const action of Object.keys(actionSet)) {
-                    newContext = handleActions(
-                        {
-                            [action]: actionSet[action],
-                        },
-                        {
-                            ...newContext,
-                            ...(definition.Constants || {}),
-                            ...(options.contractId && {
-                                ContractId: options.contractId,
-                            }),
-                            Value: event,
-                        },
-                        {
-                            originalContext: definition.Context ?? {},
-                        },
-                    )
+            // Special case: if the handler itself contains action keys and no Actions property,
+            // treat the handler as the actions
+            if (!handler.Actions && hasIrregularEventKeys) {
+                Actions = [handler]
+            }
+
+            // Create a working context with constants and event data
+            const workingContext = {
+                ...newContext,
+                ...(definition.Constants || {}),
+                ...(options.contractId && {
+                    ContractId: options.contractId,
+                }),
+                Value: event,
+            }
+
+            newContext = create(workingContext, (draft) => {
+                for (const actionSet of Actions as unknown[]) {
+                    // For each action in the action set, apply it individually
+                    for (const actionKey of Object.keys(actionSet)) {
+                        handleActionsOnDraft(
+                            { [actionKey]: actionSet[actionKey] },
+                            draft,
+                            draft, // Use the draft for reading values so each action sees previous changes
+                            {
+                                originalContext: definition.Context ?? {}
+                            }
+                        )
+                    }
                 }
-            }
 
-            // drop this specific event's value
-            if (newContext.hasOwnProperty("Value")) {
-                // @ts-expect-error
-                delete newContext.Value
-            }
+                // drop this specific event's value
+                if (draft.hasOwnProperty("Value")) {
+                    delete draft.Value
+                }
 
-            // drop this specific event's ContractId
-            if (newContext.hasOwnProperty("ContractId")) {
-                // @ts-expect-error
-                delete newContext.ContractId
-            }
+                // drop this specific event's ContractId
+                if (draft.hasOwnProperty("ContractId")) {
+                    delete draft.ContractId
+                }
 
-            // drop the constants
-            for (const constantKey of constantKeys) {
-                delete newContext[constantKey]
-            }
+                // drop the constants
+                for (const constantKey of constantKeys) {
+                    delete draft[constantKey]
+                }
+            })
         }
 
         let state = currentState
