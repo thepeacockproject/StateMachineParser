@@ -55,7 +55,7 @@ describe("handleEvent api", () => {
                 eventName: input.Name,
             })
 
-            context = <any>result.context
+            context = result.context as any
 
             if (event === 2) {
                 assert.strictEqual(
@@ -145,7 +145,7 @@ describe("handleEvent api", () => {
             timestamp: 0,
         })
 
-        context = <any>result.context
+        context = result.context as any
         currentState = result.state
 
         assert.strictEqual(
