@@ -2,7 +2,7 @@
 # Manual changes might be lost - proceed with caution!
 
 __metadata:
-  version: 8
+  version: 10
   cacheKey: 10
 
 "@babel/helper-string-parser@npm:^7.29.7":
@@ -1299,7 +1299,7 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A^7.0.2#optional!builtin<compat/typescript>":
   version: 7.0.2
-  resolution: "typescript@patch:typescript@npm%3A7.0.2#optional!builtin<compat/typescript>::version=7.0.2&hash=379a07"
+  resolution: "typescript@patch:typescript@npm%3A7.0.2#optional!builtin<compat/typescript>::version=7.0.2&hash=3bafbf"
   dependencies:
     "@typescript/typescript-aix-ppc64": "npm:7.0.2"
     "@typescript/typescript-darwin-arm64": "npm:7.0.2"

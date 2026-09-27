@@ -34,7 +34,7 @@
     },
     "author": "The Peacock Project <admin@thepeacockproject.org> (https://thepeacockproject.org)",
     "license": "Apache-2.0",
-    "packageManager": "yarn@4.3.1",
+    "packageManager": "yarn@4.18.1",
     "exports": {
         ".": {
             "types": "./build/index.d.ts",
