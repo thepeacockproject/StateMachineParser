@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-import { test, Timer } from "../src"
+import { describe, expect, it, vi } from "vitest"
+import { test, type Timer } from "../src/index.js"
 import assert from "assert"
-import callSpy from "call-spy"
 
 const data = {
     After1: [
@@ -43,17 +43,13 @@ describe("$after", () => {
     it("won't try to evaluate if no timestamp is specified", () => {
         const [sm, vars] = data.After1
 
-        const [logger, loggerCallDetails] = callSpy((category, message) => {
-            if (category === "validation") {
-                assert.strictEqual(
-                    message,
-                    "No event timestamp found when timer is supposed to be active",
-                )
-            }
-        })
+        const logger = vi.fn()
 
         assert.strictEqual(test(sm, vars, { timers: [], logger }), false)
-        assert.strictEqual(loggerCallDetails.called, true)
+        expect(logger).toHaveBeenCalledWith(
+            "validation",
+            "No event timestamp found when timer is supposed to be active",
+        )
     })
 
     it("supports basic timers", () => {

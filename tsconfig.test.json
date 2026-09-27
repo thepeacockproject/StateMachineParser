@@ -3,7 +3,8 @@
     "compilerOptions": {
         "noEmit": true,
         "emitDeclarationOnly": false,
-        "rootDir": "."
+        "rootDir": ".",
+        "types": ["node"]
     },
-    "include": ["tests", "tests/handleEvent.data.json", "src"]
+    "include": ["src", "tests", "vitest.config.ts"]
 }

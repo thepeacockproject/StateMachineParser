@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-import { test } from "../src"
+import { describe, it } from "vitest"
+import { test } from "../src/index.js"
 import assert from "assert"
 
 const data = {

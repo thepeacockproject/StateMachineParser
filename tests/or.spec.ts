@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-import { test } from "../src"
+import { describe, it } from "vitest"
+import { test } from "../src/index.js"
 import assert from "assert"
-import { describe } from "mocha"
 
 const data = {
     Or1: [

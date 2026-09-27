@@ -4,23 +4,23 @@ This is a list of the possible nodes that can appear in a state machine, and wha
 
 ## Table of Contents
 
--   [Conditional Nodes](#conditional-nodes)
-    -   [`$eq`](#eq)
-    -   [`$and`](#and)
-    -   [`$or`](#or)
-    -   [`$not`](#not)
-    -   [`$after`](#after)
-    -   [`$inarray` and `$any`](#inarray-any)
-    -   [`$all`](#all)
-    -   [`$contains`](#contains)
--   [Action Nodes](#action-nodes)
-    -   [`$inc` and `$dec`](#inc-dec)
-    -   [`$mul`](#mul)
-    -   [`$push`](#push)
-    -   [`$reset`](#reset)
--   [Common Nodes](#common-nodes)
-    -   [`$pushunique`](#pushunique)
--   [Nesting Array Nodes](#nesting-array-nodes)
+- [Conditional Nodes](#conditional-nodes)
+    - [`$eq`](#eq)
+    - [`$and`](#and)
+    - [`$or`](#or)
+    - [`$not`](#not)
+    - [`$after`](#after)
+    - [`$inarray` and `$any`](#inarray-any)
+    - [`$all`](#all)
+    - [`$contains`](#contains)
+- [Action Nodes](#action-nodes)
+    - [`$inc` and `$dec`](#inc-dec)
+    - [`$mul`](#mul)
+    - [`$push`](#push)
+    - [`$reset`](#reset)
+- [Common Nodes](#common-nodes)
+    - [`$pushunique`](#pushunique)
+- [Nesting Array Nodes](#nesting-array-nodes)
 
 ## Conditional Nodes
 
@@ -139,7 +139,7 @@ Example:
 {
     $after: 5,
 }
- // -> return `true` after 5 seconds
+// -> return `true` after 5 seconds
 ```
 
 ### `$inarray`, `$any`
@@ -148,8 +148,8 @@ These two nodes are aliases of each other, and check if at least one element in 
 
 Parameters:
 
--   `in` - A pointer to, or the literal value of the array to be checked.
--   `?` - The condition to test against each array value.
+- `in` - A pointer to, or the literal value of the array to be checked.
+- `?` - The condition to test against each array value.
 
 Example:
 
@@ -209,8 +209,8 @@ This node checks if all elements in an array, evaluated by the condition, return
 
 Parameters:
 
--   `in` - A pointer to, or the literal value of the array to be checked.
--   `?` - The condition to test against each array value.
+- `in` - A pointer to, or the literal value of the array to be checked.
+- `?` - The condition to test against each array value.
 
 Example:
 
@@ -268,8 +268,8 @@ Side effect nodes are nodes that are only supposed to be used inside `Actions` d
 
 This node increments or decrements a context variable. It's exact behavior depends how it's arguments are given.
 
--   If a string is given, it will increment or decrement the context variable with that name by 1.
--   If an array is given, the first element will be the context variable pointer, and the second element will either be the number to increment or decrement by or a pointer to a value of that number.
+- If a string is given, it will increment or decrement the context variable with that name by 1.
+- If an array is given, the first element will be the context variable pointer, and the second element will either be the number to increment or decrement by or a pointer to a value of that number.
 
 Examples:
 
@@ -295,8 +295,8 @@ Examples:
 
 This node executes a multiplication given two or three context variables (whose values must be numeric) with a double purpose:
 
--   If given 2 parameters, it assign the product to the first argument;
--   If given 3 parameters, it let the first and second arguments be multiplied and assign the product to the third argument.
+- If given 2 parameters, it assign the product to the first argument;
+- If given 3 parameters, it let the first and second arguments be multiplied and assign the product to the third argument.
 
 Example:
 
@@ -388,14 +388,14 @@ These nodes can be used as both conditions and actions.
 
 `$pushunique` is a node with a double purpose:
 
--   As an action, it adds the element to the array if it's not already present.
--   As a condition, it checks if an element is already in an array.
-    -   If the condition is true, it performs the action after finishing the evaluation of the condition.
+- As an action, it adds the element to the array if it's not already present.
+- As a condition, it checks if an element is already in an array.
+    - If the condition is true, it performs the action after finishing the evaluation of the condition.
 
 It should contain two elements:
 
--   `reference` - An array in which you try to push element.
--   `item` - The element you try to add.
+- `reference` - An array in which you try to push element.
+- `item` - The element you try to add.
 
 For _action_ use, this will try to push the `item` to `reference`. Here's an example:
 
@@ -474,9 +474,9 @@ It can only be used as an action.
 
 Parameters:
 
--   `in` - A pointer to, or the literal value of the array to be checked.
--   `?` - The condition to test against each array value.
--   `!` - The action to perform on matching values.
+- `in` - A pointer to, or the literal value of the array to be checked.
+- `?` - The condition to test against each array value.
+- `!` - The action to perform on matching values.
 
 Example:
 

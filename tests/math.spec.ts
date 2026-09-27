@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-import { test } from "../src"
-import * as data from "./math.data.json"
+import { describe, it } from "vitest"
+import { test } from "../src/index.js"
+import data from "./math.data.json" with { type: "json" }
 import assert from "assert"
 
 describe("$gt", () => {

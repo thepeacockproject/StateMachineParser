@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-import { findNamedChild, set } from "../src/utils"
-import { handleActions, handleEvent } from "../src"
+import { describe, it } from "vitest"
+import { findNamedChild, set } from "../src/utils.js"
+import { handleActions, handleEvent } from "../src/index.js"
 import * as assert from "assert"
 
 describe("edge cases", () => {

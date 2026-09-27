@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-import { handleActions, test } from "./index"
-import { deepClone, findNamedChild, set } from "./utils"
-import {
+import { handleActions, test } from "./index.js"
+import { deepClone, findNamedChild, set } from "./utils.js"
+import type {
     HandleEventOptions,
     HandleEventReturn,
     InStateEventHandler,
     StateMachineLike,
-} from "./types"
+} from "./types.js"
 
 /**
  * This function simulates an event happening, as if in game.

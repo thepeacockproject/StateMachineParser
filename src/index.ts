@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-import { handleEvent } from "./handleEvent"
-import { HandleActionsOptions, TestOptions } from "./types"
-import { deepClone, findNamedChild, set } from "./utils"
-import { handleArrayLogic } from "./arrayHandling"
+import { handleEvent } from "./handleEvent.js"
+import type { HandleActionsOptions, TestOptions } from "./types.js"
+import { deepClone, findNamedChild, set } from "./utils.js"
+import { handleArrayLogic } from "./arrayHandling.js"
 
 /**
  * Recursively evaluate a value or object.
@@ -492,4 +492,4 @@ export function handleActions<Context>(
 }
 
 export { handleEvent }
-export * from "./types"
+export * from "./types.js"

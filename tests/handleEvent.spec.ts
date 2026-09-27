@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-import { handleEvent } from "../src"
+import { describe, it } from "vitest"
+import { handleEvent } from "../src/index.js"
 import assert from "assert"
-import * as suites from "./handleEvent.data.json"
+import suites from "./handleEvent.data.json" with { type: "json" }
 
 describe("handleEvent api", () => {
     it("can trace through a series of basic events", () => {

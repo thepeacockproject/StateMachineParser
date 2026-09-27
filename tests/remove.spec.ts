@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
+import { describe, it } from "vitest"
 import assert from "assert"
-import { handleActions } from "../src"
+import { handleActions } from "../src/index.js"
 
 const data = {
     Remove1: [

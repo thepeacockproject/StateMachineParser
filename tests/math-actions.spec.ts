@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-import { handleActions } from "../src"
+import { describe, it } from "vitest"
+import { handleActions } from "../src/index.js"
 import assert from "assert"
 
 const data = {

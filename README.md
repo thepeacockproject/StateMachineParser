@@ -34,6 +34,8 @@ Or, if you use npm:
 npm i @peacockproject/statemachine-parser
 ```
 
+This package is published as native ESM. It can also be loaded with `require()` on Node.js 20.19+ / 22.12+.
+
 ### Build from Source
 
 ```shell
@@ -46,7 +48,7 @@ yarn && yarn build
 ## Usage
 
 ```js
-const { test } = require("@peacockproject/statemachine-parser")
+import { test } from "@peacockproject/statemachine-parser"
 
 const condition = {
     $eq: ["$Value.Greeting", "Hi!"],

@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-import { findNamedChild, set } from "../src/utils"
+import { describe, it } from "vitest"
+import { findNamedChild, set } from "../src/utils.js"
 import * as assert from "assert"
 
 // the main purpose of this is just to improve code coverage

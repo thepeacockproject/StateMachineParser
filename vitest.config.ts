@@ -14,18 +14,15 @@
  *    limitations under the License.
  */
 
-import esbuild, { analyzeMetafile } from "esbuild"
+import { defineConfig } from "vitest/config"
 
-const esm = await esbuild.build({
-    entryPoints: ["src/index.ts"],
-    bundle: true,
-    write: true,
-    outdir: "build",
-    metafile: true,
-    sourcemap: true,
-    format: "esm",
-    platform: "neutral",
-    target: "es2022",
+export default defineConfig({
+    test: {
+        include: ["tests/**/*.{spec,test}.ts"],
+        coverage: {
+            provider: "v8",
+            include: ["src/**/*.ts"],
+            reporter: ["lcov", "text-summary"],
+        },
+    },
 })
-
-console.log(await analyzeMetafile(esm.metafile))

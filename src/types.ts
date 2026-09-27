@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import { findNamedChild } from "./utils"
+import type { findNamedChild } from "./utils.js"
 
 /**
  * A function that logs a message.

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import type { TestOptions, TestWithPathFunc } from "./index"
+import type { TestOptions, TestWithPathFunc } from "./index.js"
 
 const fillHashtags = (count: number): string => "#".repeat(count)
 
