@@ -12,7 +12,7 @@
         "verbatimModuleSyntax": true,
         "rootDir": "src",
         "skipLibCheck": true,
-        "stripInternal": true,
+        "stripInternal": false,
         "resolveJsonModule": true,
         "emitDeclarationOnly": true
     },
