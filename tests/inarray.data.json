@@ -118,7 +118,7 @@
     "Invalid_Crash_Nested": [
         {
             "$any": {
-                "in": "$.MyList",
+                "in": "$Value.MyList",
                 "?": {
                     "$any": {
                         "in": "$.#",

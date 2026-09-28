@@ -77,7 +77,7 @@ const data = {
     ],
     UndefinedCheck1: [
         {
-            $eq: ["$Value.a"],
+            $eq: ["$Value.a", "anything"],
         },
         {
             Value: {},
