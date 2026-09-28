@@ -26,6 +26,8 @@ This is a list of the possible nodes that can appear in a state machine, and wha
 
 These nodes all return boolean values, which represent if the checks inside these nodes pass or fail.
 
+A condition node is an object with exactly one key (the operator).
+
 ### `$eq`
 
 This node checks if the child elements are equal to each other.
